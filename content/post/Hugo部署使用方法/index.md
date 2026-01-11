@@ -5,6 +5,7 @@ draft = false
 image = "dragon.jpg"
 categories = ["博客相关"]
 tags = ["博客","笔记"]
+
 +++
 
 ##### 不管新增/修改/删除文章,始终是在本地文件中直接修改,然后设置:
@@ -42,3 +43,9 @@ Hugo无任何配置文件/注册表依赖，把博客根文件夹压缩备份后
 ##### catgories中文件的slug:
 
 如slug: "test",则这篇文章的最终访问地址 = https://kimkitsuragi0571.github.io/p/test/
+
+##### 在文章中创建分类时,为分类配置图片
+
+图片放在你博客根目录的 static文件夹里，新建一个 categories子文件夹，把你的分类封面图放进去即可
+
+文章里写的是 `categories = ["博客相关"]` → 图片名就叫 `博客相关.jpg`（或 png）
