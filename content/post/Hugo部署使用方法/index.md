@@ -1,9 +1,5 @@
 +++
-date = '2026-01-11T11:20:41+08:00'
-draft = false
-title = 'Hugo部署使用方法'
-
- cover: "104859212_p0.jpg" 
++++ title = "Hugo部署使用方法" date = "2026-01-11T11:20:41+08:00" draft = false cover = "dragon.jpg" +++
 
 +++
 
@@ -13,19 +9,15 @@ git add .
 git commit -m "新增文章：hugo部署使用方法"
 git push
 
-前两句指令可以直接合并为 git commit -am "修改文章：Hugo部署使用方法"
+##### 前两句指令可以直接合并为 git commit -am "修改文章：Hugo部署使用方法"
+
+`git commit -am` 【不能用于新增文章 / 新增文件】，只能用于「修改 / 删除」
 
 ##### 查看更新日志:
 
 git log
 
 ##### 为文章设置封面:
-
---- title: "Hugo部署使用方法"
-
- date: 2026-01-11Txx:xx:xx+08:00
-
- draft: false
 
  cover: "104859212_p0.jpg"  # ✅ 新增这一行！就是你的图片文件名 ---
 
