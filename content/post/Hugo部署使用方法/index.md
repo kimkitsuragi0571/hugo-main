@@ -49,3 +49,5 @@ Hugo无任何配置文件/注册表依赖，把博客根文件夹压缩备份后
 图片放在你博客根目录的 static文件夹里，新建一个 categories子文件夹，把你的分类封面图放进去即可
 
 文章里写的是 `categories = ["博客相关"]` → 图片名就叫 `博客相关.jpg`（或 png）
+
+在你的博客根目录，新建一个 `assets/data/taxonomies` 文件夹路径,然后在里面新建一个配置文件,文件名格式 = `categories.你的分类名.yml`其中内容为image: "/categories/博客相关.jpg"
