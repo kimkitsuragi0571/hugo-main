@@ -1,9 +1,9 @@
 ---
-title: "Test"
-description: "This is an example category"
+title: "博客相关"
+description: "搭建个人博客所所用相关笔记"
 slug: "test"
-image: "hutomo-abrianto-l2jk-uxb1BY-unsplash.jpg"
+image: "mountain.jpg"
 style:
-    background: "#2a9d8f"
-    color: "#fff"
+    background: "#0e8a7b"
+    color: "#61c496"
 ---

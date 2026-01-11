@@ -3,6 +3,8 @@ title = "Hugo部署使用方法"
 date = "2026-01-11T11:20:41+08:00"
 draft = false
 image = "dragon.jpg"
+categories = ["博客相关"]
+tags = ["博客","笔记"]
 +++
 
 ##### 不管新增/修改/删除文章,始终是在本地文件中直接修改,然后设置:
@@ -36,3 +38,7 @@ hugo new content post/PassageName/index.md
 
 Hugo无任何配置文件/注册表依赖，把博客根文件夹压缩备份后，重装系统解压即可直接使用。
 对存放路径无任何要求，只需要在解压后的博客主目录打开终端即可。
+
+##### catgories中文件的slug:
+
+如slug: "test",则这篇文章的最终访问地址 = https://kimkitsuragi0571.github.io/p/test/
