@@ -1,5 +1,7 @@
-baseurl: https://kimkitsuragi0571.github.io/
-title: PersonalWebsite 
+baseurl: https://kimkitsuragi-0571.github.io
+languageCode: en-us
+theme: hugo-theme-stack
+title: PersonalWebsite
 copyright: KimKitsuragi
 
 # Theme i18n support
@@ -10,8 +12,6 @@ DefaultContentLanguage: zh-cn
 # This will make .Summary and .WordCount behave correctly for CJK languages.
 hasCJKLanguage: true
 
-theme: hugo-theme-stack
-
 languages:
     en:
         languageName: English
@@ -20,22 +20,24 @@ languages:
         params:
             sidebar:
                 subtitle: You and I were born after the dust had settled, a thousandth of a second too late.
+            taxonomyImage: true
 
     zh-cn:
         languageName: 简体中文
-        title: Harrier Du Bois
+        title:  	Harrier Du Bois
         weight: 1
         params:
             sidebar:
                 subtitle: You and I were born after the dust had settled, a thousandth of a second too late.
-
+            taxonomyImage: true
+            
 services:
     # Change it to your Disqus shortname before using
     disqus:
         shortname: "hugo-theme-stack"
     # GA Tracking ID
     googleAnalytics:
-        id: ""
+        id:
 
 pagination:
     pagerSize: 5
@@ -48,7 +50,6 @@ params:
     mainSections:
         - post
     featuredImageField: image
-    taxonomyImage: true
     rssFullContent: true
     favicon: # e.g.: favicon placed in `static/favicon.ico` of your site folder, then set this field to `/favicon.ico` (`/` is necessary)
 
@@ -60,7 +61,7 @@ params:
         #文章日期
         published: 2006-01-02
         #网页中找不到的
-        lastUpdated: ""
+        lastUpdated: 
 
     sidebar:
         emoji: 🤔
@@ -170,7 +171,7 @@ params:
                   limit: 5
             - type: categories
               params:
-                  limit: 30
+                  limit: 10
            
         page:
             - type: toc
