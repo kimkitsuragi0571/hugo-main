@@ -228,6 +228,12 @@ menu:
           params:
               icon: brand-steam
 
+        - identifier: gitAction
+          name: GitAction
+          url: https://github.com/kimkitsuragi0571/hugo-main/actions
+          params:
+              icon: brand-gitAction      
+
 
 related:
     includeNewer: true
