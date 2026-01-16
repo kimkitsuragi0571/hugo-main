@@ -1,12 +1,15 @@
 <style>
-  body {
-    {{- $bg := false -}}
-    {{- range slice "background/bg.png" "background/bg.jpg" "background/bg.jpeg" "background/bg.webp" -}}
-      {{- if (resources.Get .) -}}
-        {{- $bg = (resources.Get .).Permalink -}}
-        {{- break -}}
+  {{- $bg := "" -}}
+  {{- $formats := slice "background/bg.webp" "background/bg.jpg" "background/bg.jpeg" "background/bg.png" -}}
+  {{- range $formats -}}
+    {{- if not $bg -}}
+      {{- with resources.Get . -}}
+        {{- $bg = .Permalink -}}
       {{- end -}}
     {{- end -}}
+  {{- end -}}
+
+  body {
     background: url("{{ $bg }}") no-repeat center top !important;
     background-size: cover !important;
     background-attachment: fixed !important;
@@ -17,5 +20,4 @@
   }
 </style>
 
-<!-- 在页面底部或其他合适位置插入 partial -->
 {{ partial "footer/fish.html" . }}
