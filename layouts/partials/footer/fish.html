@@ -1,0 +1,60 @@
+<!-- 1. 飞鱼容器 -->
+<div id="jsi-flying-fish-container"></div>
+
+<!-- 2. 样式 -->
+<style>
+#jsi-flying-fish-container {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 120px;
+    z-index: -1;
+    opacity: 0;          /* 默认隐藏 */
+    overflow: hidden;
+    pointer-events: none;
+    transition: opacity .3s;
+}
+/* 到底部时出现的类 */
+.show-fish #jsi-flying-fish-container {
+    opacity: .5;
+}
+</style>
+
+<!-- 3. 动态加载 fish.js 并初始化 -->
+<script>
+window.initFlyingFish = function () {
+    const container = document.getElementById('jsi-flying-fish-container');
+    if (!container) return;
+
+    /* 清空旧画布 */
+    const oldCanvas = container.querySelector('canvas');
+    if (oldCanvas) oldCanvas.remove();
+
+    /* 动态加载 fish.js */
+    const script = document.createElement('script');
+    script.src = 'https://cdn.meimolihan.eu.org/hugo/fish/fish.js';
+    script.onload = function () {
+        if (typeof RENDERER !== 'undefined') RENDERER.init();
+    };
+    document.head.appendChild(script);
+
+    /* 滚动到底部才显示 */
+    function checkBottom() {
+        const doc = document.documentElement;
+        const isBottom = (window.innerHeight + Math.ceil(window.pageYOffset))
+                         >= (doc.scrollHeight - 10);
+        document.body.classList.toggle('show-fish', isBottom);
+    }
+
+    /* 绑定滚动 */
+    window.addEventListener('scroll', checkBottom);
+    checkBottom(); // 首次检查
+};
+
+/* 第一次加载 */
+document.addEventListener('DOMContentLoaded', initFlyingFish);
+
+/* PJAX 完成后重新加载 */
+document.addEventListener('pjax:complete', initFlyingFish);
+</script>
