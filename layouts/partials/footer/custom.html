@@ -1,22 +1,35 @@
+<!-- 兼容性更好的版本 -->
 <style>
-  {{- $bg := "" -}}
-  {{- $formats := slice "background/bg.webp" "background/bg.jpg" "background/bg.jpeg" "background/bg.png" -}}
-  {{- range $formats -}}
-    {{- if not $bg -}}
-      {{- with resources.Get . -}}
-        {{- $bg = .Permalink -}}
-      {{- end -}}
-    {{- end -}}
-  {{- end -}}
-
-  body {
-    background: url("{{ $bg }}") no-repeat center top !important;
-    background-size: cover !important;
-    background-attachment: fixed !important;
+  /* 桌面端 */
+  @media (min-width: 769px) {
+    body {
+      background: url("/background/bg.jpeg") no-repeat center center fixed !important;
+      background-size: cover !important;
+      background-attachment: fixed !important;
+    }
+  }
+  
+  /* 移动端 */
+  @media (max-width: 768px) {
+    body {
+      background: url("/background/bg.jpeg") no-repeat center top !important;
+      background-size: cover !important;
+      background-attachment: scroll !important;
+    }
+  }
+  
+  /* 确保内容区域透明 */
+  #page-wrapper,
+  .main-content,
+  .container {
+    background: none !important;
     background-color: transparent !important;
   }
-  #page-wrapper {
-    background: none !important;
+  
+  /* 如果有遮罩层影响背景 */
+  .mask,
+  .overlay {
+    background-color: transparent !important;
   }
 </style>
 
