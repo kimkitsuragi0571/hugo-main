@@ -1,4 +1,4 @@
-<!-- 兼容性更好的版本 + 文章目录自动折叠/展开功能 -->
+<!-- 兼容性更好的版本 + 文章目录自动折叠/展开功能 + 全局布局/样式微调 + 文章内容/代码块/图片样式全部整合 -->
 <style>
   /* 桌面端背景样式 */
   @media (min-width: 769px) {
@@ -41,6 +41,272 @@
           display: block;
       }
   }
+
+  /*---------------------------------------------------*/
+  /* 全局页面布局间距调整 */
+  .main-container {
+    min-height: 100vh;
+    align-items: flex-start;
+    padding: 0 15px;
+    gap: var(--section-separation);
+    padding-top: var(--main-top-padding);
+  }
+  @media (min-width: 768px) {
+    .main-container {
+      padding: 0 37px;
+    }
+  }
+
+  /*--------------------------------------------------*/
+  /* 页面三栏宽度调整 */
+  .container {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .container .left-sidebar {
+    order: -3;
+    max-width: var(--left-sidebar-max-width);
+  }
+  .container .right-sidebar {
+    order: -1;
+    max-width: var(--right-sidebar-max-width);
+  }
+  @media (min-width: 1024px) {
+    .container .right-sidebar {
+      display: flex;
+    }
+  }
+  .container.extended {
+    @media (min-width: 768px) {
+      max-width: 1024px;
+      --left-sidebar-max-width: 25%;
+      --right-sidebar-max-width: 22% !important;
+    }
+    @media (min-width: 1024px) {
+      max-width: 1280px;
+      --left-sidebar-max-width: 20%;
+      --right-sidebar-max-width: 30%;
+    }
+    @media (min-width: 1280px) {
+      max-width: 1453px; /*1536px;*/
+      --left-sidebar-max-width: 15%;
+      --right-sidebar-max-width: 25%;
+    }
+  }
+  .container.compact {
+    @media (min-width: 768px) {
+      --left-sidebar-max-width: 25%;
+      max-width: 768px;
+    }
+    @media (min-width: 1024px) {
+      max-width: 1024px;
+      --left-sidebar-max-width: 20%;
+    }
+    @media (min-width: 1280px) {
+      max-width: 1280px;
+    }
+  }
+
+  /*-------------------------------------------------------*/
+  /* 全局页面小图片样式微调 */
+  .article-list--compact article .article-image img {
+    width: var(--image-size);
+    height: var(--image-size);
+    object-fit: cover;
+    border-radius: 17%;
+  }
+
+  /* -------------------------------- */
+  /* 下拉菜单改圆角样式 */
+  .menu {
+    padding-left: 0;
+    list-style: none;
+    flex-direction: column;
+    overflow-x: hidden;
+    flex-grow: 1;
+    font-size: 1.6rem;
+    background-color: var(--card-background);
+    box-shadow: none;
+    display: none;
+    margin: 0; /*改为0*/
+    border-radius: 10px; /*加个圆角*/
+    padding: 30px 30px;
+  }
+  @media (min-width: 1280px) {
+    .menu {
+      padding: 15px 0;
+    }
+  }
+  .menu, .menu-bottom-section {
+    gap: 30px;
+  }
+  @media (min-width: 1280px) {
+    .menu, .menu-bottom-section {
+      gap: 25px;
+    }
+  }
+  .menu.show {
+    display: flex;
+  }
+  @media (min-width: 768px) {
+    .menu {
+      align-items: flex-end;
+      display: flex;
+      background-color: transparent;
+      padding: 0;
+      box-shadow: none;
+      margin: 0;
+    }
+  }
+  .menu li {
+    position: relative;
+    vertical-align: middle;
+	padding: 0;
+  }
+  @media (min-width: 768px) {
+    .menu li {
+      width: 100%;
+    }
+  }
+  .menu li svg {
+    stroke-width: 1.33;
+    width: 20px;
+    height: 20px;
+  }
+  .menu li a {
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    color: var(--body-text-color);
+    gap: var(--menu-icon-separation);
+  }
+  .menu li span {
+    flex: 1;
+  }
+  .menu li.current a {
+    color: var(--accent-color);
+    font-weight: bold;
+  }
+
+  /*手机模式下的菜单滚动条美化*/
+  .menu::-webkit-scrollbar {
+    display: none; /*防止大屏幕时出现滚动条*/
+  }
+
+  .sidebar header .site-name {
+    margin: 8px;
+    font-size: 2rem; /*字体大小*/
+  }
+
+  /*------------------------------------------------*/
+  /* 文章内容引用块样式 */
+  .article-content blockquote {
+    border-left: 6px solid #358b9a1f !important;
+    background: #3a97431f;
+  }
+
+  /* --------------------------------------- */
+  /* 代码块基础样式修改 */
+  .highlight {
+    max-width: 102% !important;
+    background-color: var(--pre-background-color);
+    padding: var(--card-padding);
+    position: relative;
+    border-radius: 20px;
+    margin-left: -7px !important;
+    margin-right: -12px;
+    box-shadow: var(--shadow-l1) !important;
+  }
+  .highlight:hover .copyCodeButton {
+    opacity: 1;
+  }
+  /* keep Codeblocks LTR */
+  [dir="rtl"] .highlight {
+    direction: ltr;
+  }
+  .highlight pre {
+    margin: initial;
+    padding: 0;
+    margin: 0;
+    width: auto;
+  }
+
+  /*----------------------------------------------*/
+  /* light模式下的代码块样式调整 */
+  [data-scheme="light"] .article-content .highlight {
+    background-color: #fff9f3;
+  }
+  [data-scheme="light"] .chroma {
+    color: #ff6f00;
+    background-color: #fff9f3cc;
+  }
+
+  /*---------------------------------------------------*/
+  /* 文章内容图片圆角 */
+  .article-page .main-article .article-content img {
+    max-width: 96% !important;
+    height: auto !important;
+    border-radius: 8px;
+  }
+
+  /*-------------------------------------------*/
+  /* 设置选中字体的区域背景颜色 */
+  ::selection {
+    color: #fff;
+    background: #001572;
+  }
+
+  /* 超链接样式全局配置 */
+  a {
+    text-decoration: none;
+    color: var(--accent-color);
+  }
+  a:hover {
+    color: var(--accent-color-darker);
+  }
+  a .link {
+    font-weight: 800; /* 字体粗细为700（加粗） */
+    padding: 0 2px; /* 内边距为左右各2px */
+    text-decoration: none; /* 取消默认的下划线 */
+    cursor: pointer; /* 鼠标指针为指针样式 */
+    color: #000000; /* 明亮模式下链接字体为黑色#000000 */
+  }
+  a .link:hover {
+    text-decoration: underline;
+  }
+  /* 暗色模式超链接颜色适配 */
+  @media (prefers-color-scheme: dark) {
+    a .link {
+      color: #FFFFFF; /* 暗色模式下链接字体为白色#FFFFFF */
+    }
+  }
+
+  /*-------------------------------------------------*/
+  /* 文章封面高度更改 */
+  .article-list article .article-image img {
+    width: 100%;
+    height: 150px; /* 设置图片的高度为 150px */
+    object-fit: cover;
+  }
+  @media (min-width: 768px) {
+    .article-list article .article-image img {
+      height: 200px;
+    }
+  }
+  @media (min-width: 1280px) {
+    .article-list article .article-image img {
+      height: 305px;
+    }
+  }
+
+  /*------------------------------------------------------*/
+  /* 修复引用块内容窄页面显示问题 */
+  a {
+    word-break: break-all;
+  }
+  code {
+    word-break: break-all;
+  }
 </style>
 
 <script>
@@ -73,7 +339,7 @@
             do {
                 ul.classList.add("open");
                 ul = ul.parentElement.parentElement
-            } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
+           } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
         });
     }
     initTocHide()
