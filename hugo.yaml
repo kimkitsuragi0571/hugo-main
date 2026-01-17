@@ -13,22 +13,14 @@ DefaultContentLanguage: zh-cn
 hasCJKLanguage: true
 
 languages:
-    en:
-        languageName: English
-        title:  	Harrier Du Bois
-        weight: 2
-        params:
-            sidebar:
-                subtitle: You and I were born after the dust had settled, a thousandth of a second too late.
-            taxonomyImage: true
 
     zh-cn:
         languageName: 简体中文
-        title:  	Harrier Du Bois
+        title:  	IBN5100
         weight: 1
         params:
             sidebar:
-                subtitle: You and I were born after the dust had settled, a thousandth of a second too late.
+                subtitle: 相逢在宇宙
             taxonomyImage: true
             
 services:
@@ -278,3 +270,4 @@ markup:
         lineNos: true
         lineNumbersInTable: true
         tabWidth: 4
+        style: github-dark

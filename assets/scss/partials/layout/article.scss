@@ -1,0 +1,187 @@
+// ==================================================
+// ./assets/scss/partials/layout/article.scss
+// 纯文章相关样式 无任何custom.scss内容 纯净完整版
+// ==================================================
+
+//------------------------------------------------
+// 文章内容 - 引用块样式 (墨绿色最新版)
+.article-content {
+  blockquote {
+    border-left: 6px solid #004b28 !important;
+    background: #366e33;
+  }
+
+  // ✅ 精准添加 你的需求【1】：图床链接的图片居中 (Line 256 同级位置，已加入)
+  // 功能：让外部图床的图片/Markdown插入的外链图片 完全居中显示
+  p > img {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+//---------------------------------------------------
+// 文章内容 - 正文图片样式
+.article-page .main-article .article-content {
+  img {
+    max-width: 96% !important;
+    height: auto !important;
+    border-radius: 8px;
+  }
+}
+
+// ---------------------------------------
+// 文章内容 - 代码块基础样式
+.highlight {
+  max-width: 102% !important;
+  background-color: var(--pre-background-color);
+  padding: var(--card-padding);
+  position: relative;
+  border-radius: 20px;
+  margin-left: -7px !important;
+  margin-right: -12px;
+  box-shadow: var(--shadow-l1) !important;
+
+  &:hover {
+    .copyCodeButton {
+      opacity: 1;
+    }
+  }
+
+  // keep Codeblocks LTR
+  [dir="rtl"] & {
+    direction: ltr;
+  }
+
+  pre {
+    margin: initial;
+    padding: 0;
+    margin: 0;
+    width: auto;
+  }
+}
+
+//----------------------------------------------
+// 文章内容 - 亮色模式 代码块配色调整
+[data-scheme="light"] .article-content .highlight {
+  background-color: #fff9f3;
+}
+
+[data-scheme="light"] .chroma {
+  color: #ff6f00;
+  background-color: #fff9f3cc;
+}
+
+//-------------------------------------------
+// 文章内容 - 选中文本背景色
+::selection {
+  color: #fff;
+  background: #001572;
+}
+
+//-------------------------------------------
+// 文章内容 - 超链接+代码换行 样式修复
+a {
+  text-decoration: none;
+  color: var(--accent-color);
+  word-break: break-all;
+
+  &:hover {
+    color: var(--accent-color-darker);
+  }
+
+  .link {
+    font-weight: 800;
+    padding: 0 2px;
+    text-decoration: none;
+    cursor: pointer;
+    color: #000000;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .link {
+      color: #FFFFFF;
+    }
+  }
+}
+
+code {
+  word-break: break-all;
+}
+
+//-------------------------------------------------
+// 文章列表 - 主页文章封面图片 全套样式
+$image-scale: 1.2;
+.article-list article .article-image img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  transition: transform 0.85s ease-in-out !important;
+
+  @include respond(sm) { height: 305px; }
+  @include respond(md) { height: 305px; }
+  @include respond(xl) { height: 325px; }
+}
+
+// 主页文章卡片圆角
+.article-list article {
+  --card-border-radius: 24px;
+}
+
+// 文章分类/标签圆角
+.article-category a, .article-tags a {
+  border-radius: 11px;
+}
+
+// 主页文章图片 悬停放大动画（必生效）
+.article-list article .article-image {
+  position: relative;
+  overflow: hidden !important;
+}
+.article-list article .article-image img:hover {
+  transform: scale($image-scale) !important;
+}
+
+//-------------------------------------------------
+// 文章内页脚 - 相关文章(紧凑列表) 专属样式
+// 相关文章小图17%圆角
+.article-list--compact article .article-image img {
+  width: var(--image-size);
+  height: var(--image-size);
+  object-fit: cover;
+  border-radius: 17% !important;
+  transition: all 0.6s ease !important;
+}
+
+// 相关文章卡片 整体悬停放大动画（必生效）
+.article-list--compact article > a {
+  display: block !important;
+  transition: transform 0.6s ease !important;
+  transform-origin: center center !important;
+}
+.article-list--compact article > a:hover {
+  transform: scale(1.03) !important;
+  overflow: visible;
+}
+
+// ✅ 精准添加 你的需求【2】：文件末尾追加代码块样式修改 (全部要求完整实现)
+// --------------------代码块样式优化------------------------
+// * 修改边距 - 重置左右边距为0，消除溢出
+// * 背景框添加圆角 - 使用全局卡片统一圆角变量
+// * 调整 copy 按钮位置 - 右上6px 精准定位
+.highlight {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: calc(100%) !important;
+    border-radius: var(--card-border-radius) !important;
+}
+
+.copyCodeButton {
+    top: 6px !important;
+    right: 6px !important;
+}

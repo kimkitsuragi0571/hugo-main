@@ -65,3 +65,27 @@ footer:
 
     designedBy:
         other: 主题 {{ .Theme }} 由 {{ .DesignedBy }} 设计
+
+    # 本博客已稳定运行1天2小时3分钟
+    runtime1:
+        other: 本站稳定运行：
+    runtime2:
+        other: 天
+    runtime3:
+        other: 小时
+    runtime4:
+        other: 分钟
+
+    # 共发表x篇文章，总计y k字
+    count1:
+        other: 共发表文章数：
+    count2:
+        other: 篇 · 总计
+    count3:
+        other: 字
+
+    # 本站总访问量X次
+    pv1:
+        other: 本站总访问量：
+    pv2:
+        other: 次

@@ -1,6 +1,6 @@
-<!-- 兼容性更好的版本 -->
+<!-- 兼容性更好的版本 + 文章目录自动折叠/展开功能 -->
 <style>
-  /* 桌面端 */
+  /* 桌面端背景样式 */
   @media (min-width: 769px) {
     body {
       background: url("/background/bg.jpeg") no-repeat center center fixed !important;
@@ -9,7 +9,7 @@
     }
   }
   
-  /* 移动端 */
+  /* 移动端背景样式 */
   @media (max-width: 768px) {
     body {
       background: url("/background/bg.jpeg") no-repeat center top !important;
@@ -31,6 +31,52 @@
   .overlay {
     background-color: transparent !important;
   }
+
+  /* 文章目录默认折叠+展开样式 核心新增 */
+  #TableOfContents > ul, #TableOfContents > ol {
+      ul, ol {
+          display: none;
+      }
+      .open {
+          display: block;
+      }
+  }
 </style>
+
+<script>
+    function initTocHide() {
+        // 判断是否存在文章目录
+        let toc = document.querySelector(".widget--toc");
+        if (!toc) {
+            return;
+        }
+        // 监听滚动
+        window.addEventListener('scroll', function() {
+            //清除class值
+            let openUl = document.querySelectorAll(".open");
+            if (openUl.length > 0) {
+              openUl.forEach((ul) => {
+                ul.classList.remove("open")
+              })
+            }
+            // 获取active-class
+            let currentLi = document.querySelector(".active-class");
+            if (!currentLi) {
+                return
+            }
+            // 展示子ul
+            if (currentLi.children.length > 1) {
+                currentLi.children[1].classList.add("open")
+            }
+            // 展示父ul
+            let ul = currentLi.parentElement;
+            do {
+                ul.classList.add("open");
+                ul = ul.parentElement.parentElement
+            } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
+        });
+    }
+    initTocHide()
+</script>
 
 {{ partial "footer/fish.html" . }}

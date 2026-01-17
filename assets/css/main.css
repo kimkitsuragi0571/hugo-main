@@ -1,0 +1,50 @@
+/* 文章代码块容器样式 - 核心基础 */
+.article-content div.highlight {
+  position: relative;
+  margin: 1rem 0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* 拷贝按钮 + 语言标识按钮 通用样式 (整合所有优化) */
+.copyCodeButton, .languageCodeButton {
+  position: absolute;
+  top: 8px;
+  border: none;
+  outline: none;
+  background: rgba(0,0,0,0.5);
+  color: #ffffff;
+  padding: 3px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: background 0.2s ease;
+  z-index: 999; /* 最高层级，永远不会被代码块滚动条/内容遮挡 */
+}
+
+/* 按钮悬浮变色效果 - 交互更友好 */
+.copyCodeButton:hover, .languageCodeButton:hover {
+  background: rgba(0,0,0,0.7);
+}
+
+/* 按钮位置分配 */
+.languageCodeButton { right: 8px; }
+.copyCodeButton { right: 70px; }
+
+/* 暗黑模式 按钮样式适配 */
+.dark .copyCodeButton, .dark .languageCodeButton {
+  background: rgba(255,255,255,0.2);
+}
+.dark .copyCodeButton:hover, .dark .languageCodeButton:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+/* 代码块文字选中高亮配色 - 补充优化，选中代码更舒服 */
+.article-content div.highlight code::selection {
+  background: rgba(128, 183, 255, 0.3);
+  color: inherit;
+}
+.dark .article-content div.highlight code::selection {
+  background: rgba(128, 183, 255, 0.2);
+}
