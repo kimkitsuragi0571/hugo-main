@@ -1,124 +1,122 @@
-// 通用全局样式与功能初始化
-document.addEventListener('DOMContentLoaded', () => {
-  // 导航栏滚动效果
-  const header = document.querySelector('header');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-      header?.classList.add('scrolled');
-    } else {
-      header?.classList.remove('scrolled');
-    }
-  });
+/*!
+*   Hugo Theme Stack
+*
+*   @author: Jimmy Cai
+*   @website: https://jimmycai.com
+*   @link: https://github.com/CaiJimmy/hugo-theme-stack
+*/
+import StackGallery from "ts/gallery";
+import { getColor } from 'ts/color';
+import menu from 'ts/menu';
+import createElement from 'ts/createElement';
+import StackColorScheme from 'ts/colorScheme';
+import { setupScrollspy } from 'ts/scrollspy';
+import { setupSmoothAnchors } from "ts/smoothAnchors";
 
-  // 移动端菜单切换
-  const menuToggle = document.getElementById('menu-toggle');
-  const navMenu = document.getElementById('nav-menu');
-  menuToggle?.addEventListener('click', () => {
-    navMenu?.classList.toggle('active');
-    menuToggle.classList.toggle('active');
-  });
+let Stack = {
+    init: () => {
+        /**
+         * Bind menu event
+         */
+        menu();
 
-  // 回到顶部按钮
-  const backToTop = document.getElementById('back-to-top');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
-      backToTop?.classList.add('show');
-    } else {
-      backToTop?.classList.remove('show');
-    }
-  });
-  backToTop?.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
+        const articleContent = document.querySelector('.article-content') as HTMLElement;
+        if (articleContent) {
+            new StackGallery(articleContent);
+            setupSmoothAnchors();
+            setupScrollspy();
+        }
 
-  // 文章内容 代码块 语言标识 + 一键复制 功能 (✅修复BUG+优化完成)
-  const highlights = document.querySelectorAll(".article-content div.highlight");
-  const copyText = `📄拷贝`,
+        /**
+         * Add linear gradient background to tile style article
+         */
+        const articleTile = document.querySelector('.article-list--tile');
+        if (articleTile) {
+            let observer = new IntersectionObserver(async (entries, observer) => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    observer.unobserve(entry.target);
+
+                    const articles = entry.target.querySelectorAll('article.has-image');
+                    articles.forEach(async articles => {
+                        const image = articles.querySelector('img'),
+                            imageURL = image.src,
+                            key = image.getAttribute('data-key'),
+                            hash = image.getAttribute('data-hash'),
+                            articleDetails: HTMLDivElement = articles.querySelector('.article-details');
+
+                        const colors = await getColor(key, hash, imageURL);
+
+                        articleDetails.style.background = `
+                        linear-gradient(0deg, 
+                            rgba(${colors.DarkMuted.rgb[0]}, ${colors.DarkMuted.rgb[1]}, ${colors.DarkMuted.rgb[2]}, 0.5) 0%, 
+                            rgba(${colors.Vibrant.rgb[0]}, ${colors.Vibrant.rgb[1]}, ${colors.Vibrant.rgb[2]}, 0.75) 100%)`;
+                    })
+                })
+            });
+
+            observer.observe(articleTile)
+        }
+
+
+        /**
+         * Add copy button to code block
+        */
+const highlights = document.querySelectorAll(".article-content div.highlight");
+const copyText = `📄拷贝`,
     copiedText = `已拷贝!`;
 
-  highlights.forEach((highlight) => {
+highlights.forEach((highlight) => {
     const copyButton = document.createElement("button");
-    copyButton.textContent = copyText; // ✅优化：用textContent保证表情正常显示
+    copyButton.innerHTML = copyText;
     copyButton.classList.add("copyCodeButton");
     highlight.appendChild(copyButton);
 
     const codeBlock = highlight.querySelector("code[data-lang]");
-    // ✅修复致命BUG：先判断是否获取到元素，再取值，彻底杜绝控制台报错
-    if (!codeBlock) return;
     // 获取语言
     const lang = codeBlock.getAttribute("data-lang");
+    if (!codeBlock) return;
 
     copyButton.addEventListener("click", () => {
-      navigator.clipboard
-        .writeText(codeBlock.textContent)
-        .then(() => {
-          copyButton.textContent = copiedText;
-          setTimeout(() => {
-            copyButton.textContent = copyText;
-          }, 1000);
-        })
-        .catch((err) => {
-          alert(err);
-          console.log("Something went wrong", err);
-        });
+        navigator.clipboard
+            .writeText(codeBlock.textContent)
+            .then(() => {
+                copyButton.textContent = copiedText;
+
+                setTimeout(() => {
+                    copyButton.textContent = copyText;
+                }, 1000);
+            })
+            .catch((err) => {
+                alert(err);
+                console.log("Something went wrong", err);
+            });
     });
 
     // Add language code button
     const languageButton = document.createElement("button");
     languageButton.innerHTML = lang.toUpperCase() + "&nbsp;&nbsp;";
     languageButton.classList.add("languageCodeButton");
-    highlight.appendChild(languageButton);
-  });
 
-  // 暗黑模式切换初始化
-  new StackColorScheme(document.getElementById("dark-mode-toggle"));
+    highlight.appendChild(languageButton);
 });
 
-// 暗黑模式核心类 - 完整保留，必不可少
-class StackColorScheme {
-  private toggle: HTMLElement | null;
-  private scheme: 'light' | 'dark' | 'auto';
-
-  constructor(toggleElement: HTMLElement | null) {
-    this.toggle = toggleElement;
-    this.scheme = this.getSavedScheme();
-    this.init();
-    this.bindToggle();
-  }
-
-  private getSavedScheme(): 'light' | 'dark' | 'auto' {
-    const saved = localStorage.getItem('stack-color-scheme');
-    return (saved as 'light' | 'dark' | 'auto') || 'auto';
-  }
-
-  private init() {
-    this.applyScheme(this.scheme);
-    this.syncToggleState();
-  }
-
-  private applyScheme(scheme: 'light' | 'dark' | 'auto') {
-    const root = document.documentElement;
-    root.classList.remove('light', 'dark');
-    if (scheme === 'auto') {
-      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      root.classList.add(isDark ? 'dark' : 'light');
-    } else {
-      root.classList.add(scheme);
+        new StackColorScheme(document.getElementById('dark-mode-toggle'));
     }
-  }
-
-  private syncToggleState() {
-    if (!this.toggle) return;
-    this.toggle.setAttribute('data-scheme', this.scheme);
-  }
-
-  private bindToggle() {
-    if (!this.toggle) return;
-    this.toggle.addEventListener('click', () => {
-      this.scheme = this.scheme === 'light' ? 'dark' : this.scheme === 'dark' ? 'auto' : 'light';
-      localStorage.setItem('stack-color-scheme', this.scheme);
-      this.applyScheme(this.scheme);
-      this.syncToggleState();
-    });
-  }
 }
+
+window.addEventListener('load', () => {
+    setTimeout(function () {
+        Stack.init();
+    }, 0);
+})
+
+declare global {
+    interface Window {
+        createElement: any;
+        Stack: any
+    }
+}
+
+window.Stack = Stack;
+window.createElement = createElement;

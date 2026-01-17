@@ -13,16 +13,15 @@ DefaultContentLanguage: zh-cn
 hasCJKLanguage: true
 
 languages:
-
     zh-cn:
         languageName: 简体中文
-        title:  	IBN5100
+        title: IBN5100
         weight: 1
         params:
             sidebar:
                 subtitle: 相逢在宇宙
             taxonomyImage: true
-            
+
 services:
     # Change it to your Disqus shortname before using
     disqus:
@@ -39,6 +38,9 @@ permalinks:
     page: /:slug/
 
 params:
+    # =============== 新增：开屏加载动画 ===============
+    enablePreloadingAnim: true  # 开屏动画，false为关闭，true为开启
+
     mainSections:
         - post
     featuredImageField: image
@@ -70,7 +72,8 @@ params:
         license:
             enabled: true
             default: KK57-0803.0815
-#文章下面的评论
+
+    #文章下面的评论
     comments:
         enabled: false
         provider: disqus
@@ -155,6 +158,7 @@ params:
         cusdis:
             host:
             id:
+
     widgets:
         homepage:
             - type: search
@@ -164,7 +168,7 @@ params:
             - type: categories
               params:
                   limit: 10
-           
+
         page:
             - type: toc
 
@@ -216,7 +220,7 @@ menu:
           url: https://space.bilibili.com/3546865758898959?spm_id_from=333.788.0.0
           params:
               icon: brand-bilibili
-              
+
         - identifier: steam
           name: Steam
           url: https://steamcommunity.com/profiles/76561199047374887/
@@ -227,8 +231,7 @@ menu:
           name: GitAction
           url: https://github.com/kimkitsuragi0571/hugo-main/actions
           params:
-              icon: brand-gitAction      
-
+              icon: brand-gitAction
 
 related:
     includeNewer: true

@@ -1,0 +1,16 @@
+{{ if fileExists "assets/font/AaYuanWeiTuSi-2.ttf" }}
+<style>
+  @font-face {
+    font-family: 'YuanWei';
+    src: url('{{ (resources.Get "font/AaYuanWeiTuSi-2.ttf").Permalink }}') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --base-font-family: 'YuanWei', sans-serif;
+    --code-font-family: 'YuanWei', monospace;
+  }
+</style>
+{{ end }}

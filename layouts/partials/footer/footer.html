@@ -8,24 +8,68 @@
         {{ now.Format "2006" }} {{ default .Site.Title .Site.Copyright }}
     </section>
     
-    <section class="powerby">
-        {{ with .Site.Params.footer.customText }}
-            {{ . | safeHTML }} <br/>
+
+
+   <!-- =============== 新增：运行时间 + 文章统计 + 访问量（统一青色字体） =============== -->
+<section class="count_info" style="color: #00ffd9 !important;">
+    <div>
+        {{ T "footer.runtime1" }}
+        <span id="ds" class="running-days number-highlight"></span>
+        {{ T "footer.runtime2" }}
+        <span id="hs" class="running-days number-highlight"></span>
+        {{ T "footer.runtime3" }}
+        <span id="ms" class="running-days number-highlight"></span>
+        {{ T "footer.runtime4" }}
+    </div>
+    <div>
+        {{ $totalWords := 0 }}
+        {{ range where .Site.Pages "Kind" "page" }}
+            {{ $totalWords = add $totalWords .WordCount }}
         {{ end }}
+        {{ T "footer.count1" }}
+        <span class="number-highlight">{{ len (where .Site.RegularPages "Section" "post") }}</span>
+        {{ T "footer.count2" }}
+        <span class="number-highlight">{{ div $totalWords 1000.0 | lang.FormatNumber 2 }}</span>
+        k {{ T "footer.count3" }}
+    </div>
+    <div>
+        <span id="busuanzi_container_site_pv">
+            {{ T "footer.pv1" }}
+            <span id="busuanzi_value_site_pv" class="number-highlight"></span>
+            {{ T "footer.pv2" }}
+        </span>
+    </div>
+</section>
 
-        {{ $articleCount := len .Site.RegularPages }}
-        {{ $totalWordCount := 0 }}
-        {{ range .Site.Pages }}
-        {{ $totalWordCount = add $totalWordCount .WordCount }}
-        {{ end }}
+<!-- =============== 网站运行时间计算脚本 =============== -->
+<script>
+(function() {
+    // ⚠️ 请修改为你的网站实际上线日期
+    const startDate = '2026-01-01';
+    const s1 = new Date(startDate.replace(/-/g, "/"));
+    const s2 = new Date();
+    const diff = s2.getTime() - s1.getTime();
 
-        <p>发布了 {{ $articleCount }} 篇文章 | 共 {{$totalWordCount}} 字</p>
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 
-        {{- $Generator := `<a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a>` -}}
-        {{- $Theme := printf `<b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="%s">Stack</a></b>` $ThemeVersion -}}
-        {{- $DesignedBy := `<a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>` -}}
+    const ds = document.getElementById('ds');
+    const hs = document.getElementById('hs');
+    const ms = document.getElementById('ms');
 
-        {{ T "footer.builtWith" (dict "Generator" $Generator) | safeHTML }} <br />
-        {{ T "footer.designedBy" (dict "Theme" $Theme "DesignedBy" $DesignedBy) | safeHTML }}
-    </section>
-</footer>
+    if (ds) ds.textContent = days;
+    if (hs) hs.textContent = hours;
+    if (ms) ms.textContent = minutes;
+
+    const pv = document.getElementById('busuanzi_value_site_pv');
+    if (pv) {
+        pv.classList.add('number-highlight');
+        pv.style.color = '#00ffd9';
+        pv.style.fontWeight = 'bold';
+    }
+})();
+</script>
+
+<!-- =============== 不蒜子统计（异步加载）=============== -->
+<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>

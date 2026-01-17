@@ -284,3 +284,19 @@ p > img {
     max-width: 100%;
     height: auto;
 }
+
+// --------------------代码块样式------------------------
+// * 修改边距
+// * 背景框添加圆角
+// * 调整 copy 按钮位置
+.highlight {
+    margin-left: 0;
+    margin-right: 0;
+    width: calc(100%);
+    border-radius: var(--card-border-radius);
+}
+
+.copyCodeButton {
+    top: 6px;
+    right: 6px;
+}

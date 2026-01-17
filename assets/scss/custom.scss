@@ -1,306 +1,235 @@
-// ---------------页面基本配色---------------
+// 【Stack主题鼠标样式写法】
+// default光标图片
+body,
+html,
+.article-content img {
+  cursor: url(../mouse/default.png), auto !important;
+}
+
+// pointer光标图片
+a:hover,
+button:hover,
+.copyCodeButton:hover,
+#dark-mode-toggle {
+  cursor: url(../mouse/pointer.png), auto;
+}
+
+// text光标图片
+input:hover,
+.site-description,
+.article-subtitle,
+.article-content span,
+.article-content li,
+.article-content p {
+  cursor: url(../mouse/text.png), auto;
+}
+
+// ----------------首页欢迎板块样式----------------
+.welcome {
+  color: var(--card-text-color-main);
+  background: var(--card-background);
+  box-shadow: var(--shadow-l2);
+  border-radius: 30px;
+  display: inline-block;
+  padding: 16px 24px;
+  margin: 30px auto;
+  animation: fadeIn 0.8s ease-out;
+}
+
+// 👋emoji实现摆动效果
+.shake {
+  display: inline-block;
+  animation: shake 1s ease 2s 1 normal none running;
+}
+
+// 实现字符跳动动画
+.jump-text1 { display: inline-block; animation: jump 0.5s 1; }
+.jump-text2 { display: inline-block; animation: jump 0.5s 1 0.1s; }
+.jump-text3 { display: inline-block; animation: jump 0.5s 1 0.2s; }
+.jump-text4 { display: inline-block; animation: jump 0.5s 1 0.3s; }
+.jump-text5 { display: inline-block; animation: jump 0.5s 1 0.4s; }
+.jump-text6 { display: inline-block; animation: jump 0.5s 1 0.5s; }
+.jump-text7 { display: inline-block; animation: jump 0.5s 1 0.6s; }
+.jump-text8 { display: inline-block; animation: jump 0.5s 1 0.7s; }
+.jump-text9 { display: inline-block; animation: jump 0.5s 1 0.9s; }
+
+// =============== 动画定义（必须在顶层）===============
+@keyframes shake {
+  0%   { transform: rotate(0); }
+  25%  { transform: rotate(45deg) scale(1.2); }
+  50%  { transform: rotate(0) scale(1.2); }
+  75%  { transform: rotate(45deg) scale(1.2); }
+  100% { transform: rotate(0); }
+}
+
+@keyframes jump {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-20px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// =====================================================
+// --------------- 页面基本配色 (全局变量优先置顶) ---------------
+// =====================================================
 :root {
   // 全局顶部边距
-  --main-top-padding: 30px;
+  --main-top-padding: 30px !important;
   // 全局卡片圆角
-  --card-border-radius: 25px;
+  --card-border-radius: 25px !important;
   // 标签云卡片圆角
-  --tag-border-radius: 8px;
+  --tag-border-radius: 8px !important;
   // 卡片间距
-  --section-separation: 40px;
+  --section-separation: 40px !important;
   // 全局字体大小
-  --article-font-size: 1.8rem;
+  --article-font-size: 1.8rem !important;
   // 行内代码背景色
-  --code-background-color: #f8f8f8;
+  --code-background-color: #f8f8f8 !important;
   // 行内代码前景色
-  --code-text-color: #e96900;
-  // ✅ 新增 墨绿色主题色变量 (和引用块颜色统一，全站复用)
-  --hover-green-color: #366e33;
-  --hover-green-bg:  #366e33;
+  --code-text-color: #e96900 !important;
+  // 链接高亮背景色（RGB格式，用于rgba）
+  --link-background-color: 255, 165, 0 !important; // 橙色
+  --link-background-opacity-hover: 0.25 !important;
 }
-// 暗色模式下样式 - 语法修正：独立根选择器 确保生效
-// 暗色模式下样式 - 适配Stack主题原生的暗黑模式类名 ✅ 修复冲突
+// 暗色模式变量 (兼容写法，无嵌套，无编译隐患)
 [data-scheme="dark"] {
-  --code-background-color: #ff6d1b17;
-  --code-text-color: #e96900;
-  // ✅ 暗色模式下的墨绿色适配 (更亮一点，保证可见度)
-  --hover-green-color:  #366e33;
-  --hover-green-bg:  #366e33;
-  
-  // 其他暗色模式样式...
+  --code-background-color: #ff6d1b17 !important;
+  --code-text-color: #e96900 !important;
 }
-//---------------------------------------------------
-// 全局页面布局间距调整
+
+// =====================================================
+// --------------- 背景图核心样式 (必加，恢复背景显示) ---------------
+// =====================================================
+/* 桌面端背景图 - 居中固定 不滚动 */
+@media (min-width: 769px) {
+  body {
+    background: url("/background/bg.jpeg") no-repeat center center fixed !important;
+    background-size: cover !important;
+    background-attachment: fixed !important;
+    background-color: transparent !important;
+  }
+}
+/* 移动端背景图 - 顶部显示 随滚动 */
+@media (max-width: 768px) {
+  body {
+    background: url("/background/bg.jpeg") no-repeat center top !important;
+    background-size: cover !important;
+    background-attachment: scroll !important;
+    background-color: transparent !important;
+  }
+}
+/* 容器透明穿透 - 背景图能显示出来的关键 */
+#page-wrapper, .main-content, .container {
+  background: none !important;
+  background-color: transparent !important;
+}
+.mask, .overlay {
+  background-color: transparent !important;
+}
+
+// =====================================================
+// --------------- 全局页面布局间距调整 ---------------
+// =====================================================
 .main-container {
-  min-height: 100vh;
-  align-items: flex-start;
-  gap: var(--section-separation);
-  padding: 0 15px;
-  padding-top: var(--main-top-padding);
+  min-height: 100vh !important;
+  align-items: flex-start !important;
+  padding: 0 15px !important;
+  gap: var(--section-separation) !important;
+  padding-top: var(--main-top-padding) !important;
 
   @include respond(md) {
-    padding: 0 37px;
+    padding: 0 37px !important;
   }
 }
 
-//--------------------------------------------------
-//页面三栏宽度调整
+/* 主页布局间距调整（覆盖默认） */
+.main-container {
+  gap: 50px;
+
+  @include respond(md) {
+    padding: 0 30px;
+    gap: 40px;
+  }
+}
+
+// =====================================================
+// --------------- 页面三栏宽度调整 ---------------
+// =====================================================
 .container {
-  margin-left: auto;
-  margin-right: auto;
+  margin-left: auto !important;
+  margin-right: auto !important;
 
   .left-sidebar {
-    order: -3;
-    max-width: var(--left-sidebar-max-width);
+    order: -3 !important;
+    max-width: var(--left-sidebar-max-width) !important;
   }
 
   .right-sidebar {
-    order: -1;
-    max-width: var(--right-sidebar-max-width);
-
+    order: -1 !important;
+    max-width: var(--right-sidebar-max-width) !important;
     /// Display right sidebar when min-width: lg
     @include respond(lg) {
-      display: flex;
+      display: flex !important;
     }
   }
 
   &.extended {
     @include respond(md) {
-      max-width: 1024px;
-      --left-sidebar-max-width: 25%;
-      --right-sidebar-max-width: 22%;
+      max-width: 1024px !important;
+      --left-sidebar-max-width: 25% !important;
+      --right-sidebar-max-width: 22% !important;
     }
 
     @include respond(lg) {
-      max-width: 1280px;
-      --left-sidebar-max-width: 20%;
-      --right-sidebar-max-width: 30%;
+      max-width: 1280px !important;
+      --left-sidebar-max-width: 20% !important;
+      --right-sidebar-max-width: 30% !important;
     }
 
     @include respond(xl) {
-      max-width: 1453px; //1536px;
-      --left-sidebar-max-width: 15%;
-      --right-sidebar-max-width: 25%;
+      max-width: 1453px !important;
+      --left-sidebar-max-width: 15% !important;
+      --right-sidebar-max-width: 25% !important;
     }
   }
 
   &.compact {
     @include respond(md) {
-      --left-sidebar-max-width: 25%;
-      max-width: 768px;
+      --left-sidebar-max-width: 25% !important;
+      max-width: 768px !important;
     }
 
     @include respond(lg) {
-      max-width: 1024px;
-      --left-sidebar-max-width: 20%;
+      max-width: 1024px !important;
+      --left-sidebar-max-width: 20% !important;
     }
 
     @include respond(xl) {
-      max-width: 1280px;
+      max-width: 1280px !important;
     }
   }
 }
 
-// --------------------------------
-// 下拉菜单改圆角样式
-.menu {
-  display: none;
-  padding-left: 0;
-  margin: 0;
-  list-style: none;
-  flex-direction: column;
-  overflow-x: hidden;
-  flex-grow: 1;
-  font-size: 1.6rem;
-  background-color: var(--card-background);
-  box-shadow: none;
-  border-radius: 10px;
-  padding: 20px 15px;
-
-  @include respond(xl) {
-    padding: 15px 0;
-  }
-
-  &,
-  .menu-bottom-section {
-    gap: 30px;
-
-    @include respond(xl) {
-      gap: 25px;
-    }
-  }
-
-  &.show {
-    display: flex;
-  }
-
-  @include respond(md) {
-    align-items: flex-end;
-    display: flex;
-    background-color: transparent;
-	padding: 0;
-	box-shadow: none;
-	margin: 0;
-  }
-
-  li {
-    position: relative;
-    vertical-align: middle;
-	padding: 0;
-
-    @include respond(md) {
-      width: 100%;
-    }
-
-    svg {
-      stroke-width: 1.33;
-      width: 20px;
-      height: 20px;
-    }
-
-    a {
-      height: 100%;
-      display: inline-flex;
-      align-items: center;
-      color: var(--body-text-color);
-      gap: var(--menu-icon-separation);
-    }
-
-    span {
-      flex: 1;
-    }
-
-    &.current {
-      a {
-        color: var(--accent-color);
-        font-weight: bold;
-      }
-    }
-  }
+// =====================================================
+// --------------- 全局页面小图片样式微调 ---------------
+// =====================================================
+.article-list--compact article .article-image img {
+  width: var(--image-size) !important;
+  height: var(--image-size) !important;
+  object-fit: cover !important;
+  border-radius: 17% !important;
 }
 
-// 手机模式下的菜单滚动条美化
-.menu::-webkit-scrollbar {
-  display: none; //防止大屏幕时出现滚动条
-}
-
-// 侧边栏站点名称样式
-.sidebar header .site-name {
-  margin: 8px;
-  font-size: 2rem; //字体大小
-}
-
-// ----------头像旋转动画--------------
-.sidebar header .site-avatar .site-logo {
-  transition: transform 1.65s ease-in-out; // 旋转时间
-}
-
-.sidebar header .site-avatar .site-logo:hover {
-  transform: rotate(360deg); // 旋转角度为360度
-}
-
-/*--------------------左侧导航栏---------------*/
-.left-sidebar {
-  --sidebar-avatar-size: 115px; //左侧头像大小
-  --sidebar-element-separation: 15px; //头像下方间距
-  --emoji-size: 40px; //emoji容器大小
-  --emoji-font-size: 25px; //emoji字体大小
-}
-
-/*社交菜单居中+✅悬浮变绿核心样式*/
-.social-menu svg {
-  gap: 15px;
-  justify-content: center;
-  width: 30px;
-  height: 30px; //社交菜单大小
-  stroke: var(--body-text-color);
-  stroke-width: 1.33;
-  transition: stroke .2s ease-in-out; /* 颜色过渡丝滑 */
-}
-.social-menu a:hover svg {
-  stroke: var(--hover-green-color) !important; /* 社交图标悬浮变墨绿色 */
-}
-
-//------------------------------------------------------
-/******* 左侧栏选项动画 + ✅ 全量悬浮变绿 核心修改区 ********/
-#main-menu {
-    overflow: visible
-}
-
-#main-menu .current {
-    transform: scale(1.1);
-    a { color: var(--hover-green-color) !important; } // 当前选中项 直接显示墨绿色
-}
-
-#main-menu>li:not(.current) a {
-    transition: transform .2s ease-in-out, color .2s ease-in-out; // 动画+颜色双重过渡
-}
-
-#main-menu>li:not(.current) a:hover {
-    transform: scale(1.1);
-    color: var(--hover-green-color) !important; // 左侧菜单文字+图标悬浮变绿
-}
-
-// 明暗模式切换按钮，调整位置
-#dark-mode-toggle {
-    margin-bottom: 100px; // 明暗模式，上下高度
-    // margin-left: 10px;  // 明暗模式，左右调节
-    gap: 30px; // 明暗模式，横向宽度
-}
-
-#dark-mode-toggle {
-    transition: transform .2s ease-in-out;
-    cursor: pointer;
-}
-
-#dark-mode-toggle:hover {
-    transform: scale(1.1);
-}
-
-#dark-mode-toggle:hover svg {
-    transform: rotate(180deg);
-    stroke: var(--hover-green-color) !important; // 暗黑模式按钮图标悬浮变绿
-    fill: var(--hover-green-color) !important;
-}
-
-.menu-social {
-    overflow: visible
-}
-
-.menu-social li {
-    transition: transform .8s ease-in-out
-}
-
-.menu-social li:hover {
-    transform: scale(1.3)rotate(360deg);
-}
-
-/* 归档和链接卡片动画 + ✅ 悬浮边框/文字变绿 */
-.article-list--compact {
-    overflow: visible;
-}
-
-.article-list--compact article {
-    transition: transform 0.6s ease, border-color 0.2s ease-in-out;
-    -webkit-font-smoothing: antialiased;
-    will-change: transform;
-    
-    &:hover {
-        transform: scale(1.05,1.05);
-        z-index: 4;
-        color: var(--hover-green-color) !important; // 卡片文字变绿
-    }
-    &:hover a {
-        color: var(--hover-green-color) !important; // 卡片链接变绿
-    }
-}
-
-//------------------------------------------------------
+// ------------------------------------------------------
 // 友情链接+分类+标签+归档【三栏显示】
+// ------------------------------------------------------
 @media (min-width: 1024px) {
   .article-list--compact {
     display: grid;
-    // 目前是三列，如需二列，则后面减去一个1fr，以此类推
     grid-template-columns: 1fr 1fr 1fr;
     background: none;
     box-shadow: none;
@@ -317,268 +246,431 @@
   }
 }
 
-/* 分类页面动画 + ✅ 悬浮变绿 */
-.article-list--tile article {
-  transition: 0.6s ease, color 0.2s ease-in-out;
-}
-
-.article-list--tile article:hover {
-  transform: scale(1.05, 1.05);
-  will-change: transform;
-  color: var(--hover-green-color) !important; // 分类卡片文字变绿
-}
-.article-list--tile article:hover a {
-  color: var(--hover-green-color) !important; // 分类卡片链接变绿
-}
-
-//------------------------------------------------------
-//归档小图标放大动画 + ✅ 悬浮变绿
+// =====================================================
+// --------------- 归档小图标放大动画 + 右侧标签放大动画 (提速✅) ---------------
+// =====================================================
 .widget.archives .widget-archive--list {
-  transition: transform .3s ease, color .2s ease-in-out;
+  transition: transform 0.15s ease-out !important;
 }
-
 .widget.archives .widget-archive--list:hover {
-  transform: scale(1.05, 1.05);
-  color: var(--hover-green-color) !important; // 归档文字+图标悬浮变绿
+  transform: scale(1.05, 1.05) !important;
 }
-.widget.archives .widget-archive--list:hover a {
-  color: var(--hover-green-color) !important;
-}
-
-//------------------------------------------------------
-//右侧标签放大动画 + ✅ 悬浮背景+文字变绿【重点美化】
 .tagCloud .tagCloud-tags a {
-  border-radius: 10px;
-  font-size: 1.4rem;
-  transition: transform .3s ease, background .2s ease-in-out, color .2s ease-in-out;
-  padding: 3px 8px;
+  border-radius: 10px !important;
+  font-size: 1.4rem !important;
+  transition: transform 0.15s ease-out !important;
 }
-
 .tagCloud .tagCloud-tags a:hover {
-  transform: scale(1.1, 1.1);
-  background: var(--hover-green-bg) !important; // 标签背景变墨绿色
-  color: #ffffff !important; // 标签文字变白 对比鲜明
+  transform: scale(1.1, 1.1) !important;
 }
 
-//------------------------------------------------
-// 文章内容引用块样式 - 墨绿色最新版
-.article-content {
-  blockquote {
-    border-left: 6px solid  #366e33 !important;
-    background:  #366e33;
+// =====================================================
+// --------------- 左侧导航栏样式配置 ---------------
+// =====================================================
+.left-sidebar {
+  --sidebar-avatar-size: 115px !important;
+  --sidebar-element-separation: 15px !important;
+  --emoji-size: 40px !important;
+  --emoji-font-size: 25px !important;
+}
+.social-menu {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 15px !important;
+}
+.social-menu svg {
+  width: 30px !important;
+  height: 30px !important;
+  stroke: var(--body-text-color) !important;
+  stroke-width: 1.33 !important;
+}
+
+// =====================================================
+// --------------- 左侧栏选项全套悬浮动画 (核心✅ 极速提速) ---------------
+// =====================================================
+#main-menu {
+    overflow: visible !important;
+}
+#main-menu .current {
+    transform: scale(1.1) !important;
+}
+#main-menu>li:not(.current) a {
+    transition: transform 0.1s ease-out !important;
+}
+#main-menu>li:not(.current) a:hover {
+    transform: scale(1.1) !important;
+}
+
+.menu-social {
+    overflow: visible !important;
+}
+.menu-social li {
+    transition: transform 0.15s ease-out !important;
+}
+.menu-social li:hover {
+    transform: scale(1.3) !important;
+}
+
+.article-list--compact {
+    overflow: visible !important;
+}
+.article-list--compact article {
+    transition: transform 0.2s ease-out !important;
+    -webkit-font-smoothing: antialiased !important;
+    will-change: transform !important;
+}
+.article-list--compact article:hover {
+    transform: scale(1.05,1.05) !important;
+    z-index: 4 !important;
+}
+
+.article-list--tile article {
+  transition: transform 0.2s ease-out !important;
+}
+.article-list--tile article:hover {
+  transform: scale(1.05, 1.05) !important;
+  will-change: transform !important;
+}
+
+// =====================================================
+// --------------- 社交图标专属悬浮放大20% (提速✅ 无旋转) ---------------
+// =====================================================
+.icon-tabler-brand-bilibili,
+.icon-tabler-brand-github,
+.icon-tabler-rss {
+  transition: transform 0.15s ease-out !important;
+}
+.icon-tabler-brand-bilibili:hover,
+.icon-tabler-brand-github:hover,
+.icon-tabler-rss:hover {
+  transform: scale(1.2) !important;
+}
+
+// =====================================================
+// --------------- 下拉菜单改圆角样式 ---------------
+// =====================================================
+.menu {
+  padding-left: 0 !important;
+  list-style: none !important;
+  flex-direction: column !important;
+  overflow-x: hidden !important;
+  flex-grow: 1 !important;
+  font-size: 1.6rem !important;
+  background-color: var(--card-background) !important;
+	box-shadow: none !important;
+	display: none !important;
+	margin: 0 !important;
+	border-radius: 10px !important;
+	padding: 30px 30px !important;
+
+  @include respond(xl) {
+    padding: 15px 0 !important;
   }
-}
-
-// ---------------------------------------
-// 代码块基础样式修改
-.highlight {
-  max-width: 102% !important;
-  background-color: var(--pre-background-color);
-  padding: var(--card-padding);
-  position: relative;
-	border-radius: 20px;
-  margin-left: -7px !important;
-  margin-right: -12px;
-  box-shadow: var(--shadow-l1) !important;
-
-  &:hover {
-    .copyCodeButton {
-      opacity: 1;
+  &, .menu-bottom-section { gap: 30px !important; }
+  @include respond(xl) { gap: 25px !important; }
+  &.show { display: flex !important; }
+  @include respond(md) {
+    align-items: flex-end !important;
+    display: flex !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+  }
+  li {
+    position: relative !important;
+    vertical-align: middle !important;
+    padding: 0 !important;
+    @include respond(md) { width: 100% !important; }
+    svg { stroke-width:1.33 !important;width:20px !important;height:20px !important; }
+    a {
+      height:100% !important;display:inline-flex !important;align-items:center !important;
+      color:var(--body-text-color) !important;gap:var(--menu-icon-separation) !important;
     }
-  }
-
-  // keep Codeblocks LTR
-  [dir="rtl"] & {
-    direction: ltr;
-  }
-
-  pre {
-    margin: initial;
-    padding: 0;
-    margin: 0;
-    width: auto;
+    span { flex:1 !important; }
+    &.current a { color:var(--accent-color) !important;font-weight:bold !important; }
   }
 }
+.menu::-webkit-scrollbar { display: none !important; }
+.sidebar header .site-name { margin:8px !important;font-size:2rem !important; }
 
-//---------------------------------------------------
-// light模式下的代码块样式调整
-[data-scheme="light"] .article-content .highlight {
-  background-color: #fff9f3;
+// =====================================================
+// --------------- 文章内容美化相关 ---------------
+// =====================================================
+.article-content blockquote {
+  border-left:6px solid #004b28 !important;background:#366e33 !important;
 }
-
-[data-scheme="light"] .chroma {
-  color: #ff6f00;
-  background-color: #fff9f3cc;
+.highlight {
+  max-width:102% !important;background-color:var(--pre-background-color) !important;
+  padding:var(--card-padding) !important;position:relative !important;border-radius:20px !important;
+  margin-left:-7px !important;margin-right:-12px !important;box-shadow:var(--shadow-l1) !important;
+  &:hover .copyCodeButton { opacity:1 !important; }
+  [dir="rtl"] & { direction:ltr !important; }
+  pre { margin:initial !important;padding:0 !important;width:auto !important; }
 }
-
-//---------------------------------------------------
-// 文章内容图片圆角
-.article-page .main-article .article-content {
-  img {
-    max-width: 96% !important;
-	height: auto !important;
-	border-radius: 8px;
-  }
+.article-page .main-article .article-content img {
+  max-width:96% !important;height:auto !important;border-radius:8px !important;
 }
+p > img { display:block !important;margin:0 auto !important;max-width:100% !important;height:auto !important; }
+::selection { color:#fff !important;background:#001572 !important; }
 
-//-------------------------------------------
-// 设置选中字体的区域背景颜色
-::selection {
-  color: #fff;
-  background: #001572;
-}
-
-// 超链接全局样式 + ✅ 悬浮变绿兼容
+/* --------------------- 鼠标悬停，超链接的显示 ------------------- */
 a {
-  text-decoration: none;
-  color: var(--accent-color);
-  word-break: break-all;
+  text-decoration: none !important;
+  color: var(--accent-color) !important;
 
   &:hover {
-    color: var(--hover-green-color) !important; // 全局链接悬浮统一变绿
+    color: var(--accent-color-darker) !important;
   }
 
-  .link {
-    font-weight: 800;
-	padding: 0 2px;
-	text-decoration: none;
-	cursor: pointer;
-	color: #000000;
+  &.link {
+    font-weight: 800 !important;
+    padding: 0 2px !important;
+    cursor: pointer !important;
+    color: #000 !important;
+    text-decoration: none !important;
+    box-shadow: 0px -2px 0px rgba(var(--link-background-color), var(--link-background-opacity-hover)) inset !important;
+    transition: all 0.3s ease !important;
 
     &:hover {
-      text-decoration: underline;
-      color: var(--hover-green-color) !important;
-    }
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .link {
-      color: #FFFFFF;
-    }
-    .link:hover {
-      color: var(--hover-green-color) !important;
+      box-shadow: 0px -18px 0px rgba(var(--link-background-color), var(--link-background-opacity-hover)) inset !important;
     }
   }
 }
 
-// 代码换行修复
-code {
-  word-break: break-all;
+@media (prefers-color-scheme: dark) {
+  a .link {
+    color: #FFFFFF !important;
+  }
 }
 
-//-------------------------------------------------
-// 主页文章图片全套样式 - 响应式高度+圆角+悬停放大动画 (完全生效)
-$image-scale: 1.2;
-.article-list article .article-image img {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-  transition: transform 0.85s ease-in-out;
-  // 响应式高度适配
-  @include respond(sm) { height: 305px; }
-  @include respond(md) { height: 305px; }
-  @include respond(xl) { height: 325px; }
-}
-// 主页文章卡片圆角
-.article-list article {
-  --card-border-radius: 24px;
-}
-// 文章分类/标签圆角 + ✅ 悬浮变绿
-.article-category a, .article-tags a {
-  border-radius: 11px;
-  transition: background .2s ease, color .2s ease;
-}
-.article-category a:hover, .article-tags a:hover {
-  background: var(--hover-green-bg);
-  color: #fff !important;
-}
-// 主页图片放大动画核心样式
-.article-list article .article-image {
-  position: relative;
+// ----------------调整 TOC 目录间距------------------
+.widget--toc {
+  background-color: var(--card-background);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--shadow-l2);
+  display: flex;
+  flex-direction: column;
+  color: var(--card-text-color-main);
   overflow: hidden;
-}
-.article-list article .article-image img:hover {
-  transform: scale($image-scale);
+  display: inline-block;
+
+  #TableOfContents {
+      max-height: 65vh;
+      overflow-y: auto;
+      padding: 12px 0;
+
+      ol,
+      ul {
+          list-style-type: none;
+          margin: 0;
+          padding: 0;
+      }
+
+      li {
+          margin: 5px 20px;
+          padding: 6px;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+
+          & > ol,
+          & > ul {
+              margin-top: 10px;
+              padding-left: 10px;
+              margin-bottom: -5px;
+
+              & > li:last-child {
+                  margin-bottom: 0;
+              }
+          }
+      }
+
+      & > ul {
+          padding: 0 1em;
+      }
+  }
 }
 
-//-------------------------------------------------
-// ✅ 文章内部-页脚-相关文章 专属样式 (全部新增+动画修复完成)
-/* 相关文章小图17%圆角，强制生效不被覆盖 */
-.article-list--compact article .article-image img {
-  width: var(--image-size);
-  height: var(--image-size);
-  object-fit: cover;
-  border-radius: 17% !important;
-  transition: all 0.6s ease;
+// =====================================================
+// --------------- 首页文章样式 合集 (核心✅ 极速提速) ---------------
+// =====================================================
+$image-scale:1.2;
+.article-list article .article-image img {
+  width:100% !important;height:150px !important;object-fit:cover !important;
+  transition:transform 0.2s ease-out !important;
+  @include respond(sm) { height:305px !important; }
+  @include respond(md) { height:305px !important; }
+  @include respond(xl) { height:325px !important; }
 }
-/* 相关文章卡片整体悬停放大动画 - 核心修复：块级元素+居中缩放 */
+.article-list article { --card-border-radius:24px !important; }
+.article-category a, .article-tags a { border-radius:11px !important; }
+.article-list article .article-image { position:relative !important;overflow:hidden !important; }
+.article-list article .article-image img:hover { transform:scale($image-scale) !important; }
+
+// =====================================================
+// --------------- 文章内部-页脚-相关文章样式 (提速✅) ---------------
+// =====================================================
 .article-list--compact article > a {
-  display: block;
-  transition: transform 0.6s ease;
-  transform-origin: center center;
+  transition:transform 0.2s ease-out !important;
 }
 .article-list--compact article > a:hover {
-  transform: scale(1.03);
-  overflow: visible;
+  transform:scale(1.03,1.03) !important;overflow:visible !important;
 }
 
-// ✅ 新增：复制按钮样式调整 + ✅ 悬浮变绿【修改为墨绿色 原橙色替换】
-/* 复制按钮样式调整 */
+// =====================================================
+// --------------- MacOS 风格代码块 + 浅色模式最新配色 ---------------
+// =====================================================
+.article-content .highlight:before {
+  content:'' !important;display:block !important;background:url(/code-header.svg) !important;
+  height:32px !important;width:100% !important;background-size:57px !important;
+  background-repeat:no-repeat !important;margin-bottom:5px !important;background-position:-1px 2px !important;
+}
+[data-scheme="light"] .article-content .highlight { background-color:#fdf4eb !important; }
+[data-scheme="light"] .chroma { color:#ff6f00 !important;background-color:#fcf0e4cc !important; }
+
+// =====================================================
+// --------------- 代码块按钮相关样式 ---------------
+// =====================================================
+.languageCodeButton { display:none !important; }
 .article-content .copyCodeButton {
-  position: absolute;
-  top: 10px;
-  right: 18px;
-  border-radius: 12px;
-  color: #ffffff; 
-  background: #3d3c3c; 
-  border: 1px solid #333; 
-  padding: 5px 10px;
-  font-weight: 500;
-  text-shadow: 0 0 1px rgba(255, 255, 255, 0.5); 
-  opacity: 0;
-  transition: all 0.2s ease-in-out;
-  border:none;
-  outline:none;
-  cursor: pointer;
+  position:absolute !important;top:10px !important;right:18px !important;border-radius:12px !important;
+  color:#ffffff !important;background:#3d3c3c !important;border:1px solid #333 !important;
+  padding:5px 10px !important;font-weight:500 !important;
+  text-shadow:0 0 1px rgba(255,255,255,0.5) !important;
+}
+.article-content .copyCodeButton:hover { background:#ffa500 !important;border-color:#000 !important; }
+
+// =====================================================
+// --------------- 修复引用块内容窄页面显示问题 ---------------
+// =====================================================
+a { word-break: break-all !important; }
+code { word-break: break-all !important; }
+
+// =====================================================
+// ✅✅✅ 修复：彻底禁用左下角亮/暗色切换按钮的悬停放大与旋转（使用有效选择器）✅✅✅
+// =====================================================
+.left-sidebar .menu-bottom-section,
+.left-sidebar .menu-bottom-section *,
+.left-sidebar .menu-bottom-section > li,
+.left-sidebar .menu-bottom-section > li *,
+.left-sidebar .menu-bottom-section button,
+.left-sidebar .menu-bottom-section button * {
+  transform: none !important;
+  scale: 1 !important;
+  rotate: 0deg !important;
+  transition: none !important;
+  transition-property: none !important;
+  animation: none !important;
+  will-change: auto !important;
 }
 
-/* 注释语言代码框 保留注释代码 */
-/* 
-.article-content .languageCodeButton {
-  position: absolute;
-  top: 9px;
-  right: 100px; 
-  border-radius: 12px;
-  color: #000; 
-  background: #ffff00; 
-  border: 1px solid #333; 
-  padding: 5px 10px;
-  font-family: lato;
-  font-size: 1.5rem;
-  text-shadow: 0 0 1px rgba(255, 255, 255, 0.5); 
-}
-*/
-
-.article-content .copyCodeButton:hover {
-  background: var(--hover-green-color) !important; // 复制按钮悬浮变墨绿色
-  border-color: var(--hover-green-bg) !important;
-}
-
-/******** 修改-页脚访问量-样式 ********/
+// ******** 修改-页脚访问量-样式 ********
 .count_info {
   border: 1px solid #ddd;
   border-radius: 25px;
+  padding: 12px;
   transform: translateY(-66px);   /* 向上抬 66px */
+  background: #ffffff;
+  color: #333;
 }
 [data-scheme="dark"] .count_info {
-  border: 1px solid #39393900;
-  padding: 12px;
-  border-radius: 20px;
+  border: 1px solid transparent;
   background: #3f3f3f;
   color: #fff;
-  transform: translateY(-66px);   /* dark 模式同样抬高 */
 }
 .number-highlight {
   color: var(--hover-text-color); /* 数值颜色修改 */
   font-weight: 600;
+}
+
+// 相关文章区域优化
+.related-contents {
+  overflow-x: visible;
+  padding-bottom: 15px;
+}
+
+// ==================== 自定义加载动画 ====================
+#loading-box .loading-left-bg,
+#loading-box .loading-right-bg {
+  position: fixed;
+  z-index: 1000;
+  width: 50%;
+  height: 100%;
+  background-color: #b1c0c7;
+  transition: all 0.5s;
+}
+
+#loading-box .loading-right-bg {
+  right: 0;
+}
+
+#loading-box > .spinner-box {
+  position: fixed;
+  z-index: 1001;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+}
+
+#loading-box .spinner-box .configure-border-1 {
+  position: absolute;
+  padding: 3px;
+  width: 115px;
+  height: 115px;
+  background: #ffab91;
+  animation: configure-clockwise 3s ease-in-out 0s infinite alternate;
+}
+
+#loading-box .spinner-box .configure-border-2 {
+  left: -115px;
+  padding: 3px;
+  width: 115px;
+  height: 115px;
+  background: rgb(63, 249, 220);
+  transform: rotate(45deg);
+  animation: configure-xclockwise 3s ease-in-out 0s infinite alternate;
+}
+
+#loading-box .spinner-box .loading-word {
+  position: absolute;
+  color: #ffffff;
+  font-size: 1.8rem;
+  font-family: 'Zhi Mang Xing', cursive;
+}
+
+#loading-box .spinner-box .configure-core {
+  width: 100%;
+  height: 100%;
+  background-color: #37474f;
+}
+
+div.loaded div.loading-left-bg {
+  transform: translate(-100%, 0);
+}
+
+div.loaded div.loading-right-bg {
+  transform: translate(100%, 0);
+}
+
+div.loaded div.spinner-box {
+  display: none !important;
+}
+
+@keyframes configure-clockwise {
+  0% { transform: rotate(0); }
+  25% { transform: rotate(90deg); }
+  50% { transform: rotate(180deg); }
+  75% { transform: rotate(270deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes configure-xclockwise {
+  0% { transform: rotate(45deg); }
+  25% { transform: rotate(-45deg); }
+  50% { transform: rotate(-135deg); }
+  75% { transform: rotate(-225deg); }
+  100% { transform: rotate(-315deg); }
 }
