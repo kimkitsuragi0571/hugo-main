@@ -34,14 +34,7 @@
             }
         }
 
-        @for $i from 1 through length($defaultTagBackgrounds) {
-            &:nth-child(#{length($defaultTagBackgrounds)}n + #{$i}) {
-                .article-category a {
-                    background: nth($defaultTagBackgrounds, $i);
-                    color: nth($defaultTagColors, $i);
-                }
-            }
-        }
+        // 已删除：分类背景色循环覆盖的@for代码
     }
 }
 
@@ -134,8 +127,9 @@
     flex-wrap: wrap;
 
     a {
-        color: var(--accent-color-text);
-        background-color: var(--accent-color);
+        // 强制指定绿色系配色（核心修改）
+        color: #ffffff !important;
+        background-color: #10b981 !important;
         padding: 8px 16px;
         border-radius: var(--tag-border-radius);
         display: inline-block;
@@ -143,8 +137,8 @@
         transition: background-color 0.5s ease;
 
         &:hover {
-            color: var(--accent-color-text);
-            background-color: var(--accent-color-darker);
+            color: #ffffff !important;
+            background-color: #059669 !important;
         }
     }
 }
@@ -300,3 +294,4 @@ p > img {
     top: 6px;
     right: 6px;
 }
+
