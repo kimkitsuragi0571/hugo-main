@@ -1,61 +1,96 @@
+<!-- 字体引入 -->
+{{ $fontName := "JianShouMengWaChaoCuYuanTi-2.ttf" }}
+{{ $fontPath := printf "assets/font/%s" $fontName }}
+
+{{ if fileExists $fontPath }}
 <style>
-    /* 目录子级默认隐藏 - 原生CSS标准写法 无嵌套 无兼容问题 */
-    #TableOfContents > ul ul,
-    #TableOfContents > ul ol,
-    #TableOfContents > ol ul,
-    #TableOfContents > ol ol {
-        display: none;
-    }
-    #TableOfContents .open {
-        display: block !important;
-    }
+  @font-face {
+    font-family: 'MengWaXiYuan';
+    src: url('{{ (resources.Get "font/JianShouMengWaChaoCuYuanTi-2.ttf").Permalink }}') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* 应用字体 */
+  :root {
+    --font-primary: 'MengWaXiYuan', sans-serif;
+  }
+  
+  /* 应用字体到所有元素 */
+  body,
+  html {
+    font-family: var(--font-primary) !important;
+  }
+  
+  /* Hugo Stack 主题特定的文章内容区域 */
+  .article-content,
+  .single__contents,
+  .widget--toc {
+    font-family: var(--font-primary) !important;
+  }
+  
+  /* 确保文章内容内的所有文本都继承字体 */
+  .article-content *:not(code):not(pre):not(.chroma):not(.highlight) {
+    font-family: inherit !important;
+  }
+  
+  /* 标题字体 */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-primary) !important;
+  }
+</style>
+{{ end }}
+
+<!-- TOC 折叠样式 -->
+<style>
+  #TableOfContents > ul ul,
+  #TableOfContents > ul ol,
+  #TableOfContents > ol ul,
+  #TableOfContents > ol ol {
+    display: none;
+  }
+  
+  #TableOfContents .open {
+    display: block !important;
+  }
 </style>
 
+<!-- TOC 折叠脚本 -->
 <script>
-    function initTocHide() {
-        // 判断是否存在文章目录，无则直接退出
-        let toc = document.querySelector(".widget--toc");
-        if (!toc) return;
+  function initTocHide() {
+    let toc = document.querySelector(".widget--toc");
+    if (!toc) return;
+    
+    let timer = null;
+    window.addEventListener('scroll', function() {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        document.querySelectorAll(".open").forEach(el => el.classList.remove("open"));
         
-        // 防抖函数 解决滚动高频触发卡顿
-        let timer = null;
-        window.addEventListener('scroll', function() {
-            clearTimeout(timer);
-            timer = setTimeout(() => {
-                // 清除所有展开的open类
-                document.querySelectorAll(".open").forEach(el => el.classList.remove("open"));
-                
-                // 获取当前激活的目录项
-                const currentLi = document.querySelector(".active-class");
-                if (!currentLi) return;
+        const currentLi = document.querySelector(".active-class");
+        if (!currentLi) return;
 
-                // 展开当前项的子级ul/ol
-                if (currentLi.children.length > 1) {
-                    currentLi.children[1].classList.add("open");
-                }
+        if (currentLi.children.length > 1) {
+          currentLi.children[1].classList.add("open");
+        }
 
-                // 向上遍历展开所有父级目录，绝对无空指针报错
-                let parentUl = currentLi.parentElement;
-                while (parentUl && (parentUl.tagName === 'UL' || parentUl.tagName === 'OL')) {
-                    parentUl.classList.add("open");
-                    const grandParent = parentUl.parentElement;
-                    parentUl = grandParent ? grandParent.parentElement : null;
-                }
-            }, 80);
-        });
-    }
-    // 初始化目录功能
-    initTocHide();
+        let parentUl = currentLi.parentElement;
+        while (parentUl && (parentUl.tagName === 'UL' || parentUl.tagName === 'OL')) {
+          parentUl.classList.add("open");
+          const grandParent = parentUl.parentElement;
+          parentUl = grandParent ? grandParent.parentElement : null;
+        }
+      }, 80);
+    });
+  }
+  
+  document.addEventListener('DOMContentLoaded', initTocHide);
 </script>
 
-<!-- ✅✅✅ 这里是唯一正确的位置！！！ Hugo模板语法 必须写在 所有HTML标签中，不能写在<script>里 -->
+<!-- 其他自定义 partial -->
 {{ partial "footer/code-block.html" . }}
-
 {{ partial "footer/fish.html" . }}
-
-{{/*  我选择放弃实现返回顶部功能
-{{ partial "footer/return.html" . }}   */}}
-
+{{/* {{ partial "footer/return.html" . }} */}}
 {{ partial "footer/copy.html" . }}
-
 {{ partial "footer/font.html" . }}
