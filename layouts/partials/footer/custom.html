@@ -1,12 +1,12 @@
 <!-- 字体引入 -->
 {{ $fontName := "JianShouMengWaChaoCuYuanTi-2.ttf" }}
-{{ $fontPath := printf "assets/font/%s" $fontName }}
+{{ $fontPath := printf "static/font/%s" $fontName }} <!-- 改为static目录的检测路径 -->
 
 {{ if fileExists $fontPath }}
 <style>
   @font-face {
     font-family: 'MengWaXiYuan';
-    src: url('{{ (resources.Get "font/JianShouMengWaChaoCuYuanTi-2.ttf").Permalink }}') format('truetype');
+    src: url('/font/{{ $fontName }}') format('truetype'); <!-- 直接指向static下的字体URL -->
     font-weight: normal;
     font-style: normal;
     font-display: swap;
