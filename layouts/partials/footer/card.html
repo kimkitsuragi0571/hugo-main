@@ -1,0 +1,106 @@
+<!-- 该文件路径: layouts/partials/footer/card.html -->
+<!-- hover下划线按钮组件 - 上下双划线同步动画+固定右侧+极致贴边+手机适配 最终完美版【修复动画失效】 -->
+<style>
+  /* ✅ 父容器：承载顶部划线，删除pointer-events: none; 能正常触发hover动画 */
+  .btn-wrap {
+    color: #ffffff95;
+    font-size: 14px;
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    position: fixed;    
+    bottom: 90px;       
+    right: -5px;        
+    z-index: 9999;      
+    display: inline-block;
+    position: relative;
+  }
+
+  /* ✅ 你的原版按钮样式，只新增【pointer-events: none;】，其他全部不变 */
+  .footer-hover-btn {
+    color: #ffffff95;
+    font-size: 14px;
+    border: none;
+    background: transparent;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    outline: none;
+	padding: 12px 20px;
+    margin: 0;
+    display: inline-block;
+    position: relative;
+    pointer-events: none; /* ✅ 移到这里：保留鼠标穿透，不拦截页面点击，不影响动画 */
+  }
+
+  /* ✅✅✅ 顶部 左右上划线 (你的原版新增代码，一字未改) */
+  .btn-wrap::before {
+    content: '';
+    width: 0%;
+    height: 2px;
+    background: #1900ff; /* 顶部左侧蓝线 */
+    transition: 0.5s ease;
+    position: absolute;
+    left: 0;
+    top: 8px;
+  }
+  .btn-wrap::after {
+    content: '';
+    width: 0%;
+    height: 2px;
+    background: #f44336; /* 顶部右侧红线 */
+    transition: 0.5s ease;
+    position: absolute;
+    right: 0;
+    top: 8px;
+  }
+
+  /* ✅✅✅ 底部 左右下划线 (你的原版代码，一字未改) */
+  .footer-hover-btn::before {
+    content: '';
+    width: 0%;
+    height: 2px;
+    background: #1900ff; /* 底部左侧蓝线 */
+    transition: 0.5s ease;
+    position: absolute;
+    left: 0;
+    bottom: 8px;
+  }
+  .footer-hover-btn::after {
+    content: '';
+    width: 0%;
+    height: 2px;
+    background: #f44336; /* 底部右侧红线 */
+    transition: 0.5s ease;
+    position: absolute;
+    right: 0;
+    bottom: 8px;
+  }
+
+  /* ✅✅✅ 核心：鼠标悬浮时，上下4条线 完美同步展开到50%，动画丝滑 */
+  .btn-wrap:hover::before,
+  .btn-wrap:hover::after,
+  .btn-wrap:hover .footer-hover-btn::before,
+  .btn-wrap:hover .footer-hover-btn::after {
+    width: 50%;
+  }
+
+  /* ✅ 你的原版手机端适配代码，完全保留，一丝未改 */
+  @media (max-width: 768px) {
+    .btn-wrap {
+      font-size: 14px;    
+      bottom: 25px;       
+      right: 15px;        
+    }
+    .footer-hover-btn {
+      padding: 8px 12px;  
+    }
+  }
+</style>
+
+<div class="btn-wrap">
+  <button class="footer-hover-btn">
+    --KK57-0803.0815--
+  </button>
+</div>

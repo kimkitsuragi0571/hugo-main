@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首次访问加载动画（修复闪屏）</title>
+    <style>
+        /* 加载层基础样式 - 全屏居中（默认隐藏） */
+        .loading {
+            position: fixed;
+            display: none; /* 默认隐藏，首次访问再显示 */
+            justify-content: center;
+            align-items: center;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            background-color: #0000007e; /* 纯色背景避免闪透 */
+            perspective: 800px;
+            transition: none; /* 取消过渡，避免干扰动画 */
+        }
+
+        /* 3D立方体加载动画（核心播放动画） */
+        .spinner {
+            width: 44px;
+            height: 44px;
+            animation: spinner-rotate 4s infinite ease-in-out; /* 持续旋转动画 */
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+        }
+
+        .spinner > div {
+            background-color: rgba(255, 255, 255, 0.2);
+            height: 100%;
+            position: absolute;
+            width: 100%;
+            border: 1px solid #ffffff;
+            backface-visibility: hidden;
+        }
+
+        .spinner div:nth-of-type(1) { transform: translateZ(-20px) rotateY(180deg); }
+        .spinner div:nth-of-type(2) { transform: rotateY(-270deg) translateX(50%); transform-origin: top right; }
+        .spinner div:nth-of-type(3) { transform: rotateY(270deg) translateX(-50%); transform-origin: center left; }
+        .spinner div:nth-of-type(4) { transform: rotateX(90deg) translateY(-50%); transform-origin: top center; }
+        .spinner div:nth-of-type(5) { transform: rotateX(-90deg) translateY(50%); transform-origin: bottom center; }
+        .spinner div:nth-of-type(6) { transform: translateZ(20px); }
+
+        /* 立方体旋转动画定义 */
+        @keyframes spinner-rotate {
+            0% { transform: rotate(45deg) rotateX(-25deg) rotateY(25deg); }
+            50% { transform: rotate(45deg) rotateX(-385deg) rotateY(25deg); }
+            100% { transform: rotate(45deg) rotateX(-385deg) rotateY(385deg); }
+        }
+
+        /* 动画暂停类（结束时触发） */
+        .animated-stop {
+            animation-play-state: paused !important;
+        }
+
+        /* 放大渐变透明动画（结束动画，时长1.5s） */
+        .scaleAndFadeout {
+            animation: scale-fade-out 1.5s ease-in-out forwards !important;
+        }
+
+        @keyframes scale-fade-out {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.2); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 加载动画容器 -->
+    <div class="loading">
+        <div class="spinner">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <script>
+        function initLoading() {
+            // 1. 判断是否首次访问（sessionStorage：会话级，关闭标签页重置；localStorage：永久）
+            const isFirstVisit = !sessionStorage.getItem('visited');
+            if (!isFirstVisit) return; // 非首次访问直接退出
+
+            // 2. 获取加载层元素（容错）
+            const loading = document.querySelector(".loading");
+            const spinner = document.querySelector(".spinner");
+            if (!loading || !spinner) return;
+
+            // 3. 显示加载层，确保动画先开始播放
+            loading.style.display = "flex";
+
+            // 4. 核心修复：给加载动画留播放时长（模拟真实加载，可替换为真实接口请求）
+            const loadingDuration = 4000; // 立方体旋转播放2秒（可调整）
+            setTimeout(() => {
+                // 5. 执行结束动画（暂停旋转 + 放大渐变透明）
+                loadFinish();
+                // 6. 结束动画完成后隐藏加载层（与scaleAndFadeout动画时长一致）
+                setTimeout(() => {
+                    loading.style.display = "none";
+                    // 标记为已访问，后续不再触发
+                    sessionStorage.setItem('visited', 'true');
+                }, 1500);
+            }, loadingDuration);
+        }
+
+        // 加载完成动画逻辑
+        function loadFinish() {
+            const spinner = document.querySelector(".spinner");
+            const loading = document.querySelector(".loading");
+            if (spinner) spinner.classList.add("animated-stop"); // 暂停立方体旋转
+            if (loading) loading.classList.add("scaleAndFadeout"); // 执行放大渐变透明
+        }
+
+        // 页面加载完成后初始化（确保DOM元素已加载）
+        window.addEventListener('load', initLoading);
+    </script>
+</body>
+</html>
