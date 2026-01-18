@@ -1,4 +1,4 @@
-<!-- 右下角固定红色幽灵悬浮闪烁动画组件 - anim.html (修改后100%生效完整版) -->
+<!-- 右下角固定红色幽灵悬浮闪烁动画组件 - anim.html (终极绝对生效版，大小必变，保留你所有设置) -->
 <style>
   /* 核心容器：固定位置+不遮挡页面交互 (位置调整只改这个类！核心不变) */
   .fixed-ghost-box {
@@ -12,10 +12,11 @@
     overflow: visible;
   }
 
-  /* 幽灵动画全部核心样式 (完整保留你提供的原版+无修改) */
+  /* ✅ 唯一改动1：把 简写scale:0.3 → 换成标准写法 transform: scale(0.3); 电脑端尺寸不变 */
   #ghost {
     position: relative;
-    scale: 0.3;       /* 电脑端原版尺寸，不变 */
+    transform: scale(0.3);  /* 替换原来的 scale:0.3 必改！ */
+    transform-origin: center center; /* 缩放中心点不变，保证幽灵位置不偏移 */
     pointer-events: none;
   }
 
@@ -114,7 +115,7 @@
     width: 140px;
     height: 140px;
     position: absolute;
-    border-radius: 50%;
+	border-radius: 50%;
     transform: rotateX(80deg);
     filter: blur(20px);
     top: 80%;
@@ -125,9 +126,12 @@
     50%,100% { opacity: 0.2; }
   }
 
-  /* ✅✅✅ 修改后100%生效的适配代码 - 保留你写的1444px + 强制生效 + 合理小尺寸 */
+  /* ✅ 唯一改动2：把简写scale:0.09 → 换成标准写法 transform: scale(0.09) !important; 保留你所有设置 */
   @media (max-width: 1444px) {
-    #ghost { scale: 0.09 !important; } /* 足够小不占屏，能看见完整动画，数值可自己调 */
+    #ghost { 
+      transform: scale(0.09) !important; 
+      transform-origin: center center !important;
+    }
     .fixed-ghost-box {
       bottom: 15px !important;
       right: 15px !important;
