@@ -1,7 +1,6 @@
 <!-- 字体引入 -->
 {{ $fontName := "JianShouMengWaChaoCuYuanTi-2.ttf" }}
-{{ $fontPath := printf "static/font/%s" $fontName }} <!-- 改为static目录的检测路径 -->
-
+{{ $fontPath := printf "static/font/%s" $fontName }}
 {{ if fileExists $fontPath }}
 <style>
   @font-face {
@@ -11,33 +10,18 @@
     font-style: normal;
     font-display: swap;
   }
-
-  /* 应用字体 */
   :root {
     --font-primary: 'MengWaXiYuan', sans-serif;
   }
-  
-  /* 应用字体到所有元素 */
-  body,
-  html {
-    font-family: var(--font-primary) !important;
-  }
-  
-  /* Hugo Stack 主题特定的文章内容区域 */
+  html, body,
   .article-content,
   .single__contents,
-  .widget--toc {
-    font-family: var(--font-primary) !important;
-  }
-  
-  /* 确保文章内容内的所有文本都继承字体 */
-  .article-content *:not(code):not(pre):not(.chroma):not(.highlight) {
-    font-family: inherit !important;
-  }
-  
-  /* 标题字体 */
+  .widget--toc,
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-primary) !important;
+  }
+  .article-content *:not(code):not(pre):not(.chroma):not(.highlight) {
+    font-family: inherit !important;
   }
 </style>
 {{ end }}
@@ -50,42 +34,165 @@
   #TableOfContents > ol ol {
     display: none;
   }
-  
   #TableOfContents .open {
     display: block !important;
   }
 </style>
 
-<!-- TOC 折叠脚本 -->
-<script>
-  function initTocHide() {
-    let toc = document.querySelector(".widget--toc");
-    if (!toc) return;
-    
-    let timer = null;
-    window.addEventListener('scroll', function() {
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        document.querySelectorAll(".open").forEach(el => el.classList.remove("open"));
-        
-        const currentLi = document.querySelector(".active-class");
-        if (!currentLi) return;
-
-        if (currentLi.children.length > 1) {
-          currentLi.children[1].classList.add("open");
-        }
-
-        let parentUl = currentLi.parentElement;
-        while (parentUl && (parentUl.tagName === 'UL' || parentUl.tagName === 'OL')) {
-          parentUl.classList.add("open");
-          const grandParent = parentUl.parentElement;
-          parentUl = grandParent ? grandParent.parentElement : null;
-        }
-      }, 80);
-    });
+<!-- 返回顶部按钮样式 -->
+<style>
+  #backTopBtn {
+    display: none;
+    position: fixed;
+    bottom: 30px;
+    right: 20px; /* 建议添加 right 定位 */
+    z-index: 99;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    background-image: url('{{ with resources.Get "icons/backTop.svg" }}{{ .Permalink }}{{ else }}/icons/backTop.svg{{ end }}');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
+    outline: none;
   }
-  
-  document.addEventListener('DOMContentLoaded', initTocHide);
+</style>
+
+<!-- 代码折叠样式 -->
+<style>
+  .highlight {
+    max-height: 400px;
+    overflow: hidden;
+    position: relative;
+  }
+  .code-show {
+    max-height: none !important;
+  }
+  .code-more-box {
+    width: 100%;
+    padding-top: 78px;
+    background-image: linear-gradient(to bottom, rgba(255,255,255,0), #fff);
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .code-more-btn {
+    display: block;
+    margin: auto;
+    width: 44px;
+    height: 22px;
+    background: #f0f0f5;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding-top: 6px;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  .code-more-img {
+    display: block;
+    margin: auto;
+    width: 22px;
+    height: 16px;
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // ===== 1. TOC 折叠逻辑 =====
+    function initTocHide() {
+      const toc = document.querySelector(".widget--toc");
+      if (!toc) return;
+
+      let timer = null;
+      window.addEventListener('scroll', () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          // 移除所有 open
+          document.querySelectorAll('.open').forEach(el => el.classList.remove('open'));
+
+          // 查找当前激活项（兼容多种 class）
+          const activeLink = document.querySelector(
+            ".toc-link.active, .toc-link.active-class, .active, .active-class"
+          );
+          if (!activeLink) return;
+
+          // 展开子列表
+          const nextSibling = activeLink.nextElementSibling;
+          if (nextSibling && (nextSibling.tagName === 'UL' || nextSibling.tagName === 'OL')) {
+            nextSibling.classList.add('open');
+          }
+
+          // 向上展开所有父级列表
+          let parent = activeLink.parentElement;
+          while (parent && parent.parentElement) {
+            if (parent.tagName === 'UL' || parent.tagName === 'OL') {
+              parent.classList.add('open');
+            }
+            parent = parent.parentElement;
+          }
+        }, 80);
+      });
+    }
+
+    // ===== 2. 返回顶部按钮 =====
+    function initScrollTop() {
+      const rightSidebar = document.querySelector(".right-sidebar");
+      if (!rightSidebar) return;
+
+      const btn = document.createElement("div");
+      btn.id = "backTopBtn";
+      btn.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
+      rightSidebar.appendChild(btn);
+
+      window.addEventListener('scroll', () => {
+        btn.style.display = window.scrollY > 20 ? "block" : "none";
+      });
+    }
+
+    // ===== 3. 代码块折叠 =====
+    function initCodeMoreBox() {
+      const codeBlocks = document.querySelectorAll(".highlight");
+      if (!codeBlocks.length) return;
+
+      // 安全获取图标路径
+      const iconSrc = {{ with resources.Get "icons/codeMore.png" }}
+        "{{ .Permalink }}";
+      {{ else }}
+        "/icons/codeMore.png";
+      {{ end }}
+
+      codeBlocks.forEach(block => {
+        if (block.scrollHeight <= block.clientHeight) return;
+
+        const moreBox = document.createElement('div');
+        moreBox.className = 'code-more-box';
+
+        const moreBtn = document.createElement('span');
+        moreBtn.className = 'code-more-btn';
+        moreBtn.addEventListener('click', () => {
+          block.classList.add('code-show');
+          moreBox.style.display = 'none';
+          window.dispatchEvent(new Event('resize')); // 触发 TOC 重定位
+        });
+
+        const img = document.createElement('img');
+        img.className = 'code-more-img';
+        img.src = iconSrc;
+        moreBtn.appendChild(img);
+        moreBox.appendChild(moreBtn);
+        block.appendChild(moreBox);
+      });
+    }
+
+    // 执行初始化
+    initTocHide();
+    initScrollTop();
+    initCodeMoreBox();
+  });
 </script>
 
 <!-- 其他自定义 partial -->
@@ -94,7 +201,5 @@
 {{/* {{ partial "footer/return.html" . }} */}}
 {{ partial "footer/copy.html" . }}
 {{ partial "footer/font.html" . }}
-<!-- 在baseof.html的</body>标签上方添加 -->
 {{ partial "footer/anim.html" . }}
-
 {{ partial "footer/card.html" . }}

@@ -24,6 +24,24 @@ input:hover,
   cursor: url(../mouse/text.png), auto;
 }
 
+// 新增的highlight代码块 ✅ 已插入指定位置
+.highlight {
+  border-radius: var(--card-border-radius);
+  max-width: 100% !important;
+  margin: 0 !important;
+  box-shadow: var(--shadow-l1) !important;
+}
+
+.highlight:before {
+  content: "";
+  display: block;
+  background: url(../icons/macOS-code-header.svg) no-repeat 0;
+  background-size: contain;
+  height: 18px;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
+
 // ----------------首页欢迎板块样式----------------
 .welcome {
   color: var(--card-text-color-main);
@@ -627,11 +645,11 @@ code { word-break: break-all !important; }
 #loading-box .spinner-box .configure-border-2 {
   left: -115px;
   padding: 3px;
-  width: 115px;
-  height: 115px;
-  background: rgb(63, 249, 220);
-  transform: rotate(45deg);
-  animation: configure-xclockwise 3s ease-in-out 0s infinite alternate;
+	width: 115px;
+	height: 115px;
+	background: rgb(63, 249, 220);
+	transform: rotate(45deg);
+	animation: configure-xclockwise 3s ease-in-out 0s infinite alternate;
 }
 
 #loading-box .spinner-box .loading-word {
@@ -642,9 +660,9 @@ code { word-break: break-all !important; }
 }
 
 #loading-box .spinner-box .configure-core {
-  width: 100%;
-  height: 100%;
-  background-color: #37474f;
+	width: 100%;
+	height: 100%;
+	background-color: #37474f;
 }
 
 div.loaded div.loading-left-bg {
