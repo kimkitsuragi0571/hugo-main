@@ -1,5 +1,5 @@
 +++
-title = "Hugo部署使用方法"
+title = "Hugo部署静态博客基本使用方法"
 date = "2026-01-11T11:20:41+08:00"
 draft = false
 image = "dragon.jpg"
