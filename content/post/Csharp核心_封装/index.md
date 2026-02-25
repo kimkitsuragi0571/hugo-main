@@ -1,8 +1,8 @@
 +++
-title = "Csharp基础 思维导图"
+title = "Csharp核心-封装 思维导图"
 date = "2026-02-25T11:20:41+08:00"
 draft = false
-image = "barsaka.jpg"
+image = "death.jpg"
 categories = ["博客相关"]
 tags = ["博客","笔记"]
 
@@ -12,7 +12,7 @@ tags = ["博客","笔记"]
 
 ##### 
 
-<embed src="CSharpBasic.pdf" type="application/pdf" width="100%" height="800px" />
+<embed src="CsharpCore_1.pdf" type="application/pdf" width="100%" height="800px" />
 
 
 
