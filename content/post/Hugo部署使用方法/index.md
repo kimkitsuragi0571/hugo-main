@@ -2,7 +2,7 @@
 title = "Hugo部署静态博客基本使用方法"
 date = "2026-01-11T11:20:41+08:00"
 draft = false
-image = "dragon.jpg"
+image = "cover.jpg"
 categories = ["博客相关"]
 tags = ["博客","笔记"]
 

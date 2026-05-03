@@ -1,0 +1,182 @@
+﻿+++
+title = "UR1 9 音频和补充知识"
+date = "2026-05-03T10:20:04+08:00"
+draft = false
+categories = ["Unity"]
+tags = ["Notes"]
++++
+
+- 音频相关
+  - 音频文件导入
+    - 常用格式
+      - wav,mp3,ogg,aiff
+    - 进度条右边
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_94b9b964-1287-4382-98a8-f6bdc8e45950.png)
+      - 中间这个是点开该文件自动播放,切到其他文件就不会播放
+    - 面板设置
+      - Force To Mono（多声道转单声道）
+        - 将多声道音频强制转为单声道，混合过程中会被标准化。
+      - Normalize（标准化）
+        - 强制为单声道时，混合过程中被标准化。
+      - Load In Background（后台加载）
+        - 在后台加载音频，不阻塞主线程
+      - Ambisonic（立体混响声）
+        - 如果音频文件包含立体混响编码的音频，需启用此选项，一般 3D 混响或者 VR 场景才会用到
+      - Load Type（加载类型）
+        - Decompress On Load
+          - 特点：不压缩形式存在内存，加载快，但内存占用高
+          - 适用：小音效
+        - Compress in memory
+          - 特点：压缩形式存在内存，加载慢，内存小
+          - 适用：仅较大音效文件
+        - Streaming
+          - 特点：以流形式存在，使用时解码。内存占用最小，CPU 消耗高
+          - 适用：性能优先但内存紧张的场景
+      - Preload Audio Data（预加载音频数据）
+        - 勾选后进入场景就加载音频；不勾选则第一次使用时才加载
+      - Compression Format（压缩方式）
+        - PCM：音频以最高质量存储，无压缩
+        - Vorbis：相对 PCM 压缩比更高，根据质量决定压缩程度
+        - ADPCM：包含噪音、会被多次播放的声音（如碰撞声）适用
+      - Quality（音频质量）
+        - 只有在 Format 中选择 Vorbis 时，才会依据质量参数进行压缩
+      - Sample Rate Setting（采样率设置）
+        - Preserve Sample Rate
+          - 描述：此设置可保持采样率不变（默认值）。
+        - Optimize Sample Rate
+          - 描述：此设置根据分析的最高频率内容自动优化采样率。
+        - Override Sample Rate
+          - 描述：此设置允许手动覆盖采样率，可有效地将其用于丢弃频率内容
+  - 音频源和音频监听
+    - AudioSource音效源
+      - AudioClip (音频切片)
+      - Output (音频输出)
+        - Output声音混响,除非声效游戏不然用不上
+      - Mute (静音)
+      - Bypass Effect (绕过效果器)
+        - 开关滤波器效果
+      - Bypass Listener Effects (绕过监听器效果)
+        - 快速开关所有监听器效果
+      - Bypass Reverb Zones (绕过混响区域)
+        - 快速开关所有混响区效果
+      - <mark style="background-color:#fef3c7;">Play On Awake (唤醒时播放)</mark>
+        - PlayOnAwake脚本依附的对象一生成就开始播放
+        - 除了BGM一般是通过代码打开播放,不会自己开始
+      - Loop (循环)
+      - Priority (优先级)
+        - Prioity优先级越高,场景中音效多的时候越不容易被擦除
+      - Volume (音量)
+      - Pitch (音高 / 播放速度)
+        - Pitch音高就是常见的整蛊音效加速hhh
+      - Stereo Pan (立体声平移)
+        - 2D 声音立体声位置，相当于左右声道
+        - StereoPan设为0,直接根据音效自身左右声道来播放,不咋用
+      - Spatial Blend (空间混合)
+        - 就是设为0直接2D音效,在哪里播放都一样
+        - 1就是3D音效
+      - 3D Sound Settings (3D 音效设置)
+        - Doppler Level (多普勒强度)
+        - Spread (扩散角度)
+          - 扩散角度设置为 3D 立体声还是多声道
+        - Volume Rolloff (音量衰减)
+          - Logarithmic Rolloff：靠近声源时声音很大，离开时衰减很快。
+          - Linear Rolloff：距离越远，听到的声音越小。
+          - Custom Rolloff：根据自定义曲线设置音量变化。
+        - Min Distance (最小距离)
+          - 最近距离，在此距离内声音保持最大音量
+        - Max Distance (最大距离)
+          - 最远距离，超过这个距离声音不再衰减
+    - AudioListener (音频监听器)
+      - 音效监听，相当于场景里的 “耳朵”
+      - 默认挂载到场景的 MainCamera 上
+      - 场景中创建多个主摄像机会默认都挂载监听器，导致报错
+  - 音频控制脚本
+    - 获取脚本组件
+      - `AudioSource audioSource;`
+      - `audioSource = this.GetComponent<AudioSource>();`
+    - 代码控制播放停止
+      - `audioSource.Play();`
+      - `audioSource.Stop();`
+      - `audioSource.Pause();`
+      - `audioSource.PlayDelayed(5);`
+        - 延迟播放,参数是秒数
+      - `audioSource.UnPause();`
+        - 停止暂停,和直接play没区别(何意味)
+    - 代码检测音效播放
+      - `if(audioSource.isPlaying)`
+        - 放Update里面检测属性,判断是否正在播放
+        - 没有直接提供检测音乐是否播放完毕的功能
+    - 动态控制音效播放
+      - 1.用的不多的方法
+        - 直接在要播放音效的物体上挂载音效源,勾选play on Awake
+        - 然后`Instantiate(obj);`通过实例化来播放音效
+      - 2.用一个AudioSource来控制播放不同的音效
+        - `public AudioClip cli;`
+        - `AudioSource aus = this.gameObject.AddComponent<AudioSource>();`
+        - `aus.clip = cli;`
+          - 音效切片传入音效源的音效切片上
+          - 这样就可以创建多个音效切片,选择其中一个播放
+        - `aus.Play();`
+  - 一个GameObject可以挂载多个 音效源脚本AudioSource
+    - 比如一个角色同时有「脚步声」和「背景音乐」,就可以挂两个 AudioSource
+    - 但是`AudioSource aud = GetComponent<AudioSource>();`
+      - 当物体上有 多个 AudioSource 时，它只会返回第一个找到的
+    - 手动给每个 AudioSource 一个专属的变量对应
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_9b8146cc-2268-4b62-8afe-9508fef9af96.png?x-tos-process=image/resize,w_400)
+  - 麦克风输入相关
+    - 我是很难想象能用得到这一节
+    - 跳过暂时不学了
+- 必备知识点补充
+  - 1.场景切换和游戏退出
+    - 切换场景
+      - `Application.LoadLevel("Test2");`
+        - 额,老版本的方法,不会报错,只会有警告,仍然可以切换场景
+      - `SceneManager.LoadScene("Test2");`
+        - 使用前必须把场景加载到列表中,不然报错
+    - 退出游戏
+      - `Application.Quit();`
+        - 在编辑模式下没有作用
+        - 发布游戏后才有用
+  - 2.隐藏鼠标和锁定相关
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_bf86e7eb-831d-4cc8-d7d9-8420e1ed7236.png?x-tos-process=image/resize,w_400)
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_3d2e200d-9b2a-4d0c-81cd-699a74000a47.png?x-tos-process=image/resize,w_400)
+      - 找正方形图片才不会变形
+      - 材质格式改成Cursor
+    - 鼠标限制
+      - `CursorLockMode.None`
+        - 不锁定鼠标，鼠标可以自由移动
+      - `CursorLockMode.Locked`
+        - 锁定并隐藏鼠标，鼠标被限制在屏幕中心
+        - 在 Unity 编辑器中按ESC键可解除锁定
+      - `CursorLockMode.Confined`
+        - 限制鼠标在游戏窗口范围内，不会超出窗口边界
+    - 鼠标图片
+      - Cursor.SetCursor()
+        - 参数一（tex）自定义光标纹理
+          - 需要导入为正方形图片（避免变形）
+          - 要把纹理导入设置中的Texture Type改为Cursor。
+        - 参数二（Vector2.zero）光标热点偏移位置
+          - Vector2.zero表示以图片左上角为点击原点。
+        - 参数三（CursorMode.Auto）光标渲染模式
+          - Auto表示自动选择硬件 / 软件光标模式
+  - 3.随机数
+    - C#里面的随机数
+      - `System.Random r = new System.Random();`
+        - Unity和C#中的Random类所处命名空间不同,不是同一个
+        - 用C#中随机数必须指定命名空间
+          - 但是你这里不能using System
+          - 引入有重名类的命名空间,导致报错
+          - 只能直接System.Random
+        - 好吧Unity里也不咋用C#的随机数
+      - `r.Next(0, 100);`
+    - Unity里的随机数
+      - int重载
+        - `int rand = UnityEngine.Random.Range(0, 100);`
+          - 边界左包含,右不包含,即0~99[)
+      - float重载
+        - `float randf = UnityEngine.Random.Range(1.1f, 99.9f);`
+          - 左右均包含[]
+  - 4.自带委托
+    - 调用C#的委托同样需要`System.Action<>`
+    - Unity自带委托
+      - `UnityAction<string> uac1 = (str) =>{};`

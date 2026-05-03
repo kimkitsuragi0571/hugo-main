@@ -1,0 +1,174 @@
+﻿+++
+title = "UR1 7 Camera和光源组件"
+date = "2026-05-03T10:20:04+08:00"
+draft = false
+categories = ["Unity"]
+tags = ["Notes"]
++++
+
+- Camera
+  - 知识点
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_607c945d-56e8-46e4-be7e-9a17dbb988da.png?x-tos-process=image/resize,w_400)
+      - 黑色的稍微看看就行,红色的是重点
+    - 重要的
+      - Clear Flags（清除标记）
+        - skybox（天空盒）
+          - 天空盒一般用来做3D游戏
+        - Solid Color（颜色填充）
+          - 纯色背景一般用来做2D游戏,颜色填充可以换成不同颜色
+        - Depth only（只画该层，背景透明）
+          - 只画该层,背景透明
+            - 配合下面的culling mask选项
+            - 其实就是只渲染某些特定层级,比如去掉Player层级
+        - Don't Clear（不移除，覆盖渲染）
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_7884b80d-b4c9-45c7-8f20-3d32b39dfc1b.png?x-tos-process=image/resize,w_225)
+            - 选择后关闭"清除每一帧"
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_f8f442fa-f120-4378-da8b-02c537483d9c.png?x-tos-process=image/resize,w_187)
+            - 实现残影效果
+      - Culling Mask（剔除遮罩）
+      - Projection（投影模式）
+        - Perspective（透视模式）
+        - orthographic（正交摄像机）
+        - FOV Axis
+          - 设置适配宽窄屏幕时候,是垂直还是水平缩放?
+        - field of view
+          - 视口大小
+        - 物理相机
+          - 额,摄影相关的知识点,看不懂喵
+      - Clipping Planes（裁剪平面）
+        - 渲染平面距离
+          - near和far
+          - 最近XX距离开始渲染,最远XX距离开始渲染
+            - 太远太近的就不渲染了
+            - 避免卡模型之类的
+        - <mark style="background-color:#fef3c7;">有时候会导致模型裁剪,比如模型重合了平面只显示个对折的三角形这种</mark>
+      - Depth（相机深度）
+        - 渲染顺序上的深度
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_7c4b8ef8-26d5-4737-e166-85eba47b48e1.png?x-tos-process=image/resize,w_368)
+          - 数字越小越先被渲染
+        - 有多个摄像机AB,先渲染的摄像机(depth = -1)就会被后渲染的摄像机(depth = 1)覆盖,相当于个画面的优先级
+          - 就记住这个就行了
+        - 配合Flags里面的Depth Only
+          - 两个摄像机,一个只渲染Player,一个除开Player,然后两个摄像机场景叠加
+            - FPS里面的持枪手部就是这样咯
+          - 注意你选择SkyBox和颜色填充就没法实现这效果
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_675dd8c8-b3e2-4b7e-911e-ee1de062b6f5.png?x-tos-process=image/resize,w_313)
+      - Target Texture（目标纹理）
+        - 主要用来做小地图和监控内容的
+        - 创建Render Texture图片
+        - 选中摄像机,拖动到Render Texture
+        - 摄像机上就没有内容了,被转移到图上
+          - 相当于拍照嘛
+        - 似乎这样就不会影响前面层级的摄像机渲染??
+      - Occlusion Culling（遮挡剔除）
+        - 是否启动剔除遮挡
+        - 就是被其他东西彻底挡住的物体,干脆就不渲染,节省性能
+    - 不重要的
+      - Viewport Rect（视口矩形）
+        - 其实就是改动画面占屏幕位置而已
+        - 做分屏游戏倒是用得上
+      - Rendering Path（渲染路径）
+        - 短时间默认就行了,别管
+      - Allow HDR（允许高动态范围渲染）
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_3077be75-53ee-4ece-cd73-e8ac55501d5c.png?x-tos-process=image/resize,w_400)
+      - Allow MSAA（允许多重采样抗锯齿）
+  - Camera函数
+    - 常用静态成员
+      - 主摄像机获取
+        - `print(`[Camera.main.name](http://Camera.main.name)`);`
+          - 场景上必须有一个 tag为MainCamera的摄像机
+      - 获取摄像机的数量
+        - `print(Camera.allCamerasCount);`
+      - 得到所有摄像机
+        - `Camera[] allCamera = Camera.allCameras;`
+        - `print(allCamera.Length);`
+      - 渲染相关委托
+        - 摄像机剔除前处理的委托函数
+          - `Camera.onPreCull += (c) =>{    };`
+        - 摄像机 渲染前处理的委托
+          - `Camera.onPreRender += (c) =>{    };`
+        - 摄像机 渲染后 处理的委托
+          - `Camera.onPostRender += (c) =>{    };`
+    - 常用成员
+      - 得到主摄像机对象 上的深度 进行设置
+        - `Camera.main.depth = 10;`
+          - 界面上的参数都可以在Camera中获取
+      - 世界坐标转屏幕坐标
+        - `Vector3 v = Camera.main.WorldToScreenPoint(this.transform.position);`
+          - x和y对应的就是屏幕坐标 z对应的是 这个3D物体距离摄像机有多远
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_ea647279-aa02-411d-d43d-a9b08d6d30c4.png?x-tos-process=image/resize,w_213)
+      - 屏幕坐标转世界坐标
+        - `Vector3 v = Input.mousePosition;`
+          - 光标位置Vector3存储,Z默认为0
+        - `v.z = 10;`
+          - Z代表的就是横截面到起始点的距离,物体在横截面上移动
+        - `obj.position = Camera.main.ScreenToWorldPoint(v);`
+- 光源组件
+  - Light组件
+    - 常用
+      - Type（光源类型）
+        - Spot（聚光灯）
+          - Range（发光范围距离）
+          - Spot Angle（光锥角度）
+        - Directional（方向光/环境光）
+        - Point（点光源）
+        - Area(baked only)（面光源）
+          - 场景中不能实时显示,只有烘焙后才能显示
+          - 场景中实时光源就是可以动态变化,但是消耗性能,所以用到烘焙光源到一张图上,类似鬼泣4
+      - Color（灯光颜色）
+      - Mode（灯光模式）
+        - Realtime（实时光源）
+          - 性能消耗有点大
+        - Baked（烘焙光源）
+        - Mixed（混合光源）
+      - Intensity（灯光强度）
+      - Shadow Type（阴影类型）
+        - 就是游戏里面设置阴影质量而已
+      - Cookie（灯光遮罩 / 投影纹理）
+        - 资源包里的Cookie拖动到面板上,实现不同的照射效果
+        - 比如探照灯和白炽灯的区别
+      - Draw Halo（球形光环开关）
+        - 光晕效果,灯泡周围有佛光
+      - Flare（耀斑光晕）
+        - 就是看太阳的时候会有的那种炫光效果
+        - 使用需要添加Flare Layer脚本,贴图拖动进light组件里面
+        - 可以素材库里右键创建lens flare
+          - 现在只能导入别人做好的
+      - Culling Mask（剔除遮罩）
+        - 剔除遮罩层,决定哪些层的对象收到该光源影响
+        - 同样指定层级
+    - 不常用
+      - Indirect Multiplier（间接光倍增）
+        - 就是光线经过一次反射后强度是变强还是变弱
+      - RealtimeShadows（实时阴影）
+        - 具体选项等阴影计算才用得上
+      - Cookie Size (Cookie 纹理尺寸)
+        - 就是调整Cookie效果的尺寸
+      - Render Mode（渲染模式）
+        - 反正就是分配不同Light的性能消耗和质量
+  - 光照环境面板
+    - 常用
+      - Skybox Material（天空盒材质）
+        - 选择天空盒,然后再这里材质也对应选择天空盒
+        - 如果要自己做天空盒材质,就是Material->shader里选天空盒
+    - 不常用
+      - Sun Source（太阳来源）
+        - 场景中光源混合呈现出整体的光照效果
+      - Environment Lighting（环境光设置）
+        - Source（环境光源颜色）
+          - Gradient
+            - 就是可以单独设置,天空一种光照,地面另一种光照
+          - Skybox
+            - 就是设定天空地面光照为一个整体
+        - Ambient Mode(全局光照模式)
+          - 这个要下面的光照烘焙啥的,这里暂时不管
+        - Environment Reflection
+          - 环境反射探针的时候才会用,这里不管
+      - Fog（雾开关）
+        - Color（雾颜色）
+        - Mode（雾计算模式）
+          - 修改start和end,离摄像机多远多近有雾,还有更改雾的效果
+          - Mode 就是三种雾的算法而已
+      - Halo Texture（光源周围挥着光环的纹理）
+        - 光晕效果更改(甚至能变成方的)
+        - 还能改耀斑,光晕的各种

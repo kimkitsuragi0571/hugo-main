@@ -1,0 +1,120 @@
+﻿+++
+title = "UR1 6 Input和Screen"
+date = "2026-05-03T10:20:04+08:00"
+draft = false
+categories = ["Unity"]
+tags = ["Notes"]
++++
+
+- Input
+  - Input键鼠输入
+    - 输入相关内容一定是写在Update中的
+    - 检测鼠标输入
+      - 鼠标在屏幕位置
+        - `print(Input.mousePosition);`
+          - 左下角为XY坐标系原点
+          - <mark style="background-color:#fef3c7;">返回的仍然是Vector3,Z轴始终为0</mark>
+          - <mark style="background-color:#fef3c7;">坐标范围和分辨率有关</mark>
+            - 如 1920×1080 屏幕，X 范围[0,1920]，Y 范围[0,1080]
+      - 中键滚动
+        - `print(Input.mouseScrollDelta);`
+          - 返回值是Vector2,X轴始终为0
+          - 上Y=1,下Y=-1
+      - +
+        - 按键按下瞬间
+          - `if (Input.GetMouseButtonDown(0))`
+            - 只触发一次,长按没用
+            - 但仍然写在Update里面,因为需要每帧都检测
+        - 按键抬起瞬间
+          - `if (Input.GetMouseButtonUp(0))`
+        - 正在按键
+          - `if (Input.GetMouseButton(0))`
+            - 只要按住就会一直输出
+    - 检测键盘输入
+      - 按下瞬间
+        - `if (Input.GetKeyDown(KeyCode.W))`
+          - 只触发按下一次
+          - <mark style="background-color:#fef3c7;">KeyCode 是自带枚举,属于 UnityEngine 命名空间</mark>
+      - 抬起瞬间
+        - `if(Input.GetKeyUp(KeyCode.W))`
+      - 键盘长按
+        - `if (Input.GetKey(KeyCode.W))`
+          - 同样持续触发
+    - 检测默认轴输入
+      - 概念
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_50039af6-b553-4802-df8f-23c5b90ac5c6.png?x-tos-process=image/resize,w_268)
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_eb1cecf5-707a-4700-b891-8e7f766a0230.png?x-tos-process=image/resize,w_261)
+          - Unity内置了18个轴
+            - 如Jump轴默认对应空格键
+          - InputManager可以找到
+      - 键盘
+        - `print(Input.GetAxis("Horizontal"));`
+          - 检测AD输入,X轴上-1到1变换
+          - 传入的是字符串
+        - `print(Input.GetAxis("Vertical"));`
+      - 鼠标
+        - `print(Input.GetAxis("Mouse X"));`
+          - 这里Mouse X也是18个轴里面的一个
+        - `print(Input.GetAxis("Mouse Y"));`
+      - GetAxisRaw用法一样
+        - 返回值仅限-1,0,1
+        - `print(Input.GetAxisRaw("Horizontal"));`
+        - `print(Input.GetAxisRaw("Vertical"));`
+      - 如果想用键盘输入让物体移动
+        - `float hor = Input.GetAxis("Horizontal");`
+          - 方法返回值是一个float值
+        - `Vector3 moveDir = new Vector3(hor, 0, 0);`
+          - 设定移动方向,Unity默认right是X轴正向
+        - `transform.Translate(moveDir * 1 * Time.deltaTime);`
+          - 沿着局部坐标系移动
+    - 其他
+      - 任意键长按
+        - `if (Input.anyKey)`
+          - 同样持续触发
+      - 任意键按下瞬间
+        - `if (Input.anyKeyDown)`
+      - 打印这一帧输入的字符串
+        - `print(Input.inputString);`
+          - 比如按下A就输出A咯
+  - Input其他输入
+    - 手柄输入
+      - 返回连接的所有手柄/控制器的名字数组
+        - `string[] strs = Input.GetJoystickNames();`
+          - Update是一个每秒60次的循环,这句都没必要重复获取
+          - 想打印所有手柄,全写start里面不就得了
+      - 按键按下
+        - 同样是GetButton那三个
+    - 移动设备触摸输入
+      - 判断是否有触摸
+        - `if (Input.touchCount > 0)`
+          - touchCount > 0 表示屏幕上有手指
+      - 获取第一根手指（索引从0开始）
+        - `Touch t1 = Input.touches[0];`
+      - 获取触摸位置
+        - `print(t1.position);`
+      - 获取相对上次位置的变化量（拖动方向/距离）
+        - `print(t1.deltaPosition);`
+          - 就是两次位置的差值
+    - 陀螺仪输入
+      - 开启陀螺仪才能正常使用重力感应
+        - `Input.gyro.enabled = true;`
+      - 获取设备重力加速度向量
+        - `print(Input.gyro.gravity);`
+      - 获取设备旋转角速度
+        - `print(Input.gyro.rotationRate);`
+      - 获取设备旋转四元数
+        - `print(Input.gyro.attitude);`
+- U2.1 Screen
+  - 静态属性
+    - 不常用
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_6c1bcf47-d349-4d5b-8856-12b3ca86b691.png?x-tos-process=image/resize,w_280)
+    - 常用
+      - 分辨率
+        - `Resolution r = Screen.currentResolution;`
+        - `print(Screen.width);print(Screen.height);`
+          - 得到的是当前窗口而非设备本身的分辨率
+      - 屏幕休眠模式
+        - `Screen.sleepTimeout = SleepTimeout.NeverSleep;`
+  - 静态方法
+    - `Screen.SetResolution(1920, 1080, false);`
+      - 设置分辨率

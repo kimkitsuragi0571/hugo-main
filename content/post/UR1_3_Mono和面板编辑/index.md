@@ -1,0 +1,193 @@
+﻿+++
+title = "UR1 3 Mono和面板编辑"
+date = "2026-05-03T10:20:04+08:00"
+draft = false
+categories = ["Unity"]
+tags = ["Notes"]
++++
+
+- 脚本成员获取(都是Mono的子类方法)
+  - 重要变量
+    - `this.gameObject`
+      - 获取当前脚本挂载的 GameObject
+      - `print(this.gameObject)`或者`print(`[gameObject.name](http://gameobject.name/)`)`都行
+    - `this.transform`
+      - 获取当前脚本挂载物体的 Transform 组件
+        - 当然直接transform也可以
+      - `print(this.transform.position)`
+        - 获取/设置物体的世界坐标位置
+      - `print(transform.eulerAngles)`
+        - 获取 / 设置物体的欧拉角旋转
+      - `print(transform.localScale)`
+        - 获取 / 设置物体的局部缩放
+    - `this.enabled`
+      - 获取 / 设置当前脚本是否启用
+      - 设置为false时生命周期函数暂停执行
+      - 不存在`this.gameObject.enabled`直接报错
+        - 毕竟游戏物体都删除了肯定没法执行脚本
+    - 同一个脚本挂载的不同物体,这种的执行顺序很难去控制
+      - 之前说的设置里面指定的方法似乎也没法改同一个脚本的顺序
+  - 重要方法
+    - 获取别的脚本(挂载的obj的)成员
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_b5956ae5-8c3a-4cf3-965c-66df92de1382.png?x-tos-process=image/resize,w_400)
+        - 变量指定Cube类型的意义看图
+          - 记得把挂载了Cube脚本的物体拖拽上
+        - 这是Unity中的引用赋值(并非反射),C#里没有这种写法
+          - 怪不得看不懂
+      - <mark style="background-color:#fef3c7;">一个继承mono的脚本里面实例化另一个继承了mono类的脚本也不行</mark>
+        - 比如说在Walk脚本里面实例化Run脚本对象(二者都继承Mono)
+        - `Run x = new Run();`
+          - 像这种就是错误的
+    - 获取自身挂载的单个组件
+      - `Cube cubeScr = this.GetComponent("Cube") as Cube;`
+        - <mark style="background-color:#fef3c7;">返回的是基类 Component,所以需要转化为脚本类型</mark>
+        - 哦好吧,不推荐的方法,看看得了
+        - 如果没有对应脚本,直接返回null
+      - `Cube cubeScr = this.GetComponent(typeof(Cube)) as Cube;`
+        - 原理和反射无关,现在也没人这么写了
+      - `Cube cubeScr = this.GetComponent<Cube>();`
+        - <mark style="background-color:#fde8e8;">最常用,获取Cube脚本组件泛型就写Cube</mark>
+          - 想获取Transform组件直接写就行
+        - 但是这里获取Capsule组件就不行,因为没有挂载
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_e781461f-6c0f-4f15-8fdc-6fb2144eec08.png?x-tos-process=image/resize,w_296)
+          - 这里Capsule变量只是一个可以手动挂载/脚本赋值的变量
+          - 甚至你空着不手动挂载都可以
+          - 改成private(默认不序列化呗)
+          - 这写法也有点多余,自身组件直接获取不就行了
+    - 获取自身挂载的多个组件
+      - 直接用数组
+        - `Cube[] arr = this.GetComponents<Cube>();`
+          - 注意获取的是所有"Cube脚本"组件,所以这里只有一个(不重复挂载的话)
+        - `print(array.Length); // 打印当前物体上挂了多少个Cube脚本`
+      - 用List装填
+        - 分开写法
+          - `List<Cube> list = new List<Cube>();`
+            - 不能实例化的只是脚本,实例化List没问题(因为list类没有继承mono)
+          - `this.GetComponents<Cube>(list);`
+            - 实例化个list列表,然后把组件装进list列表
+            - 好处是复用已有list,不会GC效率高
+          - `print(list.Count); // 打印List里的脚本数量（和数组Length一致）`
+        - 另一种间接写法
+          - `List<Cube> list = GetComponents<Cube>().ToList();`
+            - <mark style="background-color:#fef3c7;">这里返回的是Collider[]数组,所以需要ToList();</mark>
+    - 获取自身+子对象的组件
+      - 获取单个
+        - `Cube lt = this.GetComponentInChildren<Cube>(true);`
+          - <mark style="background-color:#fde8e8;">参数true：失活的子物体也能找到；false：只能找到激活的子物体</mark>
+          - <mark style="background-color:#fde8e8;">单个获取：找到第一个符合条件的Cube脚本（含自身）</mark>
+      - 获取多个
+        - 数组
+          - `Cube[] lts = this.GetComponentsInChildren<Cube>(true);`
+        - List
+          - `List<Cube> list2 = new List<Cube>();`
+          - `this.GetComponentsInChildren<Cube>(true, list2);`
+    - 获取自身+父对象的组件
+      - 获取单个
+        - `Cube lt = this.GetComponentInParent<Cube>();`
+          - <mark style="background-color:#fef3c7;">不需要参数,因为父物体要是失活了子物体脚本没法执行</mark>
+      - 获取多个
+        - 数组
+          - `Cube[] lts = this.GetComponentsInParent<Cube>();`
+        - List
+          - `List<Cube> list3 = new List<Cube>();`
+          - `this.GetComponentsInParent<Cube>(list3);`
+  - 如果是获取外部物体的组件
+    - **前提** ：public Capsule cap; 已在脚本中声明，并拖拽赋值
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_275ea5a1-3c91-4327-afa7-1c69d1bcc3c5.png?x-tos-process=image/resize,w_400)
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_27947c26-f450-4584-c761-bd8d40575aa8.png?x-tos-process=image/resize,w_400)
+- 面板成员编辑
+  - 变量的序列化
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_3c829c00-e4bc-4545-cf4d-8406bf7bab40.png?x-tos-process=image/resize,w_400)
+      - 继承Mono的类没法用构造器
+        - 这里序列化面板修改算是替代了初始化的作用
+      - 序列化:内存对象变成可保存数据
+        - 比如设置HP=100,只存放在内存中,游戏一关就没了
+          - 序列化 = 存盘
+          - 反序列化 = 读档
+        - <mark style="background-color:#fde8e8;">序列化就是将其写为二进制保存进文件中</mark>
+        - 注意对于字段是[SerializeField]而不是[Serialiable]
+      - 为什么 [SerializeField] 可以序列化 private 变量
+        - Unity 的序列化根本不遵守 C# 的访问权限
+          - public 字段 → 默认序列化
+          - private/protected → 不序列化
+        - 序列化private的好处
+          - 代码层面：安全，外部不能改
+          - 编辑器层面：可见、可改、可保存
+      - [HideInInspector]特性
+        - 加了就在面板中隐藏
+    - 不能被序列化的类型
+      - 静态变量:不属于实例
+      - 委托:可以实例化,但是默认不能序列化
+        - 委托本质是代码引用而不是数据
+      - 接口:不能实例化,但是不能序列化主要是因为没有数据/字段/状态
+        - 二者没有啥逻辑关系
+      - 属性:不能序列化
+      - 字典:逻辑过于复杂,一般不能实例化
+        - 常用解决方案是拆分为两个 List 模拟，或使用 Odin、新版 SerializedDictionary(以前用过的可序列化字典)
+    - 可以被序列化的类型
+      - array,List,enum,GameObject都可以序列化
+        - 而且面板中也会显示对应的样式
+      - 结构体/类加上序列化就需要指定命名空间
+        - 注意是System.Serializable,Unity中并没有默认引入using System
+        - 脚本中有多个结构体/类也可以,只有继承了mono的类需要和脚本同名
+    - 序列化不同类型加上不同特性
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_5748a250-2fea-4ff4-a696-0211e0ec36a6.png?x-tos-process=image/resize,w_400)
+        - <mark style="background-color:#fde8e8;">class只序列化自身没用</mark>
+          - 1.类序列化后,还需要将指定成员序列化,不然没变化
+            - 但是类没有序列化,那么所有成员序列化了也没有用
+          - 2.最后还需要序列化化对应实例字段Student stu,不然面板仍然不显示
+            - 访问性对应需要注意,类声明用特性,实例化直接public就报错
+              - 总之都用序列化就可以了
+            - `[SerializeField]Student stu;`
+              - <mark style="background-color:#fef3c7;">注意这里用的序列化字段....Field</mark>
+        - List / Array类型本身不需要序列化
+          - <mark style="background-color:#fef3c7;">只需要序列化成员,对比class</mark>
+            - `List<Student>中Student加过 [Serializable] 即可`
+          - 但是List<Student> stuList;这个字段本身仍然需要序列化(很神秘罢)
+            - <mark style="background-color:#fef3c7;">同样需要序列化字段本身[SerializeField]</mark>
+        - Dic默认不能序列化
+          - 用 Odin 插件,加上[ShowInInspector]
+          - <mark style="background-color:#fef3c7;">封装成可序列化类 + List</mark>
+            - ![image-1](https://document-image.mubu.com/document_image/32569566_fb86b7c6-7579-4595-9c84-d2b21956ad91.png?x-tos-process=image/resize,w_187)
+        - 接口 不能直接序列化
+          - 用 **序列化父类 + 多态**
+          - `[SerializeReference]public IFly fly;`
+        - 属性不能序列化
+          - 用 **字段 + 封装** ，或用 Odin
+          - `[field: SerializeField]public int Hp { get; set; }`
+            - 把特性标记到自动生成的私有字段上
+  - 辅助特性
+    - `[Header("各种属性")]`
+      - 给面板上变量分组
+    - `[Tooltip("闪避")]`
+      - 悬停会有说明
+    - `[Space()]`
+      - 两行变量添加行间距
+    - `[Range(0, 10)]`
+      - 变量改为滑条
+        - 好吧,填入数值那个界面也能直接拖动,这里意义不大
+    - `[Multiline(3)]`
+      - 多行显示字符串
+        - 不写参数默认3行
+    - `[TextArea(3, 4)]`
+      - 滚动条显示字符串
+        - 不写参数默认超过3行显示滚动条
+    - `[ContextMenuItem("重置钱", "Test")]`
+      - 为变量添加快捷方法
+        - 后面一个参数名填方法名
+        - 必须有对应同名的无参无返回值方法
+        - 面板右键"添加特性的字段"就会执行这个方法
+          - 没错这个特性是添加的另一个字段上的
+          - 这个特性也只能添加到字段上
+    - `[ContextMenu("哈哈哈")]`
+      - 让脚本可以在面板的...里面点击执行
+      - 同样必须是无参无返回值的方法
+  - 面板中变量存储
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_61cb62b4-1896-4938-d865-8a22bc3ce705.png?x-tos-process=image/resize,w_400)
+      - 1.修改面板中的i就是在修改脚本中的变量i本体,不存在什么复制体两个变量
+      - 2.这里把我脚本拖拽到GameObj上,脚本上修改默认值为200,但是面板上i仍然为100
+        - 相当于拖拽到Obj上之后就是个独立的脚本了
+      - 3.运行途中手动把i改为999,运行完毕还是会变回100
+        - 运行期修改无法保存
+        - 额,介绍了种比较笨的方法保留变化,感觉没用
+          - 运行期点击复制脚本

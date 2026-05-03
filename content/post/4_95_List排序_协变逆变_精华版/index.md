@@ -1,0 +1,95 @@
+﻿+++
+title = "95 List排序 协变逆变 精华版"
+date = "2026-05-03T10:20:02+08:00"
+draft = false
+categories = ["C-Sharp"]
+tags = ["Notes"]
++++
+
+- List排序
+  - 自带排序
+    - `List<int>.Sort()`
+    - ![image-1](https://document-image.mubu.com/document_image/bc8a5f1d-270e-4fd3-8a95-13b9d70af095-32569566.jpg?x-tos-process=image/resize,w_400)
+    - ArrayList有同样的方法,底层依赖 Array.Sort 实现
+  - 自定义类排序
+    - <mark style="background-color:#fff3bf;">总结起来就这两张图,我居然写了大半天</mark>
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_845da1c2-e312-41be-81fe-757be39732f6.png?x-tos-process=image/resize,w_300)
+        - 有了这个,定义List<Student>后就能调用.sort了
+      - ![image-1](https://document-image.mubu.com/document_image/9b477535-0e8e-43fd-b972-fa2858e48fe1-32569566.jpg?x-tos-process=image/resize,w_306)
+    - 直接用报错
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_8c031faa-449d-4be3-8d21-c2220c894d2c.png?x-tos-process=image/resize,w_400)
+      - <mark style="background-color:#fef3c7;">直接对自定义类调用sort()报错</mark>
+        - <mark style="background-color:#fef3c7;">即使其中存储的是int类型成员</mark>
+      - int类型可以直接用是继承了对应接口
+    - 需要继承IComparable<T> 接口
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_be50dd42-be41-418f-83fc-be0a53695e57.png?x-tos-process=image/resize,w_400)
+        - 实现该接口后,当你调用item.sort的时候,就会调用这个CompareTo方法
+        - sort反复比较当前元素和另一个元素大小,调用CompareTo()方法
+          - 然后根据IComparable()的返回值来确定顺序
+        - <mark style="background-color:#fef3c7;">return中调用的是int.CompareTo方法,和这里手写的Compare方法不同</mark>
+          - 既不是重载也不是递归,完全是两个没关系的方法
+      - 需要在接口中补全当前类
+        - 接口补成其他类也不报错,但是没有卵用
+      - CompareTo方法的返回值
+        - `return this.money.CompareTo(other.money)`
+          - 返回-1,升序,this.Age更小
+        - `return other.money.CompareTo(this.money)`
+    - 也可以不继承泛型接口
+      - ![image-1](https://document-image.mubu.com/document_image/9b477535-0e8e-43fd-b972-fa2858e48fe1-32569566.jpg?x-tos-process=image/resize,w_306)
+        - 涉及装箱拆箱,比较麻烦
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_51bf296c-2d1f-4046-920f-2edac31b096e.png?x-tos-process=image/resize,w_314)
+        - 甚至可以不调用int的CompareTo方法,自己手打比较逻辑
+  - 通过委托函数排序
+    - 1.`List<Student>.Sort()`直接用
+      - 就是调用继承了Student类中手写的`CompareTo`方法
+    - 2.直接调用有两个限制
+      - 首先Student类必须继承`IComparable<Student>`接口
+      - 如果想要换比较规则,必须在类中修改手写的CompareTo方法
+    - 3.`List<Student>.Sort(传入函数)`重载来解决
+      - 此时Student类既不需要继承接口,也不需要类中手写CompareTo方法
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_b826fd12-1e6a-4c9b-feef-89cbfcf5a8d7.png?x-tos-process=image/resize,w_400)
+        - 这里的lambda表达式简化写法
+        - 首先参数 (Student a,Student b),这里简化为了(a,b)
+          - 因为泛型List<Student>,所以这里只能是两个Student参数
+        - 其次这里没写return
+          - `()=>tea1.Age.CompareTo(tea2.Age);`是简化写法
+          - `()=> { return tea1.Age.CompareTo(tea2.Age);}`真实写法
+    - 4.原理解释(算了搞懂写法就行)
+      - 这里参数列表实际上是系统自带委托
+        - `list.Sort( new Comparison<Student>(比较函数) );`
+      - 对应委托类型声明
+        - `public delegate int Comparison<in T>(T x, T y);`
+        - 泛型委托逆变
+- 协变逆变
+  - 概念
+    - 子类->父类就是和谐的,因为本来父类容器可以装子类,所以叫协变
+  - 调用
+    - <mark style="background-color:#fef3c7;">只有泛型接口和泛型委托能使用</mark>
+      - `class Test<in T>{  }`就报错了
+      - `public void TestFunc(T value){  }`同样报错
+    - ![image-1](https://document-image.mubu.com/document_image/ad6aab3e-8957-4597-9110-6e497a8e00b1-32569566.jpg?x-tos-process=image/resize,w_218)
+      - <mark style="background-color:#fce7f3;">非常容易搞混,一定记住逆变in,协变反而是out当返回值</mark>
+      - 协/逆变 修饰委托
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_2205c183-b98a-4df3-bfac-74d14175a596.png?x-tos-process=image/resize,w_223)
+      - 协/逆变 修饰接口
+  - 结合里氏原则
+    - <mark style="background-color:#fde8e8;">难度实在有点高,短时间也用不上,知道实现了什么功能就可以了</mark>
+    - 1.首先定义泛型+协/逆变接口
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_3d577828-86fb-447f-c9d6-6b8c50af6230.png?x-tos-process=image/resize,w_274)
+    - 2.继承接口的类实现契约
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_97d47921-52d8-47f5-a1bd-df3bc280678c.png?x-tos-process=image/resize,w_293)
+    - 3.这里先讲协变out接口的情况
+      - 总结就一句话,能让`IStudy<Student>` 当作 `IStudy<Person>`
+        - 这俩同一个接口只是补充不同的泛型,肯定不具有继承关系
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_9f4be3b7-cfe3-4cdc-f30f-10b7a55335e2.png?x-tos-process=image/resize,w_296)
+        - 1.第一句只是因为接口没法实例化,这里就接口容器封装子类对象
+        - 2.第二句`IStudy<Person> per = stu;`
+          - 左边的IStudy<Person>接口需要一个Person对象
+          - 右边的stu返回的则是一个Student对象
+        - 3.通过协变的限制,让Student当Person用一定是安全的
+    - 4.其他几种情况
+      - 逆变接口
+        - 能让 ISpeak<Person> 当作 ISpeak<Student> 用
+      - 配合委托
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_8ed32ca7-7b7d-4f9b-e151-4ec9b262b319.png?x-tos-process=image/resize,w_400)
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_a8d51b44-af9e-4b20-d9b8-deb1d2809b7a.png?x-tos-process=image/resize,w_400)

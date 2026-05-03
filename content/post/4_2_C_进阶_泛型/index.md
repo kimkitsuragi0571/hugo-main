@@ -1,0 +1,95 @@
+﻿+++
+title = "2 C#进阶 泛型"
+date = "2026-05-03T10:20:02+08:00"
+draft = false
+categories = ["C-Sharp"]
+tags = ["Notes"]
++++
+
+- 概念
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_13e48b9d-e3b7-420b-c040-cc15734cf6bb.png?x-tos-process=image/resize,w_400)
+- 分类
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_6127334d-d925-4079-c92f-e23016b99ed3.png?x-tos-process=image/resize,w_400)
+    - 占位字母大写且随便哪个,个数不限
+    - 用的最多的就是T
+  - (空)
+    - 泛型类
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_b3edde9e-a02c-4508-bd3a-4f02ccc47d0c.png?x-tos-process=image/resize,w_226)
+        - 这里value就可以不设定类型,用T来占位
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_6573ffb8-f4a0-4671-837e-50ccd35de1b9.png?x-tos-process=image/resize,w_400)
+        - 调用时补全类型(随便你补成啥)
+        - 类型当成参数来用了,所以说实现了类型参数化
+        - <mark style="background-color:#fde8e8;">补全t对象泛型是int后,这个对象的泛型就没法更改了</mark>
+          - 不能说又改成string
+      - 多个泛型符
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_d60bd08a-bf8c-4425-dd90-6a4d4844472f.png?x-tos-process=image/resize,w_400)
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_c5eedc8d-8f38-459e-e87b-918e4503429e.png?x-tos-process=image/resize,w_500)
+          - 这里补全甚至用泛型类来套娃
+    - 泛型接口
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_61a9fc54-660a-4a15-fcb0-7575f40fc4fc.png?x-tos-process=image/resize,w_219)
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_7fd301df-de28-4d45-fd83-ca1cf634718f.png?x-tos-process=image/resize,w_400)
+        - 子类继承接口的时候补全参数
+    - 泛型方法
+      - 普通类中的泛型方法
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_638a4fe9-d1b2-4259-e8fb-6ff2dad85ecb.png?x-tos-process=image/resize,w_258)
+          - 占位符申明后可以在参数列表中使用
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_e02d101d-0041-4053-f252-176a0ff70d4c.png?x-tos-process=image/resize,w_265)
+        - 可以实现逻辑处理
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_66344684-1cbe-4f06-e094-69419bcd51ed.png?x-tos-process=image/resize,w_246)
+            - default()就是初始化
+      - 泛型类中的泛型方法
+        - 首先普通类和泛型类是可以重名的,因为一个有占位符
+          - 和重载还是有区别的,应该把<T>当成名字一部分
+        - 并非泛型方法
+          - ![image-1](https://document-image.mubu.com/document_image/6843e0be-6604-49d8-8340-57eca636e22b-32569566.jpg?x-tos-process=image/resize,w_313)
+            - 这里T参数都不能自由变化了
+            - 而且方法本身也没有占位符
+            - ![image-1](https://document-image.mubu.com/document_image/32569566_ce88e40c-6166-4416-8964-d009bf9598da.png?x-tos-process=image/resize,w_400)
+              - 调用方法时也只能传入int参数
+        - 真正的泛型方法
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_da3ca41a-6c48-4669-961e-0e8e3b350172.png?x-tos-process=image/resize,w_220)
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_19b11c7f-d838-4401-b5bc-a624b9127143.png?x-tos-process=image/resize,w_219)
+            - 但是调用时也可以省略占位符,此时编译器自动识别你传入的参数类型
+- 泛型约束
+  - 概念
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_9abb809d-f0ff-40ee-ad03-2340a205a703.png?x-tos-process=image/resize,w_400)
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_0764e19d-0c61-42cd-f310-ea326439d3e1.png?x-tos-process=image/resize,w_400)
+  - 六种约束
+    - 值类型约束
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_0d510125-a362-49f2-f684-2682a40a505a.png?x-tos-process=image/resize,w_400)
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_09df3a13-c2b6-4459-9603-95522a317b2b.png?x-tos-process=image/resize,w_400)
+        - 这里补全为引用类型就报错了
+    - 引用类型约束
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_e117b3d9-eb4a-4972-fb47-cc843606a7dd.png?x-tos-process=image/resize,w_400)
+    - 公共无参构造约束
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_b4fa3298-efe2-420f-cde1-5bb0520d6574.png?x-tos-process=image/resize,w_268)
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_5095fed3-8c81-4cbc-b45c-a00b068c9a76.png?x-tos-process=image/resize,w_213)
+          - Test2中无参构造就这么被顶掉了
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_229fd30a-f481-411e-ac3c-72409b506368.png?x-tos-process=image/resize,w_319)
+          - 传入Test2就只会报错鸟
+      - 传入结构体也是可以的
+        - 结构体默认无参之前是没法手动申明的
+        - 就算写了有参构造也不会顶掉默认无参
+      - 还得注意
+        - 1.无参构造还得是public
+        - 2.不能是抽象类,因为抽象类没法被实例化
+          - 你这里传入参数没法new,导致报错
+    - 类约束
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_1f4cfe78-316c-4baa-db4d-36aee55ba7a6.png?x-tos-process=image/resize,w_331)
+        - 传入的必须是指定类本身或者其后代 类
+        - 传入父类也是不行的
+    - 接口约束
+      - ![image-1](https://document-image.mubu.com/document_image/831f9e7d-7ac3-4b53-873d-e0b055955348-32569566.jpg?x-tos-process=image/resize,w_400)
+        - 必须是某个接口的派生类
+        - 传入接口本身是不行的,毕竟接口都不能实例化
+      - AI补充的我有点懵,后面再看吧
+        - 约束可以是「非泛型接口」或「泛型接口」
+    - 泛型约束
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_642fb8a2-6154-4a79-9f7d-5617d910e885.png?x-tos-process=image/resize,w_400)
+      - 传入的是另一个泛型类型本身或者其子类
+  - 约束可以配合使用
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_ceada28b-4302-47fe-c238-9196ea59f9c9.png?x-tos-process=image/resize,w_400)
+  - 多个泛型有约束
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_36f697b0-1127-4736-c340-9cd66f4ceca5.png?x-tos-process=image/resize,w_400)
+      - 就是给不同占位符加上不同约束
+      - 注意中间是逗号

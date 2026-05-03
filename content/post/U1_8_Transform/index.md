@@ -1,0 +1,90 @@
+﻿+++
+title = "U1 8 Transform"
+date = "2026-05-03T10:20:03+08:00"
+draft = false
+categories = ["Unity"]
+tags = ["Notes"]
++++
+
+- Vector基础
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_c6fff91e-03b4-4135-9758-69ce958e17d9.png?x-tos-process=image/resize,w_242)
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_dc136c5d-fd41-49bc-caff-0b2d7d51e92d.png?x-tos-process=image/resize,w_238)
+- Vector常用方法
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_b9e3c256-6b9c-48f2-b477-0509ba894d52.png?x-tos-process=image/resize,w_237)
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_a004b1ce-e146-4f79-9254-d1d83d6743e6.png?x-tos-process=image/resize,w_236)
+- 位置位移
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_426162cd-de3d-49f0-f690-6d38fc263297.png?x-tos-process=image/resize,w_294)
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_fb8b4f25-2d48-4aff-94f7-e822da3c4471.png?x-tos-process=image/resize,w_298)
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_46b4a7bc-eba1-40a8-cb15-1644b8416f4c.png?x-tos-process=image/resize,w_296)
+    - 没法只改x
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_1c8ec349-2c45-4c3e-e203-920ec72af3ad.png?x-tos-process=image/resize,w_400)
+    - 实际上就等于是重新搞了个vpos复制数据，然后更改再赋值回去
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_8c2d9353-ee5b-414d-8540-4570c6d5dcd8.png)
+    - 对象旋转,local坐标系也发生了变化(what?)
+- Transform位移相关
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_14b45607-d28e-48aa-c23d-cfd6899ebd54.png?x-tos-process=image/resize,w_400)
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_69ac21b7-72d4-4eea-d754-461fc51cfb67.png?x-tos-process=image/resize,w_193)
+      - 通过计算XYZ轴上分别修改了多少,然后在坐标系上修改
+      - 反正实际就是方向向量乘以位移量而已
+    - 要放在Update里面,每一帧都在位移实现移动效果
+    - 如果把this.transform.换成Vector3.就变成了朝着世界坐标系的方向移动
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_1eacd676-1146-4c17-a600-02cf00887b46.png?x-tos-process=image/resize,w_400)
+- Transform角度和旋转
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_b6a1cd1b-088d-4e33-9243-ca3f17fcde45.png?x-tos-process=image/resize,w_400)
+    - `this.transform.rotation`得到的返回值是四元数,这个第二部分讲
+    - 现在先获取欧拉角
+    - 改变面板上显示内容一定是先改变相对父对象的角度
+  - 计算
+    - 普通计算
+      - 同样每一帧加上固定角度实现不停变化
+    - API计算
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_9c8e45c4-3f04-42a9-9be5-9f97385f335f.png?x-tos-process=image/resize,w_400)
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_cc866987-06e4-4b1b-a4f2-a7f4395640a5.png?x-tos-process=image/resize,w_400)
+- Transform缩放和朝向
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_0c696dae-a991-477c-a700-e29fe49085f5.png?x-tos-process=image/resize,w_400)
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_dd90300e-7a95-48cd-f757-0312f9c5fca6.png?x-tos-process=image/resize,w_400)
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_5435b37c-dbd3-469b-db5c-55faf5e647b4.png?x-tos-process=image/resize,w_400)
+- Transform父子关系
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_b46ef0d5-5ad6-45f2-c33d-112abc3896d6.png?x-tos-process=image/resize,w_400)
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_4f103db7-61c9-43c9-f7c5-35adaca8b968.png?x-tos-process=image/resize,w_400)
+    - 主要是挂载UI的时候保证面板不会乱动?
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_630b0669-4754-4466-d7be-568f4a974214.png)
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_288bc548-0127-4bbc-9767-aab03afdc05d.png?x-tos-process=image/resize,w_400)
+    - (空)
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_10771353-0959-496e-99ec-b99d7f0e51b1.png?x-tos-process=image/resize,w_400)
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_71f34071-bfb6-4436-f479-863085791da8.png?x-tos-process=image/resize,w_400)
+- Transform坐标转换
+  - 世界坐标系转本地坐标系:用于判断大概位置
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_589ba43c-185f-4118-9ed2-0c810571241c.png?x-tos-process=image/resize,w_400)
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_3bce2386-94f9-407b-dcfd-53261e607c6e.png?x-tos-process=image/resize,w_243)
+        - 斜的是local坐标系,直的是world坐标系
+        - 已知world坐标系上一点A(0,0,1),求其相对于local坐标系的位置
+        - 额,我完全想复杂了,根本没有所谓"转化"
+          - 实际就是求A相对于local坐标系原点O'的坐标而已
+      - 这里Cube放大/缩小,相对局部坐标系位置也发生变化
+      - 立方体的边长就是本地坐标系下单位向量的模，因此会受缩放影响
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_105769f4-837d-4462-c7a1-a97e0f7e53c8.png?x-tos-process=image/resize,w_400)
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_d6f73e45-4916-4db7-990d-823f5edd4afd.png?x-tos-process=image/resize,w_251)
+        - 通过平移方向向量???
+        - 向量起始点从O变为O'
+  - 本地坐标系转世界坐标系
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_9be6356e-7124-4c2e-c636-99fb4a2de298.png?x-tos-process=image/resize,w_400)
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_4a0fa5a6-7a9f-41ab-d852-6510843e9c5b.png?x-tos-process=image/resize,w_157)
+        - 从相对O'的(0,0,1)转化为相对O的
+- 修改位置
+  - 直接赋值（绝对位置）
+    - `// 世界坐标transform.position = new Vector3(1, 2, 3);`
+  - 相对移动（走一步）
+    - `// 本地坐标（相对父物）transform.localPosition = new Vector3(1, 2, 3);`
+- 修改旋转
+  - 直接设置欧拉角（最常用）
+    - `// 世界欧拉角transform.eulerAngles = new Vector3(0, 90, 0);`
+    - `// 本地欧拉角（相对父物体）transform.localEulerAngles = new Vector3(0, 90, 0);`
+  - 旋转一定角度（相对旋转）
+    - `// 自身旋转（Y轴转1度）transform.Rotate(0, 1, 0);`
+    - `// 绕世界轴旋转transform.Rotate(0, 1, 0, Space.World);`
+- 看向目标
+  - `transform.LookAt(目标物体.transform);`
+- 修改缩放（Scale）
+  - ### 直接设置缩放
+    - `// 每帧变大一点transform.localScale += new Vector3(0.01f, 0.01f, 0.01f);`

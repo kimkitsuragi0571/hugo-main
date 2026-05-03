@@ -2,7 +2,7 @@
 title = "Csharp核心-封装 思维导图"
 date = "2026-02-25T11:20:41+08:00"
 draft = false
-image = "death.jpg"
+image = "cover.jpg"
 categories = ["博客相关"]
 tags = ["博客","笔记"]
 

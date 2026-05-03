@@ -1,0 +1,81 @@
+﻿+++
+title = "UR1 1 基本设置"
+date = "2026-05-03T10:20:04+08:00"
+draft = false
+categories = ["Unity"]
+tags = ["Notes"]
++++
+
+- 窗口
+  - Scene场景
+    - 按住ctrl就是依单位(一小格一小格)移动
+    - Y可以同时实现旋转和移动
+    - ALT配合鼠标实现视口中心点旋转
+    - F物体视口居中
+    - 坐标系依屏幕为参照物
+      - 垂直屏幕Z,平行屏幕横向X,平行屏幕垂直Y
+  - 场景上方工具栏
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_f483a46b-71ee-4ce1-a538-f0fe91777c8a.png?x-tos-process=image/resize,w_271)
+      - 渲染模式:有着色器渲染,网格渲染,均显示 三种
+      - 光源:就是要不要开启默认的日照光线啥的
+    - 右边的板块
+      - 最右边的小圆球:就是给个选中时的显示效果(是否有框啊之类的)
+      - 右上角可以设置快速布局
+    - Game窗口右键
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_62109402-0a64-41f3-e019-d8816dd3c289.png?x-tos-process=image/resize,w_202)
+      - Display
+        - 就是分屏游玩
+      - stats
+        - 渲染统计信息,这个后面讲
+    - Pivot和Center
+      - 坐标系是单独父对象中心还是父子整体的中心
+  - 场景下面文件栏
+    - project
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_a44ff9e6-d681-4292-c4f1-8fbacd9153a2.png?x-tos-process=image/resize,w_69)
+      - 左边是按类型查找,右边是按标签查找
+    - Console
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_3d297858-6af3-4227-9a62-7380909aef5e.png?x-tos-process=image/resize,w_225)
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_934ea357-6dd0-4db3-a784-a39e1552eba8.png?x-tos-process=image/resize,w_74)
+        - <mark style="background-color:#fef3c7;">678注意,如果你没有选择这三个提示,就算报错控制台也不会输出</mark>
+        - Editor就是控制开发信息,暂时不用
+  - Inspector
+    - 名字旁边小方块就可以设置不同颜色的图标
+    - Tags设置标签
+    - Layer图层,比如UI层游戏层
+    - 右边可以选静态对象,这个后面讲
+      - 用于处理场景墙面等不会移动的物体
+      - 只有静态物体可以被烘焙光照
+    - Transform脚本:控制物体位置
+      - 只要是场景中的物体都需要位置信息
+- 设置栏
+  - Edit
+    - Selection操作编队
+      - <mark style="background-color:#fef3c7;">ctrl加alt就是保存编队</mark>
+      - <mark style="background-color:#fef3c7;">ctrl加shift就是加载编队</mark>
+    - ProjectSetting
+      - 对项目各种更改如Layer或者Tag,都会保存到ProjectSetting的.Asset文件
+      - 删除文件夹里的文件,改动的设置就丢失了
+    - Preference
+      - External Tool可以修改对应的代码编辑器(比如Visual )
+      - Languages
+        - 额,就改成中文嘛
+      - Clear All PlayerPrefabs
+        - 额,清除预制体?
+      - Grid and Snap
+        - <mark style="background-color:#fef3c7;">Grid size</mark>
+          - <mark style="background-color:#fef3c7;">就是改变场景参考线的宽度</mark>
+        - Move
+          - 改变按住ctrl时的移动距离
+          - 22版似乎把这个选项改到了Scene上
+  - GameObject
+    - <mark style="background-color:#fef3c7;">Move to View</mark>
+      - 把选中的物体放在视口中心
+    - <mark style="background-color:#fef3c7;">Align with View</mark>
+      - 选中物体放在摄像机位置
+        - 和抱脸虫一样
+      - 一般用来设置摄像机
+        - 选中摄像机就可以放在指定视角了
+    - <mark style="background-color:#fef3c7;">Align View to Selected</mark>
+      - 视角中心重置为选中物体的Z轴正方向
+    - Toggle Active Stats
+      - 额,就是激活/关闭物体而已

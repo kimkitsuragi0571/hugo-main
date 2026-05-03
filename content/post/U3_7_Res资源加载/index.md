@@ -1,0 +1,119 @@
+﻿+++
+title = "U3 7 Res资源加载"
+date = "2026-05-03T10:20:04+08:00"
+draft = false
+categories = ["Unity"]
+tags = ["Notes"]
++++
+
+- Res同步加载
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_9d8fc3ef-c3e5-4c39-ad58-8788823830b4.png?x-tos-process=image/resize,w_400)
+    - 比如加载一个预制体,那对应的C#对象就是GameObject
+    - 预设体需要实例化,其余都是直接用
+  - 几种文件
+    - 预制体文件
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_6d922faf-1aa3-48fc-8709-04e97f4f9b50.png?x-tos-process=image/resize,w_400)
+        - 预制体Cube放Res文件夹下面
+        - 这个方法默认返回的Object基类容器
+        - Load只是把配置资源加载到内存中
+          - 并没有创建场景中物体
+          - 不加载配置也没法创建物体
+        - Res文件夹位置不限,个数可以多个
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_dccd6ae9-7a5e-4f4f-8d18-0ce20bbb7f31.png?x-tos-process=image/resize,w_172)
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_f1c22df6-081b-42ec-9121-9b30444b8a7c.png?x-tos-process=image/resize,w_223)
+            - Cube和Sphere都会创建
+    - 音频文件
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_2f305418-7ad4-4cd8-8b18-4c9bd430e290.png)
+        - 注意是Res文件夹下路径对应上
+      - 场景中创建AudioSources,然后把音频文件拖动到AudioClip中
+      - 如果不想手动拖拽,就可以用代码创建
+        - `public AudioSource audioS;`
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_19bfd88a-36e9-47b8-ac31-89120b2bbd1b.png?x-tos-process=image/resize,w_400)
+          - 不需要实例化,只要赋值就能和AudioSource关联
+          - 此时AudioClip上并没有手动挂载,运行中自动挂载
+    - 文本资源
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_805ee849-4ec3-40a4-b0f5-f4613e8fae3e.png?x-tos-process=image/resize,w_400)
+        - 常用的就图上这几种格式
+    - 图片资源
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_6f37f9ff-4334-49e2-ba53-650747607244.png)
+        - `private Texture tex;`
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_dcf7abc6-0c55-4364-f6fc-f9f41dc62107.png?x-tos-process=image/resize,w_400)
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_ac0df80c-79a2-4164-9a75-09dfd9662ff1.png?x-tos-process=image/resize,w_400)
+    - 其他资源
+      - 要什么类型直接用
+      - 具体后面讲
+  - 解决资源重名
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_0f505866-ea23-4bc7-e68b-0531ce76dd90.png?x-tos-process=image/resize,w_329)
+      - 比如test.png和test.txt就是同名
+  - 泛型方法
+    - 就是前面typeof的高级版
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_c64cd7fe-47eb-4f6f-fdec-a4305c680c0a.png?x-tos-process=image/resize,w_400)
+- Res异步加载
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_d430c158-5560-41d9-897a-1014350184a0.png?x-tos-process=image/resize,w_400)
+    - 新线程加载的资源不能中途加载到一半拿出来用
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_ff52139d-0419-46a3-d622-ab7f6ad72f13.png?x-tos-process=image/resize,w_262)
+      - 就是原子性嘛
+      - 必须加载完毕才会返回给中间商对象
+    - <mark style="background-color:#fde8e8;">新开的线程不能访问Unity</mark>
+      - 他居然说讲过???什么时候讲过了
+      - 99%的Unity功能都不能碰
+      - 这里也是没有直接新线程碰Unity的,而是加载资源返回到中间的一个对象内,然后主线程通过这个对象提取资源
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_fcac5b68-4f76-41c3-c60f-8eae0e4dd4da.png?x-tos-process=image/resize,w_400)
+    - 拿到的资源不能马上用(至少等一帧),所以叫异步加载?
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_517c7ebd-c69f-4f6b-ddd0-cdd9eabdd3f3.png?x-tos-process=image/resize,w_318)
+      - 执行完毕就会调用基类中的事件,从而提醒新线程已经完成加载
+    - 也有非泛型的版本,懒得讲了
+      - 总之泛型可以解决同名方法
+    - 所以这里单纯执行右边的语句不够,还要用对象接收监听是否加载完成
+    - 新开一个线程去下载资源,下载完毕就是自动调用LoadOVer函数
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_ab681cc3-0ccd-4cbf-cccb-fba75598030e.png?x-tos-process=image/resize,w_400)
+      - 这里传入参数和事件记得对应
+    - (空)
+      - `private Texture tex;`
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_ac10cfaa-39bf-4bcd-9b70-e31c19274cf6.png?x-tos-process=image/resize,w_400)
+        - <mark style="background-color:#fde8e8;">一定注意检查是否为空</mark>
+        - 中间有一段时间图片在加载,此时就为空不能执行调用
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_ce60fddc-5543-48a3-de1d-ca2f7eb9821d.png?x-tos-process=image/resize,w_400)
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_cf25e51f-20cc-4aca-ceeb-bd8854bb9305.png?x-tos-process=image/resize,w_400)
+      - 类中Object类型的对象asset就是资源
+      - 直接rq.asset肯定得不到资源
+      - 注意不要直接使用,等加载结束
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_6c2ba658-803c-4f0d-e520-59ad61f25aba.png?x-tos-process=image/resize,w_400)
+    - 通过协程加载资源
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_56eade9e-2d7c-4b8a-c22a-2d9d0456634f.png?x-tos-process=image/resize,w_400)
+      - 协程除了返回null还可以返回rq对象
+        - ResourcesRequest和WaitForSeconds的父类都是YieldInstruction
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_34e3cb0e-b0f6-482d-9e64-e862c7fd2105.png?x-tos-process=image/resize,w_400)
+          - 知道在异步加载了就会去协程协调器中判断资源是否加载完毕
+          - 加载完毕才会继续执行下一句tex=..
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_99aebbe2-24a9-4639-a3c2-fda72e61d412.png?x-tos-process=image/resize,w_400)
+          - 这里打印帧数也能看出来至少得等一帧才能使用
+    - 区别
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_943179dd-982a-4c63-d5fb-3161012ac6a6.png?x-tos-process=image/resize,w_337)
+- Res卸载资源
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_af45c20c-4a77-4ef0-ace4-709dd9b7d13e.png?x-tos-process=image/resize,w_400)
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_61a6fa82-b180-4709-835e-70ffc1f63a4c.png?x-tos-process=image/resize,w_400)
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_adc63560-9484-4427-9b07-6254d5eb2f81.png?x-tos-process=image/resize,w_400)
+    - ctrl+7 profiler窗口打开性能检测
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_56f89a48-3ecd-4dfe-ff75-b870f2d79d50.png?x-tos-process=image/resize,w_400)
+- 场景异步加载
+  - 之前讲过的场景同步切换
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_f5270114-1bc4-4343-f0a1-41c843c4134b.png?x-tos-process=image/resize,w_263)
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_d7a0f1b3-23f4-498c-adc8-b06d409ff5b9.png?x-tos-process=image/resize,w_272)
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_3a2ae5e7-ddb1-42ca-8436-ae33b37dae5e.png?x-tos-process=image/resize,w_400)
+    - 事件回调就没有协程加载的那种问题
+    - 函数引用存储到事件里面
+    - 场景上删除对象但是内存中依然存在,下一次垃圾回收才处理
+    - 但是即使垃圾回收,函数仍已经回收到了事件中
+      - 对象回收,函数仍然存事件里
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_e47b25a1-b2db-494d-bbe7-5b22a2cb85d9.png?x-tos-process=image/resize,w_400)
+    - 可能顺带把脚本删除了
+  - 加上个切换场景不被移除就可以了
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_30d8881a-67bd-4195-d663-fda78eb82bf8.png?x-tos-process=image/resize,w_400)
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_3bc60b4b-807c-4a92-b51a-e50a0c69f7f3.png?x-tos-process=image/resize,w_400)
+    - 异步加载后打印的信息并没有打印
+    - 因为场景切换成功之后,脚本被删除了
+    - 上面那种一定是场景加载结束了做处理,而协程可以在场景加载中做处理
+    - 协程就可以做进度条
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_1ee73bc3-66d8-46af-e41b-8c997dd95fc1.png?x-tos-process=image/resize,w_400)
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_1af27ec3-4163-448f-ee2c-583d8ee1113b.png?x-tos-process=image/resize,w_400)

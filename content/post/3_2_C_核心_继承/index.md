@@ -1,0 +1,194 @@
+﻿+++
+title = "2 C#核心 继承"
+date = "2026-05-03T10:20:02+08:00"
+draft = false
+categories = ["C-Sharp"]
+tags = ["Notes"]
++++
+
+- 基本概念
+  - 特点
+    - 继承的核心是表达 "is-a"（是一种）的关系（比如：大学生是一种学生），而成绩和学生是 "has-a"（拥有）的关系（学生拥有成绩）
+      - 注意使用场景
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_0a074c1f-cfeb-40c4-cfa9-de095340dd08.png?x-tos-process=image/resize,w_374)
+      - 只能有一个爹
+      - 动物可以分为猫,狗,...
+        - 猫又可以分为各种猫..
+      - 子类可以继承父类的private成员
+        - 但是这部分完全没法访问和使用
+  - 写法
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_7f22a6e4-2e7f-43b3-c9dd-b6744e954a0e.png?x-tos-process=image/resize,w_385)
+      - 这里dog就不能继承多个(单根性,只能有一个爹)
+        - 有的语言可以继承多个
+      - <mark style="background-color:#fef3c7;">再写个子类Chihuahua,那么爹Dog和爷Animal都已继承</mark>
+      - 调用父类中的成员变量
+        - 没有重名直接写变量名也可以
+        - 有重名变量就要用base关键字
+  - 访问修饰符的影响
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_e88030d3-ccb6-468d-e46e-eae143b1b2fb.png?x-tos-process=image/resize,w_400)
+      - 这里还追加了internal,不过用的不多
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_f9228f89-ffcc-4440-a4d9-007efd8895f7.png?x-tos-process=image/resize,w_400)
+      - <mark style="background-color:#fef3c7;">父类中private成员不仅外部不能用,子类中也不能用</mark>
+      - <mark style="background-color:#fef3c7;">改成protect成员就可以了,外部不能用但是子类可以用</mark>
+  - 同名成员
+    - 子类和父类可以存在同名的成员
+    - 但是非常不建议使用(goto是吧)
+  - <mark style="background-color:#fde8e8;">子类构造函数和父类有参构造函数这块的知识点:后面没讲就自己补充了</mark>
+    - 哦好吧后面讲了
+- 里氏替换原则
+  - 概念
+    - ![image-1](https://document-image.mubu.com/document_image/10478762-a09e-4e64-8b61-8da3c0ed1248-32569566.jpg?x-tos-process=image/resize,w_400)
+      - 为了实现多态
+        - 以统一的父类类型处理不同子类对象
+        - 多态的概念:同一父类类型的引用，指向不同子类的实例时，调用相同的方法会执行子类各自的实现
+  - 写法
+    - <mark style="background-color:#fde8e8;">关于实例化对象的语法</mark>
+      - Animal one = new Animal();
+        - 实际上左边的Animal变量one相当于栈区指针(就是引用嘛)
+          - 右边的对象Animal()则是堆区开存储对象的类型
+      - Animal two = new Dog();
+        - 声明一个父类类型的引用变量（容器），但让它指向子类类型的对象实例（内容）
+      - <mark style="background-color:#fef3c7;">C#基本不用指针,而是引用(其实就是栈区指针指向堆区内存而已)</mark>
+        - 也就是说C#里面基本不会直接定义指针,而是用引用类型来操控
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_e43615a6-9c5f-4021-b4ac-521a80721521.png?x-tos-process=image/resize,w_400)
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_5f21a349-bf2a-4160-b015-a9674f491049.png?x-tos-process=image/resize,w_400)
+      - 第二种里面堆区分散三块内存
+      - 分别是数组对象,Student对象,Teacher对象
+      - | 场景编号 | 代码示例 | stu is Student 结果 | 能否直接调用 Student 独有方法？ | 核心原因 |
+        | --- | --- | --- | --- | --- |
+        | 1 | Person stu = new Student(); | true（满足） | ❌ 不能 | 编译时stu的类型是Person，编译器仅识别Person的成员，不认Student独有方法；虽运行时是Student，但需转型告知编译器 |
+        | 2 | Student stu = new Student(); | true（满足） | ✅ 能 | 编译时stu的类型就是Student，编译器直接识别并允许调用Student的所有成员（包括独有方法） |
+        | 3 | Person stu = new Graduate(); | true（满足） | ❌ 不能 | Graduate是Student子类，运行时stu真身是Student体系，但编译时类型仍为Person，需转型才能调用 |
+        | 4 | Person stu = new Person(); | false（不满足） | ❌ 不能 | 编译时是Person，运行时真身也是Person，本身无Student独有方法，调用会编译报错 |
+        | 5 | Person stu = new Teacher(); | false（不满足） | ❌ 不能 | Teacher是Person的同级子类，和Student无继承关系，既无Student方法，编译时也不识别 |
+        | 6 | Person stu = null; | false（不满足） | ❌ 不能 | stu未指向任何对象，无成员可调用，且不存在Student的实例，调用会编译 / 运行报错 |
+        - 判断stu的类型:
+          - (空)
+            - 执行阶段看堆中实例类型
+            - 编译阶段看栈中引用类型
+          - 啊,准确来说这个两个阶段看不同类型,是我们通过转型手动实现的
+            - 编译器不自动完成是为了保证安全(让你明说~别让我猜~)
+        - Person stu = new Student();
+          - 能否调用Student子类的独有方法
+            - 看 **编译阶段** 的类型
+              - 栈里引用的声明类型
+          - 能否转型后调用 Student 的独有方法
+            - 看 **运行阶段** 的类型
+              - 堆里的实例类型
+            - (stu as Student).Speak();是否可成功调用
+              - 这里stu运行阶段本来就是Student类型
+              - 但是转型的目的不是为了改变对象本身
+                - 而是告诉编译器stu真实类型为Student
+              - 没有转型，编译器识别不出 stu 的真实类型（Student）
+                - 它只会死死认定 stu 是 Person 类型。
+            - ![image-1](https://document-image.mubu.com/document_image/fbf4a4a7-741f-44b5-973b-79bacd6699d7-32569566.jpg?x-tos-process=image/resize,w_400)
+        - Person stu = new Graduate();
+          - raduate是Student的子类，本质上Graduate对象同时属于Graduate、Student、Person三个类型
+          - stu的类型
+            - 编译时：stu的声明类型是Person
+              - 编译器允许你把它转型成 **任何 Person 的子类**
+              - 编译时stu as Student、stu as Graduate、stu as Teacher都行
+            - 运行时：堆里的Graduate实例 “天生属于” Student 类型（因为继承）
+              - stu as Student/stu as Graduate 都行，只是转型后能调用的方法不同
+              - 因为Graduate继承Student，所以stu as Student/stu as Graduate 都能成功；
+        - 转型的作用总结版本
+          - 编译时stu的声明类型永远是 Person，运行时stu指向的永远是 Graduate 实例
+          - 想把stu“当成 Graduate/Student 用”（保持它本来的类型），也必须手动转型
+            - 因为编译器只认 Person 类型，不认运行时的 Graduate 类型
+          - 想把stu“当成 Teacher 用” 的转型， **运行时一定会失败** （因为实例是 Graduate，和 Teacher 无继承）
+            - 可以编译时候的类型A--通过转型-->运行时的实例类型B,但是这俩必须是有继承关系的
+          - (空)
+            - | 转型方向 | 例子 | 是否需要手动转型？ | 运行是否会失败？ | 核心原因 |
+              | --- | --- | --- | --- | --- |
+              | 向上转型（子→父） | Graduate→Student/Person | ❌ 自动隐式 | ❌ 永远成功 | 子类天生是父类，身份天然合法 |
+              | 向下转型（父→子） | Person→Student/Graduate | ✅ 必须手动 | ✅ 可能失败 | 父类可能指向其他子类（比如 Person→Teacher） |
+            - ![image-1](https://document-image.mubu.com/document_image/8689f22b-f8b9-4da4-9bc4-93a8bb553310-32569566.jpg?x-tos-process=image/resize,w_400)
+              - 子类的实例对象赋值给父类的引用
+              - 能调用父类/祖父类方法,但是不能调用子类的独有方法
+                - stu1.StudentInfo();可以
+                - stu1.PersonInfo();可以
+                - stu1.TopStudentInfo();不可以
+            - 2.向下转型我暂时实在看不懂,等下把
+    - 向上转型的意义
+      - **父类类型的 “容器”** （变量 / 数组 / 集合），装所有子类的实例，不用为每个子类单独写逻辑
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_a144e43c-63e7-40df-ae1c-b527497fe23b.png?x-tos-process=image/resize,w_400)
+          - 一个Student数组就能管理所有种类的子类
+      - 实现多态
+        - ![image-1](https://document-image.mubu.com/document_image/6324c3e7-f89f-4f68-bc82-28ec3b689507-32569566.jpg?x-tos-process=image/resize,w_400)
+    - 向下转型
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_0c5773de-80e6-4e51-bf06-17f2a6e0a8dc.png?x-tos-process=image/resize,w_400)
+        - 向上转型是实现「多态」的基础
+        - p is Student stu 是 C# 7.0 + 的 **模式匹配语法糖** ，等价于 “先判断p是不是Student类型，若是则自动转型为Student并赋值给stu变量”—— 比p is Student+p as Student更简洁；
+  - is和as
+    - is
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_1dec3e64-3b85-4db1-cd61-474b3a76a9f2.png?x-tos-process=image/resize,w_247)
+        - 就是另一种==
+        - 比如我们这里就可以判断labubu is Dog
+    - as
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_26be2074-8599-4db6-8caf-36b9fbba55c8.png?x-tos-process=image/resize,w_252)
+        - 另一种Convert转化
+        - 这里把名字为player的对象转化为Player类型
+          - 然后用Player类型的p来接收
+        - 失败了返回的是null
+          - p中存储的就是null
+    - 组合使用
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_bc4a72be-50c8-46f2-fb90-326ca280b421.png?x-tos-process=image/resize,w_267)
+      - 像上面那种写数组的情况,要判断每个成员的类型,经常用到这种
+        - ![image-1](https://document-image.mubu.com/document_image/ffde46b3-a258-41d5-82fb-4254d9e9de61-32569566.jpg?x-tos-process=image/resize,w_249)
+- 继承中的构造函数
+  - ![image-1](https://document-image.mubu.com/document_image/264ba06f-a7ca-4265-abc0-d879083f31f4-32569566.jpg?x-tos-process=image/resize,w_400)
+    - 声明子类对象的时候,优先调用父类的构造函数
+      - 默认调用的无参
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_6fea8ce3-6ae3-47eb-c705-640d5d2169f1.png?x-tos-process=image/resize,w_341)
+    - 父类重载个有参构造函数,那原来的无参构造肯定就被顶掉了
+    - 而实例化子类对象的时候,默认先调用父类无参构造函数,导致报错
+    - 解决方法
+      - 1.把父类无参构造函数补上(如图)
+      - 2.利用base指定父类构造
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_a8f93986-f63e-433f-b112-499f986a0f0d.png?x-tos-process=image/resize,w_376)
+      - 3.利用this间接调用base
+        - ![image-1](https://document-image.mubu.com/document_image/892bc44a-1eb6-480e-be53-13fb7a2abb35-32569566.jpg?x-tos-process=image/resize,w_344)
+          - this就是那个指定优先级的写法
+          - 这里this()就是优先执行无参构造函数
+            - 写成this(123)就是递归单参数调用自身了
+            - 执行无参构造的时候又会优先执行父类构造函数,从而避免报错
+- 万物之父
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_260242bb-0f94-4d1f-91f4-63edb61e2947.png?x-tos-process=image/resize,w_400)
+    - object所有类的父亲
+  - 接下来就是向上转型和向下转型的知识点了
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_0bc1fbc5-04c2-4cdd-92b7-89ca4977b7a4.png)
+      - 编译器只认stu是Person类型 → 所以你只能调用Person里定义的成员，直接调Student独有的方法会报错（比如stu.SpeakName()编译报错）
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_c2f7715a-8c3a-4f6a-ae31-9e9a31760228.png)
+      - 先判断父类引用stu指向的实例是否真的是Student类型，确认后再安全地向下转型为Student，并调用Student的独有方法Speak()
+  - object类
+    - 同样可以用向下转型调用子类方法
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_a623f812-7830-465a-f521-ce9a1ddfb843.png)
+    - 值类型的装箱与拆箱
+      - ![image-1](https://document-image.mubu.com/document_image/0bd37c9e-09c5-4490-8e73-eb2814684cde-32569566.jpg)
+        - 1.引用类型实例放堆,值类型只放栈
+        - 装箱（Boxing）：把值类型 “打包” 成引用类型
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_6e6284ce-2605-4a8c-f9dc-08be85c57916.png?x-tos-process=image/resize,w_147)
+            - 就是把浮点数搬到堆上,然后让引用obj2指向它
+              - 和向上转型一个意思嘛
+            - 最常见的就是用object类
+              - 和浮点数并没有实际的类继承关系
+              - 但是所有值类型都隐式兼容 object 类型
+                - 本质是通过装箱实现的 “伪继承” 效果
+              - 反正记住object是万能容器就对了
+            - 这个装箱的过程
+              - 代码是不用我们写的
+              - 你让个object引用指向它就行了
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_f7d82e61-ec4c-4b4a-b6e3-af6b7ebcec77.png?x-tos-process=image/resize,w_300)
+            - object万能容器,但是直接装值类型会报错
+            - 装箱就是给值类型套个 “引用外壳”，让它能塞进这个容器
+            - 像这里就可以同时传入int float类型了
+        - 拆箱（Unboxing）：把 “打包” 的值类型取出来
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_52c65fc3-17a2-48a5-a17e-20910f6ab5aa.png?x-tos-process=image/resize,w_202)
+            - 就是把obj引用的浮点数强制转化回来
+            - 必须显式写强制转换把目标类型写上，编译器不自动做
+      - string和数组同样可以
+        - ![image-1](https://document-image.mubu.com/document_image/1fe73c4c-4096-4d6f-8540-e59649a8effa-32569566.jpg)
+          - 都是一种普通转换,一种as转型
+- 密封类
+  - ![image-1](https://document-image.mubu.com/document_image/b4303528-ba13-4d79-bc02-5bca692f2658-32569566.jpg?x-tos-process=image/resize,w_376)
+  - 就是让类不能再被继承,没了

@@ -1,0 +1,166 @@
+﻿+++
+title = "UR2 3 向量"
+date = "2026-05-03T10:20:04+08:00"
+draft = false
+categories = ["Unity"]
+tags = ["Notes"]
++++
+
+- 基本概念
+  - 向量和标量的区别
+  - 向量可以随意平移
+  - 两点决定一个向量
+    - AB向量从A-->B
+    - B-A = (Xb - Xa, Yb - Ya, Zb - Za)
+    - 终点坐标=起点坐标
+  - 零向量
+    - (0,0,0),是唯一一个大小为0的向量
+  - 负向量
+    - (x,y,z)的负向量为(-x,-y,-z)
+      - 大小相等方向相反
+  - 向量的模长
+    - 向量的模长就是向量的长度/始末两个点的距离
+    - 模长 = √x² + y² + z²
+  - 单位向量
+    - 模长为1
+    - 任意一个向量经过归一化就是单位向量
+    - 归一化:(x/模长,y/模长,z/模长)
+- 向量相关属性
+  - Vector3就是可以代表三维向量的喵,这里不重复了
+  - 零向量
+    - `print(Vector3.zero);`
+  - 负向量
+    - `print(Vector3.forward);`
+    - `print(-Vector3.forward);`
+  - 两点决定一个向量
+    - 已知
+      - `Vector3 B = new Vector3(5, 1, 5);`
+      - `Vector3 A = new Vector3(1, 2, 3);`
+    - `Vector3 AB = B - A;`
+  - 向量模长
+    - `print(AB.magnitude);`
+  - 单位向量
+    - `print(AB.normalized);`
+    - `print(AB / AB.magnitude);`
+      - 也可以手动向量归一化
+- 向量四则运算
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_360649b3-74f6-4be6-a04a-b1f551863612.png?x-tos-process=image/resize,w_400)
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_fe0d14c3-b23f-4dc7-f438-f17629334f90.png?x-tos-process=image/resize,w_400)
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_8ed5d30b-ba30-4db5-f7d7-22b9696fbfb0.png?x-tos-process=image/resize,w_400)
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_9a37c69c-678b-4d33-950e-5d91886cc388.png?x-tos-process=image/resize,w_400)
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_d517f904-f202-4195-dc12-c4d1d7bb55f1.png?x-tos-process=image/resize,w_209)
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_77a02503-a03d-49ea-e883-8db7228e9241.png?x-tos-process=image/resize,w_271)
+  - 代码
+    - 向量加法
+      - `this.transform.position += new Vector3(1, 2, 3);`
+        - 在原来坐标加上向量,从而实现物体瞬间移动
+        - 放在Update里面移动也是不连贯的
+      - `this.transform.Translate(Vector3.forward * 5);`
+    - 向量减法
+      - `this.transform.position -= new Vector3(1, 2, 3);`
+    - 向量乘除
+      - `this.transform.localScale *= 2;`
+      - `this.transform.localScale /= 2;`
+- 调试画线补充
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_6b0b47fa-9b0c-497a-dd15-18d0351a772d.png?x-tos-process=image/resize,w_500)
+    - DrawLine第二个参数终点,这里就是实现指向当前物体前方1m
+  - 如果想用射线实现指向目标物体(方向设定为目标点和当前点间向量)
+    - `Debug.DrawRay(this.transform.position, target.position - this.transform.position, Color.red);`
+    - 这里如果是用DrawLine,第二个参数传入other.transform.position就行了
+  - DrawRay画出来的射线长度会受到向量模长影响,可以用单位向量
+    - `Debug.DrawRay(this.transform.position, this.transform.forward, Color.red);`
+    - `Debug.DrawRay(this.transform.position, (target.position - this.transform.position).normalized, Color.red);`
+    - 额,意味不明
+- 向量点积
+  - 公式
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_9212b22e-7f04-4c48-f581-77f7a79c2f07.png?x-tos-process=image/resize,w_144)
+      - <mark style="background-color:#fde8e8;">向量*向量=标量</mark>
+  - 几何意义
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_423e3fab-d275-4248-f7f0-6a154788273f.png?x-tos-process=image/resize,w_247)
+      - 向量点积的正负可以判断夹角
+      - <mark style="background-color:#fde8e8;">当两个向量垂直,点积一定为0</mark>
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_eee2e517-91ff-4bf9-b222-7c6ba1ad23aa.png?x-tos-process=image/resize,w_240)
+      - 利用向量点积求向量夹角
+    - <mark style="background-color:#fce7f3;">向量点积公式</mark>
+      ![向量点积公式-1](https://document-image.mubu.com/document_image/32569566_0972aaaf-c5fa-44c3-9c26-0b5a513c9b2c.png?x-tos-process=image/resize,w_260)
+      - <mark style="background-color:#fce7f3;">所以当AB都是单位向量的时候,二者点积==夹角余弦值</mark>
+      - <mark style="background-color:#fce7f3;">可以由此直接求出向量夹角</mark>
+  - 通过点乘判断对象方向
+    - `float dotResult = Vector3.Dot(this.transform.forward, target.position - this.transform.position);`
+    - 第一个参数是当前物体的前方
+    - 第二个参数是目标物体和当前物体间向量
+      - 也就是指向目标的方向
+    - >=0 目标物体在当前物体前面
+- U3.3 向量
+  - 向量点乘
+    - 方法1
+      - 单位向量算出点乘结果
+        - `dotResult = Vector3.Dot(this.transform.forward, (target.position - this.transform.position).normalized);`
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_4e0dbbf8-322a-4bf7-b867-511e236b942e.png?x-tos-process=image/resize,w_118)
+          - dotResult是两个向量之间的余弦值,(-1,1)之间
+          - <mark style="background-color:#dbeafe;">单位向量点积==夹角余弦值</mark>
+          - 两个向量分别是this前方,两个物体之间的向量
+      - 反三角函数得到角度
+        - `print("角度" + Mathf.Acos(dotResult) * Mathf.Rad2Deg);`
+          - 余弦值转化输出弧度,然后转化为角度
+    - 方法2
+      - Vector3中提供了得到两个向量之间夹角的方法
+        - `print("角度2" + Vector3.Angle(this.transform.forward, target.position - this.transform.position));`
+        - 传入两个向量就能直接得到夹角了,🌿
+  - 向量叉乘
+    - 数学上概念
+      - 好吧其实是个老方法
+        - 已知向量A和向量B,求一个和A,B都垂直的向量C
+        - 所以C和向量A/B点积均为0
+        - 比如这两个求向量c,得到:
+          ![比如这两个求向量c,得到:-1](https://document-image.mubu.com/document_image/32569566_5e4e3db9-433f-4d8e-e1da-b3e8fd0128a7.png?x-tos-process=image/resize,w_147)
+          - 1⋅x+1⋅y+0⋅z=0
+          - 1⋅x+3⋅y+(−1)⋅z=0
+        - 化简后就是x=-y,z=2y
+          - 带入到(x,y,z)
+          - 最后就是(-y,y,2y),提取出y(-1,1,2)
+          - 这里y(或者说系数K)可以是任何数
+            - 因为我们已经求出了向量c的方向,y就是其模长
+            - 多长都无所谓了(只需要垂直AB)
+        - 系数k的正负和这个向量C的方向/ab叉乘顺序关系
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_7ab21968-426a-47c0-c518-2d1ea2487fd6.png?x-tos-process=image/resize,w_123)
+        - 总结为通用公式
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_04a59608-35d9-41e0-f2ac-42342debb956.png?x-tos-process=image/resize,w_256)
+      - 直接用ijk分量形式算
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_3e1998a6-b3df-420d-9cc9-acdca34c8d4c.png?x-tos-process=image/resize,w_264)
+          - 拆分为ijk分向量形式
+        - 我草,前世记忆终于觉醒
+          - 比如求C向量的x分量,就直接不看i部分向量
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_870bc032-8f8a-4d53-c989-6d38e1190d68.png?x-tos-process=image/resize,w_155)
+            - 然后求j,k两个向量的交叉相乘
+          - 这里x就是1*(-1) - 0
+        - 最后求出c=(-1,1,2)
+          - 自动提出系数k
+      - 如果是二维向量,设定为Z=0来算就行
+        - 而真正的二维向量没有叉乘
+  - 向量叉乘
+    - `print(Vector3.Cross(A.position, B.position));`
+      - 得出的就是叉乘向量C
+    - C(x,y,z)中y分量正负
+      - >0,B在向量A右侧
+      - <0,B在向量A左侧
+    - 叉乘判断左右，靠的是  **右手定则**
+      - [如何判断两个矢量叉乘方向？——右手定则_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1Gf4y1e7pF?spm_id_from=333.788.recommend_more_video.0&trackid=web_related_0.router-related-2479604-5lvcw.1776947001091.129&vd_source=84e02b1f50f8f0e11b75732187cfda96)
+  - Vector3里面的线性插值
+    - Mathf和Vector3里面都有插值运算
+      - Mathf的是针对单个浮点数,Vector3则是针对三维向量,对向量三个分量分别做Mathf插值运算
+      - 额,不过其实都差不多,你对每个分量都Mathf.Lerp不就行了
+    - 代码
+      - 先快后慢
+        - `A.position = Vector3.Lerp(A.position, target.position, Time.deltaTime);`
+      - 匀速移动
+        - `time += Time.deltaTime;`
+        - `B.position = Vector3.Lerp(startPos, target.position, time);`
+      - 之前写的匀速方法有缺陷
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_55e02d54-0086-4208-8c34-b548a6f30469.png?x-tos-process=image/resize,w_286)
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_6bee05f3-a0bd-43fe-caa7-19692c0bce72.png?x-tos-process=image/resize,w_267)
+  - 球形插值
+    - `C.position = Vector3.Slerp(Vector3.right * 10, Vector3.forward * 10, time*0.1f);`
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_28ecd6e8-778c-4771-d781-8b29a10ff744.png?x-tos-process=image/resize,w_217)
+      - 用于模拟曲线运动,比如模拟太阳运动弧线
+    - Mathf 里没有 Slerp

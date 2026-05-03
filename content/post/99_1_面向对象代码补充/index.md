@@ -1,0 +1,283 @@
+﻿+++
+title = "1 面向对象代码补充"
+date = "2026-05-03T10:20:03+08:00"
+draft = false
+categories = ["C-Sharp"]
+tags = ["Notes"]
++++
+
+- 静态类和构造函数
+  - (空)
+    - 静态类中静态成员可显式指定 public/private/internal，默认是 internal且 protected 无意义
+    - 静态类本身private/protected都不能用
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_a670b150-a44c-42ea-dfa1-8ac8dcefac53.png?x-tos-process=image/resize,w_400)
+    - 成员方法能直接对成员字段修改
+      - 无论静态与否,只是静态修改的所有对象而已
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_4a1409b6-a53d-4ef1-8038-3d7ec88ec3f1.png?x-tos-process=image/resize,w_400)
+      - 如果像这样传入参数,就没法修改本体了
+      - 修改的只是传入的total复制体
+- 拓展方法和运算符重载
+  - 拓展类:静态类中的静态方法
+    - 但是被拓展的不是静态类
+    - 比如写Person类的拓展方法,一般是新建个public static PersonExtension显得专业一点
+    - 而且一定记得处理null的情况
+  - 运算符重载:公共静态方法
+- 成员属性和索引器
+  - 两种会用到this的声明
+    - 拓展方法
+      - ![image-1](https://document-image.mubu.com/document_image/1733e7ef-9f4c-4666-86c6-44cd41f81891-32569566.jpg?x-tos-process=image/resize,w_400)
+    - 索引器
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_9a952833-2164-4a99-d51a-5746688e32ab.png?x-tos-process=image/resize,w_400)
+- 容易混淆的申明方式
+  - 构造函数
+    - 普通
+      - 有访问修饰符,参数列表,函数体
+      - 没有
+        - 返回值
+      - 注意
+        - 要和原函数同名
+    - 静态
+      - 有static,函数列表,函数体
+      - 没有
+        - 访问修饰符
+        - 返回值
+      - 注意
+        - 函数列表为空
+  - 静态方法
+    - 有返回值,访问修饰符,...
+      - <mark style="background-color:#fef3c7;">静态方法就是个方法,所以啥都不缺</mark>
+    - <mark style="background-color:#fde8e8;">可以加访问修饰符,默认private/internal</mark>
+      - <mark style="background-color:#fde8e8;">但是静态构造函数不能加访问修饰符</mark>
+    - 可以加返回值,默认void
+  - 拓展方法
+    - 同样啥都有
+      - <mark style="background-color:#fef3c7;">注意必须是静态类中的静态方法</mark>
+        - <mark style="background-color:#fef3c7;">静态类容器不能用protected和private,本身修饰符不能用protected</mark>
+        - ![image-1](https://document-image.mubu.com/document_image/02ccf8e8-d942-4c81-a949-cff2cfb12446-32569566.jpg?x-tos-process=image/resize,w_400)
+    - 参数列表是(this int value)
+  - 运算符重载
+    - 同样啥都有
+      - <mark style="background-color:#fde8e8;">注意必须是public静态方法</mark>
+    - 还多出来了 operator +()
+      - 返回值一般就写自定义类型(写个int啥的不报错也用不上)
+  - 成员属性
+    - 属性
+      - 有返回值,修饰符
+      - 没有
+        - 参数列表
+      - 注意
+        - 名字任意
+    - 访问器
+      - 除了get{}/set{}什么都没有
+  - 虚方法
+    - 什么都不缺
+    - 加上个virtual和override就是了
+  - 抽象方法
+    - 没有函数体{}
+      - 其余啥都有
+- 新看增加的知识点
+  - 类和结构体
+    - |  | 类 | 结构体 |
+      | --- | --- | --- |
+      | 字段 | 字段可以定义时有初始值 | 没有初始值 |
+      | 默认无参 | 写有参就覆盖默认无参 | 并不会被覆盖 |
+      | 构造函数参数 | 懒得写 |  |
+      | 构造函数内容 | {}内部直接为空都可以 | {}内部也必须给所有字段赋值 |
+      | 静态构造 | 实例化时/访问静态构造成员调用一次 | 访问静态成员/调用构造函数时调用一次 |
+      | 实例化 | 必须new分配内存 | 只需要Student stu;(并没有调用任何构造函数,只是分配内存空间,字段都没有赋值) |
+      | 继承 | ​ | 只可以继承接口 |
+      - <mark style="background-color:#fce7f3;">静态构造函数调用时机其实99%相同啦</mark>
+      - <mark style="background-color:#fce7f3;">唯一要区别的就是结构体Student stu;的时候并没有调用静态构造</mark>
+  - 运算符重载和拓展方法
+    - |  | 拓展方法 | 运算符重载 |
+      | --- | --- | --- |
+      | 存放位置 | 单独一个静态工具类 | 重载的类内部 |
+      | 修饰符 | 可以不是public(但是不用public没意义) | 必须是public |
+      | 返回值 | 随便 | 返回值不能是void |
+      | 参数 | 随便 | 不能有ref/out,至少一个是类本身 |
+      - 运算符重载唯一一个不能是ref/out
+  - 访问权限
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_b8d1cb38-eef7-454b-ce58-5283bf208964.png?x-tos-process=image/resize,w_400)
+      - 公共的（public）方法Extens，不能把 非公共的（internal）类型Student 当作参数暴露出去
+        - Student类没写修饰符,默认internal
+      - 这里外部类去掉修饰符,改为internal即可
+  - 堆栈区的变化
+    - 装/拆箱的时候
+      - `Object obj2 = 1.2f;`
+        - 浮点数复制一份到堆上,用obj2引用指向它
+      - <mark style="background-color:#fce7f3;">Object stu = new Student()不是装箱!</mark>
+        - 父子类都是引用类型
+  - 静态与继承
+    - 1.静态的共享仅限于类内,并不会被子类继承
+      - 子类无法通过实例.成员访问
+        - 比如Person中的静态字段Country,子类Student,用stu.Country就不行
+      - 当然你直接类.成员 访问不就得了
+        - Person.Country即可
+    - 2.静态构造函数同样子类无法继承
+      - 好吧这个得和下一点结合看
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_5560a973-dbde-46fc-f749-de1bb56fff57.png?x-tos-process=image/resize,w_400)
+    - 3.父类静态构造的调用(额,又是烧脑)
+      - <mark style="background-color:#fde8e8;">1.创建子类实例对象时,并没有创建父类实例</mark>
+        - <mark style="background-color:#fde8e8;">不管你是默认无参还是手写参数</mark>
+        - <mark style="background-color:#fde8e8;">只是初始化了子类实例中的父类对象</mark>
+      - 2.<mark style="background-color:#fef3c7;">子类不会自动调用父类静态构造函数</mark>
+        - 就是说子类继承本身没有写这种逻辑
+      - 3.但是子类实例化的时候,如果是首次访问到父类
+        - 则仍然会调用父类静态构造
+        - <mark style="background-color:#fef3c7;">反正子类实例化仍然会有一次调用父类静态构造就对了</mark>
+    - 4.静态类只能继承自object,且不能被任何类继承
+  - 多态中的各种权限
+    - virtual方法不能是private
+    - static方法只能用new
+    - <mark style="background-color:#dbeafe;">访问权限:重写方法>=父类方法</mark>
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_e209dabd-180c-43d1-d2a4-4fb3cd1c1652.png?x-tos-process=image/resize,w_400)
+      - 总之子类必须更加严格
+        - 所以virtual不能加private呢,子类直接没法重写了
+    - 接口
+      - <mark style="background-color:#dbeafe;">成员只能是默认隐含的public abstract</mark>
+      - 子类实现
+        - <mark style="background-color:#dbeafe;">子类实现成员必须是public</mark>
+          - <mark style="background-color:#dbeafe;">显式实现成员不能加修饰符</mark>
+            - <mark style="background-color:#dbeafe;">显式实现+向上转型,不同容器决定不同同名契约实现</mark>
+              - <mark style="background-color:#dbeafe;">如果子类自身也有同名方法,肯定优先调用自身</mark>
+        - <mark style="background-color:#dbeafe;">而且接口实现成员不加override,对比抽象类</mark>
+        - <mark style="background-color:#dbeafe;">子类实现接口可以用virtual虚方法(还是必须实现具体逻辑)</mark>
+          - <mark style="background-color:#dbeafe;">抽象子类可以用abstract抽象方法(逻辑在后代中实现)</mark>
+          - 接口实现接口的时候也可以不写逻辑
+      - <mark style="background-color:#fff3bf;">接口,抽象方法,虚方法 实现的都是动态绑定</mark>
+        - 注意抽象类中普通方法不是动态绑定
+  - 向下转型和虚方法的区别
+    - 向下转型是解锁子类独有的
+      - 虚方法是重写父类子类重名的
+    - 向下转型中用的还是静态绑定
+      - 虚方法用的动态绑定
+  - 抽象类和接口的成员
+    - 抽象类
+      - 可以含有实例成员,抽象成员
+        - 抽象成员只能在抽象类中,并且必须重写
+        - 抽象索引器一般只写get方法
+      - 不能实例化,所以不能包含的有
+        - +
+          - <mark style="background-color:#fef3c7;">抽象类和静态类不能作为内部类,只能写在命名空间下,所以不能包含</mark>
+          - 不存在抽象构造函数,抽象字段
+          - 不存在抽象常量,抽象静态成员
+            - 接口中的静态抽象成员特殊,可以看做"static abstract"这一整个修饰符
+            - 抽象和静态的理念本就冲突
+          - 不存在抽象拓展方法
+            - 必须写在静态类里面
+          - 不存在抽象运算符重载
+            - 必须是public静态方法
+          - 不存在密封抽象,密封静态
+            - 一个必须继承后重写,一个不能被继承
+            - 两个愿望能被你一次满足也是不容易
+        - 向上转型并没有实例化抽象类,所以不报错
+          - `Biology stu = new Student();`
+    - 接口
+      - 接口可包含的有
+        - "静态抽象"成员,抽象方法,抽象属性
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_65eead95-31b6-451c-97cf-b69e00f7eb5f.png?x-tos-process=image/resize,w_125)
+            - ![image-1](https://document-image.mubu.com/document_image/32569566_b54884c4-925f-4ab1-d726-95fedd240a5a.png?x-tos-process=image/resize,w_180)
+          - 接口里面的默认隐含public abstract,不能显式加
+        - 事件,索引器默认实现
+      - 接口不能包含的有
+        - <mark style="background-color:#fce7f3;">接口：</mark><mark style="background-color:#fce7f3;"> **既不能有实例字段，也不能有普通静态字段** </mark>
+          - 抽象类： **可以有实例字段，也可以有静态字段** ,只是不存在抽象字段
+        - <mark style="background-color:#fef3c7;">没有构造/析构函数</mark>
+        - 和static冲突
+          - 和抽象一样
+        - 和protected/sealed/private 也冲突
+          - 主要是接口作为公共契约
+  - 虚方法和抽象方法
+    - 声明格式
+      - <mark style="background-color:#fef3c7;">抽象方法一定没有{}函数体,虚方法有{}且其中可以不写逻辑</mark>
+    - 重写限制
+      - <mark style="background-color:#fef3c7;">虚方法可以由子类选择性实现,抽象方法必须实现</mark>
+        - 就是之前说的写了virtual可以不写override
+      - 二者都可以被子类无限重写
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_08123528-d4f9-4af5-8580-5f560a3fea2f.png?x-tos-process=image/resize,w_234)
+        - 这里抽象方法已经在子类中实现,所以孙子类不写也不报错
+    - 作用域
+      - <mark style="background-color:#fde8e8;">抽象方法必须放在抽象类中</mark>
+      - <mark style="background-color:#fde8e8;">虚方法则可以写在抽象类普通类中</mark>
+    - 二者冲突的访问修饰符一样
+      - 和抽象abstract函数冲突的修饰符
+        - private
+          - 子类没法访问重写
+        - sealed
+          - 子类没法访问重写
+        - virtual
+          - 抽象函数本来就是隐含虚方法,冗余
+        - static
+          - C#11之后仅限接口 / 抽象类的静态多态可以用
+            - 普通抽象函数仍然不能用static
+      - 和virtual冲突的访问修饰符
+        - private
+        - sealed
+        - static
+      - 二者在重写override之后都是可以密封sealed的
+  - 深浅拷贝
+    - <mark style="background-color:#fce7f3;">值类型：拷贝后数据相同，栈存储位置不同（深浅拷贝结果一致）；</mark>
+    - <mark style="background-color:#fce7f3;">引用类型：浅拷贝仅复制栈上指针（堆中实例共用），深拷贝需自定义（指针和堆实例均不同）；</mark>
+      - 所以string就是深拷贝咯?
+  - StringBuilder
+    - StringBuilder的意义
+      - String类型的方法都不会修改字符串本体
+      - <mark style="background-color:#fde8e8;">修改string是深拷贝一份复制哈</mark>
+      - <mark style="background-color:#fde8e8;">字符串初始值修改后就没法更改了</mark>
+      - <mark style="background-color:#fde8e8;">所以用到了StringBuilder解决</mark>
+    - 初始化必须new,("")里面填初始字符串值
+    - 添加没法+=,只能用Append方法
+    - 比较没法直接==,只能Equals方法
+    - 有个初始容量,没有超容量之前不会复制堆中容器
+  - 实例Equals
+    - 值类型比较所有字段值
+    - 引用类型看指向地址
+  - 栈
+    - <mark style="background-color:#fde8e8;">栈不能用for循环遍历</mark>
+      - 因为for (int i=0; i<stack.size(); i++)就是随机访问
+        - 按照索引遍历了
+      - 但是栈本身就和这种思路冲突
+      - foreach遍历就可以,很神奇罢
+    - 而且不能指定查看下标为i的元素
+    - 堆也有这两个特性
+      - 而且栈Peek只能查看队首元素
+  - 哈希表
+    - 并非泛型,所以键和值都是随意的
+  - 泛型
+    - 泛型方法和普通方法可以重名
+      - Speak()和Speak<T>()
+    - 这不是泛型方法
+      - `public T TName`
+      - `public void Speak(TName name)`
+        - 当你用这个方法的时候类型已经指定了,所以不算泛型方法
+  - 六种约束
+    - 值类型约束
+      - `public void TestFun<T>() where T : struct { }`
+    - 引用类型约束
+      - `public void TestFun<T>() where T : class { }`
+    - 公共无参构造约束
+      - `public void TestFun<T>() where T : new() { }`
+        - 注意约束是new()而不是new
+        - 无参构造必须是public
+        - 传入结构体也可以
+    - 类约束
+      - `public void TestFun<T>() where T : Student { }`
+        - 传入的必须是指定类本身或者其后代 类
+        - 传入Student的父类也是不行的
+    - 接口约束
+      - `public void TestFun<T>() where T : IStudy { }`
+        - 必须是传入接口IStudy的派生类
+        - 传入接口本身是不行的,毕竟接口都不能实例化
+    - 泛型约束
+      - `public void TestFun<T, U>() where T : U { }`
+        - T 需继承 / 实现另一个泛型参数 U）
+          - T,U必须是当前<>中明确声明过的泛型参数
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_874747b4-0ffb-4179-e0a4-00ba5dbce8ac.png?x-tos-process=image/resize,w_400)
+          - 值类型必须是同一个
+          - 引用类型必须是继承/实现
+  - 委托和事件限制(就记住这个)
+    - 1.类中直接委托绑定非静态方法报错
+      - 因为此时都还没有类实例呢,非静态方法依附实例存在
+    - 2.类构造函数中绑定非静态方法可以
+      - 此时实例已存在
+    - 3.事件和委托的规则完全相同

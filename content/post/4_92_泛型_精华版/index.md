@@ -1,0 +1,130 @@
+﻿+++
+title = "92 泛型 精华版"
+date = "2026-05-03T10:20:02+08:00"
+draft = false
+categories = ["C-Sharp"]
+tags = ["Notes"]
++++
+
+- 概念和优势
+  - 类型占位符,相比object无装箱拆箱,性能损耗更小
+- 分类
+  - 基本语法
+    - `class Student<T>`
+    - `interface IStudy<I,T,R>`
+      - 用的最多的就是T
+      - 占位字母大写且随便哪个,且个数不限
+  - +
+    - 泛型类
+      - `class Student<T>{public T value}`
+        - 这里value就可以不设定类型,用T来占位
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_e9d7d24d-59ab-4f9e-e739-1c13495cf68a.png?x-tos-process=image/resize,w_400)
+        - 调用时补全泛型
+          - 实例化的时候
+            - 必须补全所有占位符
+          - 继承的时候
+            - 子类也是泛型类
+              - 可以复用父类的泛型占位符（无需补全）
+              - ![image-1](https://document-image.mubu.com/document_image/32569566_8d5149ef-9c47-40cd-ac98-f53fd27cf460.png?x-tos-process=image/resize,w_311)
+                - 子泛型类中的占位符和父类中的一样
+                - 所以此时还是不需要指定父类泛型的
+                - ![image-1](https://document-image.mubu.com/document_image/32569566_9bab9754-5649-4ffc-c2fa-02179c7117be.png?x-tos-process=image/resize,w_336)
+                  - 不需要指明父类中继承的TId和TName
+                - ![image-1](https://document-image.mubu.com/document_image/32569566_3478e2c4-7514-4470-f5f1-3e9cc111acf4.png?x-tos-process=image/resize,w_334)
+                  - 普通类这里就需要补全父类中的泛型了
+              - ![image-1](https://document-image.mubu.com/document_image/32569566_6dbf6ec5-6dfe-4f04-96c4-76e609f77e73.png?x-tos-process=image/resize,w_312)
+                - 实例化子类的时候传入参数,不需要再给父类重复传一次
+            - 子类是普通类
+              - 必须补全父类的所有泛型占位符
+              - ![image-1](https://document-image.mubu.com/document_image/45f380cf-3db1-47ed-bf91-171313a5f139-32569566.jpg?x-tos-process=image/resize,w_400)
+                - 子类声明的时候父类泛型就已经确定了
+                - <mark style="background-color:#fef3c7;">普通子类继承泛型父类,那子类声明的时候父类中泛型已经固定了,没法像泛型子类一样实例化的时候再声明</mark>
+        - 补全后这个对象的泛型就没法更改了
+      - <mark style="background-color:#fef3c7;">补全的时候甚至可以补上泛型套娃</mark>
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_3a5aad18-c687-4898-b3b4-27688442dc4e.png?x-tos-process=image/resize,w_400)
+    - 泛型接口
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_2d86d264-47a9-4471-f1e2-a30044dd7970.png?x-tos-process=image/resize,w_400)
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_863e3fb9-6f70-439b-fa66-f202ac728f55.png?x-tos-process=image/resize,w_400)
+        - 好像也没啥特殊的,还是子类必须实现那一套
+    - 泛型方法
+      - 普通类中的泛型方法
+        - 使用
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_e02d101d-0041-4053-f252-176a0ff70d4c.png?x-tos-process=image/resize,w_265)
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_638a4fe9-d1b2-4259-e8fb-6ff2dad85ecb.png?x-tos-process=image/resize,w_258)
+            - <mark style="background-color:#fef3c7;">占位符申明后可以在参数列表中使用</mark>
+        - 可以实现逻辑处理
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_66344684-1cbe-4f06-e094-69419bcd51ed.png?x-tos-process=image/resize,w_246)
+            - default()就是初始化
+      - 泛型类中的泛型方法
+        - <mark style="background-color:#fef3c7;">首先普通类和泛型类是可以重名的,因为一个有占位符</mark>
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_7b5e0bc4-1d99-4091-d593-1e76d85ce024.png)
+          - 和重载还是有区别的,应该把<T>当成名字一部分
+        - 并非泛型方法
+          - ![image-1](https://document-image.mubu.com/document_image/6843e0be-6604-49d8-8340-57eca636e22b-32569566.jpg?x-tos-process=image/resize,w_313)
+            - 参数在实例化对象的时候就已经确定,调用这个方法没法自由指定
+        - 真正的泛型方法
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_da3ca41a-6c48-4669-961e-0e8e3b350172.png?x-tos-process=image/resize,w_220)
+            - 这里是另一个参数,调用方法可以自由指定
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_19b11c7f-d838-4401-b5bc-a624b9127143.png?x-tos-process=image/resize,w_219)
+            - 但是调用时也可以省略占位符,此时编译器自动识别你传入的参数类型
+            - 完整写法应该是tt2.TestFun<int>(123)
+- 泛型约束
+  - <mark style="background-color:#fce7f3;">Main方法内部不允许有泛型约束的函数,要么搬到类里面要么去掉泛型</mark>
+  - 六种约束
+    - 值类型约束
+      - `public void TestFun<T>() where T : struct { }`
+    - 引用类型约束
+      - `public void TestFun<T>() where T : class { }`
+    - 公共无参构造约束
+      - `public void TestFun<T>() where T : new() { }`
+        - 例子
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_5095fed3-8c81-4cbc-b45c-a00b068c9a76.png?x-tos-process=image/resize,w_165)
+            - Test2中无参构造就这么被顶掉了
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_229fd30a-f481-411e-ac3c-72409b506368.png?x-tos-process=image/resize,w_319)
+            - 传入Test2就只会报错鸟
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_dd4edddb-bd2f-495a-aeb2-2581c618ed87.png?x-tos-process=image/resize,w_400)
+        - 注意约束是new()而不是new
+      - 还得注意
+        - 1.参数中的无参构造还得是public
+          - 类中默认的无参结构体也是public
+        - 2.不能是抽象类,因为抽象类没法被实例化
+          - 你这里传入参数没法new,导致报错
+        - 3.传入结构体也是可以的
+          - 结构体默认无参之前是没法手动申明的
+          - 就算写了有参构造也不会顶掉默认无参
+          - 总之就是不要传入缺乏无参构造的类/结构体
+        - 4.这么写只是传入个泛型类+普通方法,并不成立
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_af10e94d-2c58-4c84-a443-a59d65eca361.png?x-tos-process=image/resize,w_179)
+        - 5.多种约束时,new()必须放最后
+    - 类约束
+      - `public void TestFun<T>() where T : Student { }`
+        - 传入的必须是指定类本身或者其后代 类
+        - 传入Student的父类也是不行的
+    - 接口约束
+      - `public void TestFun<T>() where T : IStudy { }`
+        - 必须是传入接口IStudy的派生类
+        - 传入接口本身是不行的,毕竟接口都不能实例化
+      - 约束可以是「非泛型接口」或「泛型接口」
+        - 非泛型接口
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_68cb8689-5974-476d-82bf-242ea9570fab.png?x-tos-process=image/resize,w_400)
+        - 泛型接口
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_aad65357-5ae6-4b03-b526-9ebaed9de4f3.png?x-tos-process=image/resize,w_400)
+          - ![image-1](https://document-image.mubu.com/document_image/889319ee-ba38-41c4-9601-8ba72816fe50-32569566.jpg?x-tos-process=image/resize,w_400)
+            - 设定约束的时候不需要明确类型,和泛型父/子类继承一样
+              - 你这里用子类中的泛型T或者直接明确是int都可以
+            - 想用另一个泛型K,子类中就必须有T,K
+              - 类似于this()优先调用无参构造一样,不能出现没有的参数
+              - ![image-1](https://document-image.mubu.com/document_image/32569566_c4139b4d-7574-46cf-af72-30f0d5179fb7.png?x-tos-process=image/resize,w_258)
+    - 泛型约束
+      - `public void TestFun<T, U>() where T : U { }`
+        - T 需继承 / 实现另一个泛型参数 U）
+          - T,U必须是当前<>中明确声明过的泛型参数
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_874747b4-0ffb-4179-e0a4-00ba5dbce8ac.png?x-tos-process=image/resize,w_400)
+  - 配合使用
+    - 有多个参数,且添加不同的约束
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_36f697b0-1127-4736-c340-9cd66f4ceca5.png?x-tos-process=image/resize,w_341)
+        - 就是给不同占位符加上不同约束
+        - 注意中间没有逗号,直接用where分割
+    - 约束可以同时用多个
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_ceada28b-4302-47fe-c238-9196ea59f9c9.png?x-tos-process=image/resize,w_307)
+        - 同时是无参构造/引用类型约束

@@ -1,0 +1,83 @@
+﻿+++
+title = "5 C#进阶 List排序,协变逆变"
+date = "2026-05-03T10:20:02+08:00"
+draft = false
+categories = ["C-Sharp"]
+tags = ["Notes"]
++++
+
+- List排序
+  - 因为需要有委托排序这个知识点,所以放在现在才来讲
+  - 自带排序
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_686bad52-04f4-4b49-c7ee-a041eb6e3df7.png?x-tos-process=image/resize,w_332)
+      - 使用后就不是按照添加顺序打印了
+      - 变成了顺序的123456
+    - ArrayList中有同样的sort方法
+  - 自定义类排序
+    - 直接用
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_78d6218c-12e9-4277-995c-c3f136bc4498.png?x-tos-process=image/resize,w_238)
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_676cd2c5-1af3-46e9-ff10-ec431ab3194c.png?x-tos-process=image/resize,w_240)
+        - 这样直接调用sort方法只会报错
+        - 前面int能用sort排序是因为int类继承了排序接口,这里自定义类item不行
+          - 即使比较的自定义类中的值
+    - 修正后
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_55298b97-c4de-4613-8ad2-713f753ad750.png?x-tos-process=image/resize,w_243)
+        - 这里Item自定义类继承泛型接口(指定类型item)
+        - 这个AllowNull删掉也无所谓,别在意
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_7e435e7a-aae4-4b55-ce65-6ccc8a410f4b.png?x-tos-process=image/resize,w_246)
+          - 当你调用item.sort的时候,就会调用这个CompareTo方法
+          - 此时按照这个方法返回的值来排序(相当于返回值作为序号)
+          - 当然比起序号,说是权重更合适
+            - ![image-1](https://document-image.mubu.com/document_image/32569566_20fe6279-6037-486e-f355-0edaac70aa15.png?x-tos-process=image/resize,w_226)
+            - ![image-1](https://document-image.mubu.com/document_image/32569566_3ea064c0-f026-4812-f8ba-0b79ffd3f0b5.png?x-tos-process=image/resize,w_239)
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_c035967a-f652-48d8-a093-fa2adf2c3eab.png?x-tos-process=image/resize,w_281)
+            - this>other,return值大于0,就放在other后面
+    - 原理就是把比较对象向上转型为接口
+      - 因为接口动态绑定嘛,as转化为父对象
+      - 然后利用接口对象.CompareTo
+      - 所以不继承接口只会报错呢
+    - 还有另外一种就是不继承泛型接口
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_5f1e1b34-e930-452b-fe2d-860c07d08732.png?x-tos-process=image/resize,w_321)
+        - CompareTo中就得传入Object类型
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_51bf296c-2d1f-4046-920f-2edac31b096e.png?x-tos-process=image/resize,w_314)
+          - 比起泛型还得拆箱
+  - 委托函数来排序
+    - ![image-1](https://document-image.mubu.com/document_image/da7ee68a-c44c-4d94-8ffe-84bbf7b5d834-32569566.jpg?x-tos-process=image/resize,w_400)
+      - 直接调用同样会报错
+      - sort方法有重载,其中就有匿名函数作为参数的重载
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_dd46e663-9a84-4064-cf1a-d7021dea3cd6.png?x-tos-process=image/resize,w_400)
+        - 这里把比较的函数传进去
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_3c4b77f3-81dc-4e99-b046-6bceb8826588.png?x-tos-process=image/resize,w_400)
+        - 或者直接现场申明一个匿名函数
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_976dc963-8aa2-4c63-b651-815de7a44322.png?x-tos-process=image/resize,w_400)
+        - lambda表达式
+- 协变逆变
+  - 概念和作用
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_2f1e57aa-7525-4e2f-9b27-70cbffd29570.png?x-tos-process=image/resize,w_400)
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_5446b9de-0fc9-45d9-bb38-c6073cb64fc5.png)
+  - 调用
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_d20c2aa7-825e-49b2-9eae-4541799b131a.png?x-tos-process=image/resize,w_282)
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_3b29b627-a335-4b5f-b3cb-af5c8e59dfaf.png?x-tos-process=image/resize,w_222)
+        - out修饰泛型参数T,此时用T类型参数v就报错
+      - (空)
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_b67b364c-477c-49ff-dfb6-4b800465ef0c.png?x-tos-process=image/resize,w_193)
+        - in和out只能用在泛型接口/委托上面
+        - 用在其他地方就报错
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_ed21eb55-21b1-4d86-9a29-a82a589e9099.png?x-tos-process=image/resize,w_196)
+        - 同样不行
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_5d36fed5-d306-4318-9a23-1cd4bfde229f.png?x-tos-process=image/resize,w_204)
+        - 作为返回值倒是可以
+  - 结合里氏原则
+    - (空)
+      - 泛型指明为子类/父类
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_89bf512f-285a-4ee2-e2f0-d70b316edba8.png?x-tos-process=image/resize,w_243)
+        - 委托替换要求格式相同,这种就没法直接替
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_7aabf9ad-a7a2-4b82-f43e-ba9943302d58.png?x-tos-process=image/resize,w_400)
+        - 但是这里委托泛型要是加上out
+        - 上面那个就可以替换了
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_3ec62bf2-f977-4203-9b2a-544e22b2b926.png?x-tos-process=image/resize,w_400)
+        - 改成son f= of()就不可以
+        - 实际上返回的会os里面装的函数 返回的是son
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_cdb1bcc5-42a6-463f-9f64-431f907baedf.png?x-tos-process=image/resize,w_400)
+        - (空)
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_69a6e044-618e-47db-be46-f0375ca868c0.png?x-tos-process=image/resize,w_400)

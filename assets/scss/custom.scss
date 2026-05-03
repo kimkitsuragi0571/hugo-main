@@ -317,6 +317,7 @@ input:hover,
 }
 #main-menu>li:not(.current) a:hover {
     transform: scale(1.1) !important;
+    color: #00ff08 !important;
 }
 
 .menu-social {
@@ -327,6 +328,7 @@ input:hover,
 }
 .menu-social li:hover {
     transform: scale(1.3) !important;
+    color: #00ff08 !important;
 }
 
 .article-list--compact {
@@ -355,13 +357,20 @@ input:hover,
 // =====================================================
 .icon-tabler-brand-bilibili,
 .icon-tabler-brand-github,
+.icon-tabler-brand-steam,
+.icon-tabler-file-upload,
+.icon-tabler-square-rounded-arrow-up,
 .icon-tabler-rss {
-  transition: transform 0.15s ease-out !important;
+  transition: transform 0.15s ease-out, color 0.15s ease-out !important;
 }
 .icon-tabler-brand-bilibili:hover,
 .icon-tabler-brand-github:hover,
+.icon-tabler-brand-steam:hover,
+.icon-tabler-file-upload:hover,
+.icon-tabler-square-rounded-arrow-up:hover,
 .icon-tabler-rss:hover {
   transform: scale(1.2) !important;
+  color: #00ff08 !important;
 }
 
 // =====================================================
@@ -589,8 +598,8 @@ code { word-break: break-all !important; }
   border-radius: 25px;
   padding: 12px;
   transform: translateY(-66px);   /* 向上抬 66px */
-  background: #ffffff;
-  color: #333;
+  background: #3f3f3f;
+  color: #fff;
 }
 [data-scheme="dark"] .count_info {
   border: 1px solid transparent;
@@ -598,7 +607,7 @@ code { word-break: break-all !important; }
   color: #fff;
 }
 .number-highlight {
-  color: var(--hover-text-color); /* 数值颜色修改 */
+  color: #00ff08; /* 数值颜色修改 */
   font-weight: 600;
 }
 

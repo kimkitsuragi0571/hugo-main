@@ -1,0 +1,449 @@
+﻿+++
+title = "91 封装 精华版"
+date = "2026-05-03T10:20:02+08:00"
+draft = false
+categories = ["C-Sharp"]
+tags = ["Notes"]
++++
+
+- 静态成员
+  - 调用
+    - +
+      - 普通成员就要先实例化
+        - 然后对象.成员名
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_381a9048-1b9b-459f-84ee-f5cbb1ff8367.png?x-tos-process=image/resize,w_270)
+        - 静态类中根本没有普通成员,不用考虑
+      - 不管是静态/普通 类中的静态成员
+        - 都是直接类名.成员名即可
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_9fd9d09d-eebe-4e4d-d364-6f691d2b6a0a.png?x-tos-process=image/resize,w_194)
+    - +
+      - 非静态函数调用静态成员
+        - ![image-1](https://document-image.mubu.com/document_image/3389122d-4fcd-45a3-9601-cb5b4e6375d6-32569566.jpg?x-tos-process=image/resize,w_400)
+      - 静态函数调用非静态成员
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_6246f085-3365-4bbf-cf91-01e83ce84a21.png?x-tos-process=image/resize,w_400)
+  - 补充
+    - <mark style="background-color:#fef3c7;">关于控制台打印函数</mark>
+      - ![image-1](https://document-image.mubu.com/document_image/a6d028f0-abee-4a65-a972-28e332e0d0fd-32569566.jpg?x-tos-process=image/resize,w_206)
+        - 直接这样只会报错,因为Console.WriteLine() 需要接收一个 “有值的参数
+          - 而test_2的返回值是void
+        - 如果改成返回值是int,然后Console.WriteLine(test_2(99))
+          - 会执行函数中的打印语句+打印99
+          - 因为需要先执行函数中的代码,然后return 返回值
+    - Const常量和Static成员的区别
+      - const 是「编译期常量」，静态成员是「运行期变量」
+        - ![image-1](https://document-image.mubu.com/document_image/7d25f86f-8fa0-4c75-b189-7b457a3fd364-32569566.jpg?x-tos-process=image/resize,w_400)
+        - <mark style="background-color:#fef3c7;">也就意味着static可以在运行时改变</mark>
+      - <mark style="background-color:#fef3c7;">const值固定不可改、存储在常量区</mark>
+        - <mark style="background-color:#fef3c7;">static可改、存储在静态存储区</mark>
+        - 而且const常量必须初始化
+          - const还必须加上修饰符,static成员就没这种要求
+      - <mark style="background-color:#fde8e8;">同样有全局唯一性</mark>
+        - <mark style="background-color:#fde8e8;">都能通过「类名.成员」直接访问，无需 new 实例对象</mark>
+          - public const int MAX_AGE = 100;
+          - 就可以 Console.WriteLine(Test_static.MAX_AGE); // const常量：100
+          - 默认为静态,多加个static反而报错
+      - <mark style="background-color:#fde8e8;">const和static成员都和程序具有相同的声明周期</mark>
+    - 静态成员的作用
+      - 声明 常用唯一变量/便于别人获取的对象
+      - 但是占用内存且不会释放,不要乱用
+    - 不用实例化的原因
+      - <mark style="background-color:#fef3c7;">静态成员,程序启动后就分配在静态存储区中</mark>
+        - 程序启动后分配，退出释放
+          - <mark style="background-color:#fef3c7;">和程序是相同的生命周期</mark>
+        - C#四区不就是栈,堆,常量,静态存储
+- 关于"静态"的限制
+  - 静态结构体
+    - 不存在这种东西
+  - 静态方法
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_c561900d-c978-41e9-9af3-f529180e9937.png?x-tos-process=image/resize,w_143)
+      - 非静态成员
+        - 访问前必须先实例化
+        - ![image-1](https://document-image.mubu.com/document_image/f08184bb-751d-417b-9f58-301943f0831a-32569566.jpg?x-tos-process=image/resize,w_355)
+          - 这里this就是指当前实例对象
+          - 比如实例化个stu,那调用这个方法就会传入[stu.name](http://stu.name)
+          - 不写this也不报错
+            - ![image-1](https://document-image.mubu.com/document_image/5038723e-eb12-4cce-a881-a0de0c07d4f5-32569566.jpg?x-tos-process=image/resize,w_297)
+            - 但是如果有同名的参数,此时Console.writeLine(name)
+              - 优先打印传入的name,而不是private string name
+      - 非静态方法
+        - 调用
+          - Student stu1 = new Student();
+          - stu1.ShowName();
+        - 静态/非静态成员都可以访问
+          - 静态成员:Student.school
+          - 非静态成员:[this.name](http://this.name)
+      - 静态成员
+        - 静态成员不能被实例化
+          - 用this.school = school会报错
+        - 静态成员不手动初始化也有默认值
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_168ccab6-f775-4c18-e165-390d5869bd88.png?x-tos-process=image/resize,w_400)
+          - 静态类是整个类共享的(或者说就是整个类)
+          - 就像学生类实例化为不同的学生,不同的学生姓名年龄不同,name也不是同一块内存
+          - 但是他们都归属于同一个学校,不同的实例共享同一块内存
+        - (空)
+          - <mark style="background-color:#fef3c7;">静态成员分配内存:</mark><mark style="background-color:#fef3c7;"> **程序启动 / 第一次使用类时** </mark><mark style="background-color:#fef3c7;">分配</mark>
+          - <mark style="background-color:#fef3c7;">静态成员释放内存:</mark><mark style="background-color:#fef3c7;"> **程序退出时** </mark><mark style="background-color:#fef3c7;">才释放</mark>
+      - 静态方法
+        - <mark style="background-color:#fde8e8;">静态成员可以加访问修饰符,默认private/internal</mark>
+          - <mark style="background-color:#fde8e8;">但是静态构造函数就不能加访问修饰符了</mark>
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_2bc77d26-d4ba-482b-c220-1b7e8d3ab248.png?x-tos-process=image/resize,w_363)
+        - 静态方法里只能直接访问静态成员
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_2d94a6fc-8d50-4338-b389-beb5c163dea3.png?x-tos-process=image/resize,w_269)
+            - 直接写school也行,编译器优先调用同一个Student类中school
+            - 不过还是严谨点写上吧,避免传入school同名参数,逻辑错误
+            - 调用
+              - Student.ShowSchool(18);
+          - <mark style="background-color:#fef3c7;">应该说静态类中所有的成员必须是静态的,不能有实例成员</mark>
+        - 如果要访问非静态成员,需要先实例化
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_facb8cbf-aa58-4f0f-bb2f-52b1edd360d8.png?x-tos-process=image/resize,w_305)
+        - 一般是通过类名.方法名调用,拓展方法实现了实例.方法名调用
+          - 当然,只是语法糖而已
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_4caeba0d-30a9-43ca-cf75-6ef242d07d5c.png?x-tos-process=image/resize,w_400)
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_b0e072e0-0340-4b1e-fb8d-2b1d2424e9c6.png?x-tos-process=image/resize,w_400)
+      - 补充
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_7711ba23-092b-4369-b11e-c05c664af962.png?x-tos-process=image/resize,w_309)
+          - <mark style="background-color:#fde8e8;">静态类不能实现接口,不能被重写</mark>
+        - <mark style="background-color:#fde8e8;">静态类只能继承自Object类且不能被其他类继承</mark>
+  - 静态类
+    - ![image-1](https://document-image.mubu.com/document_image/0eb0993e-083b-4f37-8297-813cbbcb8beb-32569566.jpg?x-tos-process=image/resize,w_247)
+      - 只能包含静态成员,也不能被实例化
+      - <mark style="background-color:#fef3c7;">静态类本身不可实例化，而非静态方法 / 字段必须依附于对象才能存在，因此静态类中定义非静态成员从设计上就无意义，编译器直接禁止</mark>
+    - Console就是个静态类,包含的全部是静态成员
+      - 并且不能被实例化
+        - 自然静态类中也不能用this
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_7b979ccb-5fff-409a-b0ce-706d71d32f2b.png?x-tos-process=image/resize,w_400)
+    - 静态类成员可以用private但不能用protected
+      - 因为静态类没有子类
+    - 静态成员同样不初始化也有默认值
+    - <mark style="background-color:#fef3c7;">静态方法的调用只能是类名.方法名</mark>
+      - <mark style="background-color:#fef3c7;">除了拓展方法是个例外(语法糖)</mark>
+    - 静态类和普通类的区别
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_aa700b90-29a9-4893-f131-301691fa4f5e.png?x-tos-process=image/resize,w_400)
+  - 调用总结
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_27e8617a-95de-48c0-b99c-b626992a0924.png?x-tos-process=image/resize,w_400)
+      - 非静态方法调用本类成员（静态 / 非静态）：直接写方法名即可；
+      - 静态方法调用非静态方法（无论本类 / 其他类）：必须先实例化;
+      - 调用其他类的静态方法（无论调用者是静态 / 非静态）：统一写 类名.静态方法名()；
+- 构造函数
+  - 声明语法相同
+    - 结构体构造函数
+      - 结构体普通构造函数
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_9a01e70b-2ca2-4365-ce3f-d829af337970.png?x-tos-process=image/resize,w_400)
+      - 结构体静态构造函数
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_04f3284f-f452-4e3e-af4e-c9f9d5bb709b.png?x-tos-process=image/resize,w_400)
+          - 静态构造函数 **不需要手动调用** ，也无法手动调用 —— 当类第一次被使用（比如创建对象、访问静态字段）时，CLR 自动执行，且仅执行一次
+          - <mark style="background-color:#fef3c7;">类和结构体都可以同时拥有两种构造函数</mark>
+            - <mark style="background-color:#fef3c7;">同时拥有静态和普通的时候,先触发静态构造,再触发普通构造(都有的)</mark>
+            - <mark style="background-color:#fef3c7;">而且静态构造只触发1次</mark>
+              - <mark style="background-color:#fef3c7;">类</mark>
+                - <mark style="background-color:#fef3c7;">创建第一个实例时触发静态构造（仅 1 次），后续创建实例不再触发</mark>
+              - <mark style="background-color:#fef3c7;">结构体</mark>
+                - <mark style="background-color:#fef3c7;">创建实例（无论第几次）都不触发静态构造，只有首次访问自定义静态成员时才触发（仅 1 次）</mark>
+                - <mark style="background-color:#fef3c7;">当然.NET5之后改为调用自定义构造函数时候也能触发</mark>
+                  - <mark style="background-color:#fde8e8;">但是调用默认无参就不行了</mark>
+                  - 结构体之前没法自定义无参,现在可以了
+                    - 这种也能触发
+        - <mark style="background-color:#fef3c7;">静态构造函数因为只能给自己用,所以不能有修饰符</mark>
+          - 不管结构体还是类
+    - 类构造函数
+      - 普通构造
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_43bfe4cb-77f3-4ed4-affc-6f1f1ecdd6b2.png?x-tos-process=image/resize,w_316)
+          - 声明这块和结构体的语法是相同的
+      - 静态无参构造
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_c7c348ad-b75e-4ab8-b8dc-8a11df824616.png?x-tos-process=image/resize,w_400)
+          - 一样的要求,同样是必须无参数
+  - 二者的区别
+    - <mark style="background-color:#fef3c7;">1.无参构造函数</mark>
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_0f0d8701-5af8-4709-d9ba-390dff2dfe2c.png?x-tos-process=image/resize,w_400)
+        - 结构体中之前是没法手动声明这种无参构造函数的
+        - 虽然静态构造函数也是无参的
+        - 当然现在是可以了
+        - <mark style="background-color:#fef3c7;">总之结构体中就算你写了有参构造也不会顶掉默认无参</mark>
+    - <mark style="background-color:#fef3c7;">2. 有参构造的字段赋值</mark>
+      - 其实就是构造函数中参数要包含每个成员
+        - 所以之前都不许结构体无参构造
+      - 但是类可以不这样(默认null)
+        - 类一直可以声明无参构造
+    - <mark style="background-color:#fef3c7;">3. 调用默认构造的方式</mark>
+      - 默认构造函数就是你没写构造函数时候隐含的那个
+      - 结构体两种方法
+        ![结构体两种方法-1](https://document-image.mubu.com/document_image/32569566_ff121a5a-5704-4153-dea6-33de875a01cf.png?x-tos-process=image/resize,w_400)
+        - 就是说结构体仅仅Student stu;这样,就可以实现调用默认构造函数(看似没有new分配内存,但是已经实现了)
+        - 结构体是值类型,不需要堆区分配内存也能用
+          - 1.直接用结构体就是存储在栈上,这里只是为了语法规范等等
+          - 2.存放在类中的结构体仍然在堆中
+          - 3.结构体被Object装箱时
+            - object obj = stu;
+            - stu本体仍然在栈上
+            - 但是obj是stu的复制体,放在堆中
+      - 类仅有一种方法生效
+        ![类仅有一种方法生效-1](https://document-image.mubu.com/document_image/32569566_389f3a1b-5da3-4334-b35c-5b80698ff207.png?x-tos-process=image/resize,w_400)
+    - <mark style="background-color:#fef3c7;">4.传入参数</mark>
+      - 类中构造函数可以不写[this.name](http://this.name) = name;
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_8e63f487-075b-4e48-d6b5-90c21212c31f.png?x-tos-process=image/resize,w_347)
+          - 写无关逻辑或者直接为空都可以
+      - 结构体中构造函数不分配就报错咯
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_29de28a0-dbe9-41e8-e320-c862a698b0d0.png?x-tos-process=image/resize,w_400)
+  - 关于this()的使用
+    - ![image-1](https://document-image.mubu.com/document_image/4a878d41-c9e2-46a3-9c54-414b4b59b19a-32569566.jpg?x-tos-process=image/resize,w_369)
+      - <mark style="background-color:#fef3c7;">1.这个是放在有参构造函数的后面,让无参构造函数优先执行的</mark>
+        - 这里即使写的Student stu = new Student(18);传入参数
+        - 仍然先执行无参构造的逻辑
+          - <mark style="background-color:#fef3c7;">但是之后还是会执行单参构造的</mark>
+          - <mark style="background-color:#fde8e8;">这个this不是"让给你执行",而是"你先执行,然后我再执行"</mark>
+      - <mark style="background-color:#fef3c7;">2.结构体之前没法手写无参构造声明,自然也不能用this()</mark>
+        - 现在是可以了
+      - <mark style="background-color:#fef3c7;">3.写法相似,但是和继承没有关系</mark>
+        - 一个写在构造函数后面,一个写在类后面
+      - <mark style="background-color:#fef3c7;">4.如果写成this(name),那就是有限触发单参数构造</mark>
+        - public Student(string name, int score) : this(name,score)
+          - 无限递归了,报错
+        - public Student() : this(name,score)
+          - <mark style="background-color:#fde8e8;">只能是参数全的,让不全的先执行</mark>
+          - <mark style="background-color:#fef3c7;">不是优先级,而是无参构造中引用了未定义的变量本来就会报错</mark>
+        - public Student() : this()
+          - 同样无限递归了
+        - 反正无参构造函数就和这个 this优先级没关系了
+  - 补充
+    - 类和结构体静态构造函数的区别
+      - 最主要的就是触发时机的不同
+      - ![image-1](https://document-image.mubu.com/document_image/770ec8a5-4f6a-440b-b17b-f59ba209c84e-32569566.jpg?x-tos-process=image/resize,w_273)
+        - <mark style="background-color:#fef3c7;">类:创建实例就触发/访问静态变量就触发</mark>
+        - <mark style="background-color:#fef3c7;">结构体:创建实例并不触发,访问静态成员的时候触发</mark>
+          - <mark style="background-color:#fef3c7;">注意是静态成员(也就是static int age)</mark>
+          - <mark style="background-color:#fef3c7;">但是.NET5之后,首次调用</mark><mark style="background-color:#fef3c7;"> **用户自定义的实例构造函数** </mark><mark style="background-color:#fef3c7;">同样会触发</mark>
+            - <mark style="background-color:#fef3c7;">注意默认无参构造不行</mark>
+    - +
+      - 拷贝构造函数
+        - ![image-1](https://document-image.mubu.com/document_image/67f00fa9-c05f-46bf-b4e4-0756639858b1-32569566.jpg)
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_b1bcce05-435c-4907-eead-d4da6f8f6c03.png?x-tos-process=image/resize,w_400)
+      - private构造函数
+        - 禁止外部类通过 new 创建该类的实例
+        - 一般是单例模式常用
+      - protected构造函数
+        - 专门用于 **继承体系** ：比如定义一个「父类 BaseClass」，希望它不能被外部直接实例化（避免 new BaseClass()），但允许子类继承并调用它的构造函数。
+      - base构造函数
+        - 子类构造函数(参数) : base(父类构造参数) {}
+        - **在子类构造函数中调用父类（基类）的构造函数** ，目的是：初始化从父类继承的字段 / 属性
+- 拓展方法
+  - 声明
+    - ![image-1](https://document-image.mubu.com/document_image/fffbf46e-0af0-404d-8dbb-d74c9e81e682-32569566.jpg?x-tos-process=image/resize,w_400)
+      - <mark style="background-color:#fef3c7;">1.必须是静态类中的静态方法</mark>
+        - 总之避免语义混乱,避免实例化时的错误
+        - <mark style="background-color:#fce7f3;">记住是给实例类拓展方法,自己必须放在静态类里,所以必须静态方法</mark>
+      - 2.参数传入被拓展的类型
+        - this 被拓展类型 随便定个变量名
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_bb0351b0-517d-4034-9c0a-3cca4738c8f0.png)
+          - 这里已经创建了个int类型的实例,this就是用来关联这个实例的
+        - 这里value是可以随便改的哈
+      - <mark style="background-color:#fef3c7;">3.静态类不能被实例化</mark>
+        - <mark style="background-color:#fef3c7;">所以Console,GC之类的静态类是不能被拓展的</mark>
+        - 比如这里写this Console value就不行
+      - 4.通过int对象调用存放在另一个静态类中的静态方法,很神奇罢
+        - 这是某种语法糖
+    - ![image-1](https://document-image.mubu.com/document_image/aead6f87-95d5-429c-a455-6a99d1228c71-32569566.jpg?x-tos-process=image/resize,w_400)
+      - 也可以有普通参数
+  - 调用
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_be402014-b98a-4f80-c043-173c64b64685.png?x-tos-process=image/resize,w_400)
+      - 实例化对象,并调用其中静态方法
+  - 补充
+    - 好处
+      - 使用拓展方法和直接在类中加上方法,好处就是第三方不修改原class
+        - 更安全
+      - <mark style="background-color:#fef3c7;">允许你</mark><mark style="background-color:#fef3c7;"> **不修改原有类的代码、不继承该类** </mark><mark style="background-color:#fef3c7;">，给现有类型“新增” 实例方法</mark>
+    - 拓展方法和类型中原有方法重名
+      - 不报错,但会失效
+      - 比如拓展个int.ToString()
+        - 虽然不报错,但调用时执行的肯定不是自己手写的那个方法
+    - <mark style="background-color:#fde8e8;">调用拓展方法时，被拓展的对象是 null也不报错</mark>
+      - （比如 string s = null; s.AddSuffix();）
+        - 并不会报错显示空指针异常
+      - 因为静态方法不能被实例化嘛
+        - 这里仅仅是语法糖
+    - <mark style="background-color:#fde8e8;">可以重载</mark>
+    - <mark style="background-color:#fef3c7;">对修饰符的要求</mark>
+      - | 角色 | 访问修饰符要求 | 关键原因 |
+        | --- | --- | --- |
+        | 存放拓展方法的静态类 | 不能用 protected/private（仅能public/internal） | 静态类本身不能被继承，protected无意义；private仅能在当前类内部访问，拓展方法会失效 |
+        | 拓展方法本身 | 不能用 protected（public/private/internal均可） | 拓展方法是静态方法，protected用于 “子类访问父类成员”，静态方法无继承场景，因此禁止 |
+      - 总之就是静态统一不能用protected毕竟不能继承
+        - 而且静态类容器必须public用以访问
+        - 拓展方法可以private,不过也没啥意义
+- 运算符重载
+  - 要求
+    - <mark style="background-color:#fde8e8;">公共静态方法</mark>
+    - <mark style="background-color:#fef3c7;">给Student类实现重载,就必须写在Student类内部</mark>
+      - <mark style="background-color:#fef3c7;">对比拓展方法是写在专门的静态工具类里面</mark>
+    - 参数不能加上ref和out
+      - 要是允许加上,比如+号重载
+      - A+B返回C,结果执行完后
+        - A变成了A+B,B变成了B+A
+        - 运算数也发生了变化
+      - <mark style="background-color:#fce7f3;">只有运算符重载不能加上ref和out</mark>
+    - 不可重载运算符
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_23b200c4-741a-40ba-a07a-32ff58f471ba.png?x-tos-process=image/resize,w_271)
+    - 必须成对重载
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_4ddb8ad6-5965-4c3b-cd13-407f97e994cd.png?x-tos-process=image/resize,w_222)
+  - 使用
+    - 声明
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_c1f99d95-a7ec-4a06-d13d-7d09dc797e2f.png?x-tos-process=image/resize,w_400)
+        - 1.对参数种类:
+          - <mark style="background-color:#fde8e8;">至少得有一个参数和返回值相同</mark>
+          - <mark style="background-color:#fde8e8;">图上一个Point一个int也是可以的,两个int就不行了</mark>
+        - 2.对参数个数:
+          - 二元运算符重载了也只允许两个参数
+          - C# 语言里唯一的三元运算符是条件运算符
+            - 但这个运算符 **完全不允许重载**
+    - 调用
+      - ![image-1](https://document-image.mubu.com/document_image/5aae2a76-261c-4792-8f07-a9c25de2c383-32569566.jpg?x-tos-process=image/resize,w_400)
+        - 声明个对象用来接收结果,这个对象就不用实例化了
+        - 相当于只声明个指针,堆里面的都是弄好了的
+- 成员属性
+  - 声明
+    - 简化写法
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_22696a9e-2013-463d-b956-48c206842824.png?x-tos-process=image/resize,w_400)
+        - 简化版是一个属性里面两个访问器
+          - 1.属性名字任意,不需要和构造器一样
+          - 2.属性/访问器/构造函数的区别
+            - 属性没有参数列表
+            - 构造函数没有返回值
+            - 访问器返回值和参数列表都没有
+              - 当然实际还是有的,简化了写法
+          - 3.访问器简写的部分
+            - get 的返回类型强制和属性类型一致
+              - （比如 public int Age 的 get 只能返回 int）
+            - set 的参数就是固定关键字 value（类型和属性一致），编译器自动生成
+              - 传入变量参数必须是value,不能变
+    - 完整写法
+      - ![image-1](https://document-image.mubu.com/document_image/7c83dce0-77c5-44f7-bbf6-225a26522dca-32569566.jpg?x-tos-process=image/resize,w_400)
+        - 完整版是用两个独立的方法来实现
+  - 调用
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_05d8644c-dfa0-40d6-807a-2cb178ef2dbf.png?x-tos-process=image/resize,w_400)
+      - 完整版还得调用不同的方法
+      - 简写版直接对成员属性读写即可
+        - (系统自动判断调用get/set)
+    - 错误的无限递归调用
+      - 和索引器无限递归一个道理
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_655f86e1-4ac2-43fd-a074-e7d6709210d1.png?x-tos-process=image/resize,w_303)
+        - return属性自身,读操作又会递归调用get方法
+        - <mark style="background-color:#fde8e8;">总之就是get返回的是成员变量而不是成员属性哈,小心递归</mark>
+  - 成员属性实现解决3P局限性
+    - <mark style="background-color:#fde8e8;">访问器权限设置原则</mark>
+      - 1.访问器权限必须更加严格
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_01090a11-65eb-45fd-d138-2a5a2ab56c05.png?x-tos-process=image/resize,w_400)
+        - <mark style="background-color:#fef3c7;">属性public,访问器里面加上一个public的时候仍然报错</mark>
+          - 就是说等级一样的时候,不加修饰符就能实现
+          - 你再重复显式声明一次就错了
+      - 2.最多添加一个修饰符
+        - <mark style="background-color:#fef3c7;">get和set都加上private的时候就会报错</mark>
+      - 3.唯一访问器不能加修饰符
+        - <mark style="background-color:#fef3c7;">比如只有get,加个private就报错</mark>
+        - 设置的和属性相同,照样报错
+      - 4.不加修饰符默认跟随属性
+        - <mark style="background-color:#fef3c7;">比如public int Age,那这里默认就是public</mark>
+    - 自动属性
+      - 只是想设置权限的话就可以用
+        - 这下连代码块都省了
+      - ![image-1](https://document-image.mubu.com/document_image/88802650-d11a-4a6b-9d37-600176ff6e5e-32569566.jpg)
+        - 这里Info自动属性不是修改的id或者age任何一个
+        - 而是自己生成了一个隐含成员变量_Info
+        - <mark style="background-color:#fef3c7;">说白了就是直接操控属性Info</mark>
+          - <mark style="background-color:#fef3c7;">不需要专门申明个变量int info再设置对应属性</mark>
+  - 静态属性
+    - ![image-1](https://document-image.mubu.com/document_image/a4bc7947-ce61-415b-9bbb-2c452a942c95-32569566.jpg?x-tos-process=image/resize,w_265)
+    - 不支持继承相关修饰符（virtual/abstract 等）；
+    - 同样类名.属性访问
+    - 对静态成员优先使用静态属性来修改
+      - 虽然实例属性修改静态成员也可以,但是不推荐
+    - <mark style="background-color:#fef3c7;">修改静态属性,就是修改这个类下所有的对象了</mark>
+      - 实例属性修改的只是这个类的实例对象
+- 索引器
+  - 声明
+    - 普通(没有逻辑的)声明
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_06e700e7-caa1-45fa-86c3-8a610cce6ebd.png?x-tos-process=image/resize,w_330)
+        - 总之索引器就相当于把"<mark style="background-color:#fef3c7;">类实例对象中的数组</mark>"抽象为"<mark style="background-color:#fef3c7;">实例对象数组</mark>"
+        - 本来是要写stu.team[i]访问的,现在写成stu[i]就可以了
+          - 如果你写的不是this[int i]而是Test[int i],那就得写成stu.Test[i]
+        - 通过索引器的语法,让我们访问stu[0]的时候,返回team[0]
+    - 访问器里写逻辑
+      - ![image-1](https://document-image.mubu.com/document_image/68e4ce5a-bb77-4f83-ac80-db6962e7d721-32569566.jpg?x-tos-process=image/resize,w_400)
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_db86e4fe-77d4-4efa-e265-08154438cb3e.png?x-tos-process=image/resize,w_400)
+        - else if索引越界的时候新元素强行放在最后一位
+  - 调用
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_569f3518-1433-4af4-8c4f-62346754d6b0.png?x-tos-process=image/resize,w_400)
+      - <mark style="background-color:#fef3c7;">创建一个新的 Student 对象，并将其赋值给 stu对象内部的Student数组 team 的第 0 个位置</mark>
+      - stu[0] = stu也能写,不会报错
+        - 将实例化的对象指向他自己的team成员数组0号位置
+        - 把自己写到电话本第一位,没啥用
+    - 无限递归报错
+      - ![image-1](https://document-image.mubu.com/document_image/8f4bf335-080c-4702-87d4-0ae57689287a-32569566.jpg?x-tos-process=image/resize,w_280)
+        - 这里要是return this[i]无线递归报错
+        - this[i]指的就是当前对象本身的索引器
+          - 一读就会调用get,递归
+        - 这里return this[i,j]连参数都对不上,更加错了
+  - 重载
+    - 如果有多个一维数组
+      - 都是单参数不能实现重载
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_14098b0e-c33f-46e4-dc3b-0df6c813b8c2.png?x-tos-process=image/resize,w_243)
+        - 加个bool之类的就可以实现重载了
+        - 而且索引器的参数列表不是()而是[]
+          - []在索引器中即是数组访问符,又是参数列表
+    - <mark style="background-color:#fef3c7;">对比同名属性就不能重载</mark>
+      - 毕竟连参数列表都没有
+  - 补充
+    - 和静态的联系
+      - <mark style="background-color:#fef3c7;">索引器可以是static静态的</mark>
+        - <mark style="background-color:#fef3c7;">此时调用方式是Student[i]而非stu[i]</mark>
+        - 好吧老版本似乎并不支持这个(VS老东西了)
+      - 索引器中存储的也可以是静态成员数组
+        - 属于 **类** ，全局共享（所有实例共用）
+          - 静态索引器就不能访问实例成员了
+        - 静态 / 实例索引器都能访问
+    - 并且索引器下标可以是stiring等等
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_dfff6fb5-0671-49a3-c062-0da79725b47a.png?x-tos-process=image/resize,w_400)
+        - 注意!数组只能用int作为下标
+        - 你这里参数用string,就还需要映射string->int
+        - ![image-1](https://document-image.mubu.com/document_image/c074247a-915a-4e4b-a0ba-9ed4c8066f2b-32569566.jpg?x-tos-process=image/resize,w_400)
+          - 用switch语句也可以实现哈
+          - 这个switch表达式我懒得拓展了
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_f54556d3-df2a-4ab4-b1e5-d17a918b0e72.png?x-tos-process=image/resize,w_400)
+    - 和属性的区别
+      - 除了名字,调用方式
+      - 索引器可以重载,同名属性不能重载
+        - 比如两个都叫AgeElem的属性就不能重载
+- 分部类和内部类
+  - 内部类
+    - 没卵用
+  - 分部类
+    - ![image-1](https://document-image.mubu.com/document_image/5fa14cc3-7ffd-4eae-8fa2-e015dc22217d-32569566.jpg?x-tos-process=image/resize,w_357)
+      - 类修饰符一致,且不能有重复成员
+      - 类加上修饰符partial
+        - public partial class
+        - 不能写反了
+    - 和重名的命名空间中的不同类有点像
+- 补充
+  - 注意申明对象数组的语法
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_8c41f4bc-8e7d-4bec-c98a-1f13d56be26a.png?x-tos-process=image/resize,w_400)
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_bc405318-1caa-4dae-80d6-aca501f6c845.png?x-tos-process=image/resize,w_400)
+      - 或者想放入现有对象
+  - 结构体和类的区别
+    - ![image-1](https://document-image.mubu.com/document_image/99e449af-7e8a-48fb-afe9-fc20cb0ed5f3-32569566.jpg?x-tos-process=image/resize,w_400)
+      - 只写我不熟悉的:
+      - 结构体不能被继承,不具有多态性质,成员不能用protected
+      - <mark style="background-color:#fde8e8;">结构体成员变量声明时</mark><mark style="background-color:#fde8e8;"> **不能指定初始值** </mark>
+      - 构造函数
+        - 结构体 **不能声明无参构造函数** (参数必须要包含所有成员嘛)
+          - 后面好像又可以了?
+        - <mark style="background-color:#fde8e8;">结构体声明有参构造函数后，无参构造不会被顶掉</mark>
+          - 类的会被顶掉
+        - 结构体 **不能声明析构函数**
+        - 结构体构造函数中 **必须初始化所有成员变量**
+      - 结构体可以 **继承接口**
+        - 啊?居然可以继承接口吗
+      - 构造函数调用
+        - 结构体的 默认无参构造函数可以不用new 直接调用
+          - ![image-1](https://document-image.mubu.com/document_image/4d0f4493-e2ef-4c80-b910-e13b241354b3-32569566.jpg?x-tos-process=image/resize,w_400)
+          - 因为是值类型
+        - 类的默认无参构造函数 直接声明Student stu;仅为变量声明，未实例化
+      - 选择建议
+        - 看图吧

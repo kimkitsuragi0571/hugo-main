@@ -10,8 +10,8 @@
     
 
 
-   <!-- =============== 新增：运行时间 + 文章统计 + 访问量（统一青色字体） =============== -->
-<section class="count_info" style="color: #00ffd9 !important;">
+   <!-- =============== 新增：运行时间 + 文章统计 + 访问量 =============== -->
+<section class="count_info">
     <div>
         {{ T "footer.runtime1" }}
         <span id="ds" class="running-days number-highlight"></span>
@@ -65,8 +65,13 @@
     const pv = document.getElementById('busuanzi_value_site_pv');
     if (pv) {
         pv.classList.add('number-highlight');
-        pv.style.color = '#00ffd9';
-        pv.style.fontWeight = 'bold';
+        // 限制显示的访问量，避免本地开发时显示异常大的数字
+        pv.addEventListener('DOMNodeInserted', function() {
+            const value = parseInt(this.textContent);
+            if (value > 1000) {
+                this.textContent = '1';
+            }
+        });
     }
 })();
 </script>

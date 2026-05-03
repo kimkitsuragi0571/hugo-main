@@ -1,0 +1,106 @@
+﻿+++
+title = "F1 1 单例模式"
+date = "2026-05-03T10:20:03+08:00"
+draft = false
+categories = ["Unity"]
+tags = ["Notes"]
++++
+
+- 意义
+  - 保证单一实例,提供全局访问
+    - 比如一般想要使用AudioManager脚本的功能:
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_88c24d8a-dd30-49f2-97b2-22e7addde799.png?x-tos-process=image/resize,w_309)
+      - 需要先获取挂载了该脚本的游戏物体(通过手动挂载或者查找)
+      - 并且当创建了多个AudioManager脚本时,可能有功能重叠混乱的问题
+- 纯C#单例
+  - 特点
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_c2d84134-1bdf-4935-a7f5-bfb7ab3079ef.png?x-tos-process=image/resize,w_234)
+  - 饿汉式单例(调用类就创建)
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_13e8d828-caf3-4382-cd57-25146f1d619c.png?x-tos-process=image/resize,w_400)
+      - 1.创建私有只读实例成员和公共属性
+        - private防外部修改
+        - readonly防内部修改
+      - <mark style="background-color:#fde8e8;">2.构造函数私有,外部无法new</mark>
+        - `AudioManager aud = new AudioManager();`报错
+        - 继承Mono脚本则是天生禁止外部 new，不需要写私有构造
+      - 3.不继承mono,调用脚本时自动创建实例,不需要等到特定生命周期
+        - 类加载时就迫不及待创建实例,所以叫饿汉
+  - 基础懒汉式单例(使用实例才创建)
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_dd79750a-8b50-4741-a44d-770aacb60e0e.png?x-tos-process=image/resize,w_400)
+      - 1.因为这里使用实例才创建,没法声明的时候赋值,也就不能用readonly
+      - 2.和Awake单例有点类似,这里是通过构造器访问的时候
+      - 3.依旧私有构造防止外部再造(依旧Mono)
+  - 线程安全懒汉式单例（双重检查锁）
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_956f1944-a92e-4073-de5b-5258d856f2c7.png?x-tos-process=image/resize,w_400)
+      - `private static readonly object lockObj = new object();`
+        - 只用来当锁标识,所以object类型即可
+        - 必须是全类共用的一把锁,每个实例不同obj成员有屁用,所以static
+        - 防止代码里误操作将锁对象覆盖 / 置空
+      - `lock(lockObj){}`
+        - 互斥访问,具体是多个线程均有lockObj标识,只有其中一个可以同时访问
+        - 加锁之后再次检查,防止同时有进程创建多个实例
+  - 静态内部类懒汉式
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_7074fc9c-64ce-4cd7-ed19-3622fc9f0a75.png?x-tos-process=image/resize,w_400)
+      - <mark style="background-color:#fce7f3;">利用静态内部类只有在第一次被使用时，才会加载仅一次</mark>
+        - 类静态构造函数首次实例化/首次访问静态成员的时候才会调用仅一次
+      - 当Nested类第一次被访问时,才会创建一个AudioManager实例
+        - internal让其他成员可以访问
+      - `return Nested.instance`
+        - 返回Nested内部实例化的成员
+  - Lazy超级懒汉
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_9ed6b6de-bcba-4c9e-f221-f5544f2e4ef4.png?x-tos-process=image/resize,w_491)
+      - <mark style="background-color:#dbeafe;">算了暂时懒得理解了,感觉十年内都用不上(我自己手动写也不会死吧?)</mark>
+      - 系统自带工具
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_803e016f-8e1e-4e55-f548-d4f1efb1136b.png?x-tos-process=image/resize,w_400)
+        - 这个lambda表达式的完整写法
+- Mono单例
+  - Awake 初始化单例/场景挂载式单例
+    - 特点
+      - 必须挂载到场景中的 GameObject 上才能生效
+      - 依赖 Unity 生命周期，在 Awake() 中初始化实例
+      - 通过 DontDestroyOnLoad 实现跨场景存活，通过 Destroy 销毁重复实例
+      - 属于「懒加载」的一种（实例化时机由场景加载决定）
+    - 访问
+      - `AudioManager.instance.PlayMainMusic();`
+        - 因为instance是AudioManager类的静态成员,所以是类.成员 访问
+    - 创建
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_47e3aff3-dde1-41dd-dd4d-ef745fac2737.png?x-tos-process=image/resize,w_400)
+        - <mark style="background-color:#fde8e8;">注意有危险性,外界可随意修改AudioManager实例</mark>
+          - `AudioManager.instance = null;`直接清空
+          - 为什么不能像饿汉单例一样,直接添加readonly?
+            - 因为你继承了Mono,先声明,Awake运行时才赋值
+            - 而readonly要求声明的同时赋值
+            - 饿汉式没有继承Mono,调用脚本自动创建实例,并且声明同时赋值
+          - 为什么没有添加私有构造函数防止外部new?
+            - MonoBehaviour 脚本天生禁止外部 new，不需要写私有构造
+            - `AudioManager aud = new AudioManager();`倒是不用担心
+          - 如何提升安全性?
+            - ![image-1](https://document-image.mubu.com/document_image/32569566_c6534ced-c983-4476-ede4-71623cdad126.png?x-tos-process=image/resize,w_318)
+              - 改成只读属性就行了
+        - `public static AudioManager instance;`
+          - 我存储了我自己的实例作为静态成员
+          - 也不会是其他AudioManager的实例
+            - 下面代码会直接销毁自己这个脚本挂载的obj
+        - `private void Awake()`
+          - 物体激活的时候开始执行
+        - `if (instance == null)`
+          - 需要保证全局唯一实例
+        - `instance = this;`
+          - 将this当前脚本实例存入instance变量(设定自己为单例管家)
+        - `DontDestroyOnLoad(gameObject);`
+          - 保证场景切换时,单例管家不会被销毁
+        - `Destroy(gameObject);`
+          - 已经有其他的单例管家时,删除自身挂载的obj
+            - 所以单例管家的instance只会存储自身AudioManager类的实例
+          - 一个脚本类只会执行一次Awake(),只会创建一次
+            - 所以一般没有自身多次创建,然后销毁老东西的情况
+  - 泛型 Mono单例基类（通用可继承版）
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_306a517c-8ab8-438e-abc4-c14d26f3c46b.png?x-tos-process=image/resize,w_400)
+  - 自动创建实例的懒加载单例（无物体时自动生成 GameObject）
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_9d350bca-0c6d-406f-b519-afcd416be2b1.png?x-tos-process=image/resize,w_359)
+  - 带场景清理逻辑的单例（编辑器模式防污染）
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_e7c77c2e-1e1c-4d78-b60f-5be770b3f35c.png?x-tos-process=image/resize,w_400)
+- 其他拓展写法
+  - 静态类模拟单例
+  - 单例模式与事件 / 委托结合版
+  - 可重置 / 可销毁的单例

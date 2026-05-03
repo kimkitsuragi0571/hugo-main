@@ -1,0 +1,121 @@
+﻿+++
+title = "UR1 2 基本概念"
+date = "2026-05-03T10:20:04+08:00"
+draft = false
+categories = ["Unity"]
+tags = ["Notes"]
++++
+
+- 脚本中的反射
+  - 1.通过反射找到对应类
+    - Unity获取文件名->反射通过这个文件名查找类
+    - 所以类名和文件名必须相同
+  - 2.检查其是否继承 MonoBehaviour
+    - 继承的脚本不能new实例化,必须和GameObj绑定由其管理生命周期
+  - 3.创建类实例和物体绑定
+    - 物体相当于容器,初始必须容纳Transform脚本
+    - 和程序集引用(依赖)不同
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_4f9a4dcb-59b9-4a98-b716-4d60cb471af0.png?x-tos-process=image/resize,w_184)
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_14042215-81d2-4493-ce6e-0e135c0f5d60.png?x-tos-process=image/resize,w_185)
+  - 4.代码上相当于
+    - 获取反射,创建实例
+      - `Type type = Type.GetType(你设定的脚本/类名);`
+      - `object script = Activator.CreateInstance(type);`
+    - 调用生命周期函数
+      - `MethodInfo update = type.GetMethod("Update");`
+        - 获取生命周期函数用type.GetMethod
+      - `update.Invoke(script, null);`
+        - 虚方法/接口 不需要反射,用的C# 原生多态（虚表机制）
+        - (空)
+          - 普通方法：Update() → Unity 必须用 GetMethod("Update") 找
+          - 虚方法 / 接口： **直接调** ，引擎 **根本不用知道方法名**
+            - 直接编译期确定要执行方法的"序号"
+    - 面板修改参数
+      - `FieldInfo nameField = type.GetField("name");`
+        - 面板显示变量用的就是type.GetField
+      - `nameField.SetValue(script, "新名字");`
+- 脚本
+  - 创建规则
+    - 1.不需要命名空间
+      - 反射查找按照"类名"而不是"反射.类名"
+      - 但是现代Unity也推荐加了???
+    - 2.类名==文件名
+  - MonoBehavior基类
+    - <mark style="background-color:#fef3c7;">1.只有继承了MonoBehavior类才能挂载到GameObject上</mark>
+    - <mark style="background-color:#fef3c7;">2.继承后的脚本不能new实例化对象,只能挂载</mark>
+      - 所以不要写构造函数,没有意义
+    - 3.继承的脚本可以在一个对象上挂载多个
+      - 除非有Dis.....ent特性
+    - 4.继承的类可以被再次继承
+  - 不继承MonoBehavior的类
+    - <mark style="background-color:#fef3c7;">1,不能挂载到GameObject,使用前需要new实例化</mark>
+    - 2.一般是单例模式类,用于管理模块
+      - 比如GameManager就是个单例管理器
+      - 不挂在任何物体上，不依赖场景，全场只有一个
+      - 便于随时调用且不会因为物体顺带被销毁
+    - 3.start和update等默认函数都不用保留
+  - 执行顺序
+    - 脚本页面中有个Excutition Order...
+      - 点击+选择脚本执行顺序
+  - 默认脚本模版
+    - UnityHub的脚本选项中可以改,但是谁闲着没事改这个呢
+- 生命周期函数
+  - 概念
+    - 帧
+      - 游戏的本质就是一个死循环,每个循环帧里面处理特定逻辑
+      - Unity底层已经做好了所谓死循环(以后就不需要使用while循环了)
+        - 或者说Update里写while循环会直接卡死
+    - 生命周期(函数)
+      - 继承Mono的脚本才会有生命周期函数,并且这些脚本都会挂载到对象上
+      - 挂载了就会依附于游戏对象,遵从GameObj创建到销毁的生命周期
+      - 生命周期函数就是游戏物体特定生命周期自动执行的函数
+        - 通过反射实现(所以这些函数固定名称)
+  - 使用
+    - 修饰符
+      - 有子类的时候就protected,没有就private
+      - 一般不用public,因为不需要外部调用生命周期函数
+    - 所有生命周期函数
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_21f4dbc5-5639-4848-f358-d90f5ac5664d.png?x-tos-process=image/resize,w_359)
+      - Awake
+        - 1.类被实例化调用,所以初次挂载/GameObj被创建时触发
+          - <mark style="background-color:#fde8e8;">注意:挂载未激活脚本时,脚本仍然实例化,只是不执行</mark>
+        - <mark style="background-color:#fef3c7;">3.即使脚本没有激活,仍然会调用Awake</mark>
+          - <mark style="background-color:#fde8e8;">注意:一定不是游戏物体未激活,obj没激活所有脚本都不可能执行</mark>
+          - <mark style="background-color:#fde8e8;">只有Awake属于构造期脚本没激活也能用,其余都是运行期</mark>
+        - 2.Awake同一个脚本在同一个物体上始终只调用一次
+          - 就算禁用再次启用Awake也不会跑
+        - <mark style="background-color:#fde8e8;">3.Awake和Start不同的作用</mark>
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_71f0f785-8a79-4d9f-825a-8681183dcc1a.png?x-tos-process=image/resize,w_295)
+            - Awake刚诞生就能获取自身组件
+            - Start等其他物体初始化完毕再获取其组件
+      - OnEnable
+        - 注意Awake是Obj创建时,OnEnable则是激活时
+        - 运行期函数,所以脚本不激活就不执行
+      - Start
+        - 1.物体被创建/Awake之后,第一帧Update更新之前
+        - <mark style="background-color:#fef3c7;">2.脚本必须激活才执行</mark>
+          - 脚本运行途中激活脚本才执行OnEnable和Start
+        - 3.同样只执行一次
+        - 4.等准备好了才动,具体准备的是
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_2db4c092-a99c-49b5-9684-434efe865346.png?x-tos-process=image/resize,w_204)
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_dee3e356-e792-4103-cde0-8a40f5287fb7.png?x-tos-process=image/resize,w_204)
+      - FixedUpdate
+        - 物理更新
+        - 同样是"每一帧"执行,但是这个帧是固定时间间隔的帧
+          - ProjectSetting里面Time可以修改间隔帧数
+      - Update
+        - 逻辑帧更新,每帧执行
+      - LateUpdate
+        - 每帧执行,Update之后执行
+        - 摄像机位移啥的就放这里面,防止黑屏闪烁
+      - OnDisable
+        - 每次对象失活时才会调用
+          - 同样也只有一次
+      - OnDestroy
+        - 对象被销毁的时候才会调用
+    - 生命周期函数支持继承多态
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_31588b54-f83a-4f44-b2d4-136adc1c47bd.png?x-tos-process=image/resize,w_192)
+        - 写个脚本继承了Lesson1类/脚本中的内容
+        - 挂载后会调用父类脚本中的内容
+    - Unity中打印信息
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_34e9b648-e93a-47b7-c9dc-e1a5af0ab243.png?x-tos-process=image/resize,w_233)

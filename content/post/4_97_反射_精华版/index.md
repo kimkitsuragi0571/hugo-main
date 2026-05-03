@@ -1,0 +1,195 @@
+﻿+++
+title = "97 反射 精华版"
+date = "2026-05-03T10:20:03+08:00"
+draft = false
+categories = ["C-Sharp"]
+tags = ["Notes"]
++++
+
+- 概念
+  - 反射
+    - <mark style="background-color:#fce7f3;">反射通过成员名字查找元数据从而找到成员,然后对成员进行修改</mark>
+      - <mark style="background-color:#fef3c7;">反射只能修改对象成员但不能增删成员</mark>
+        - 比如可以修改age字段值,但是不能增加/删除字段
+      - 为什么反射方法要传入字符串
+        - 运行时根据名字找东西,编译时只能用【字符串 = 名字】来定位
+        - 所以为了避免重名,还需要写出包含命名空间的全名
+      - 为什么反射是动态,变量是静态
+        - 反射 = 运行时才知道要改谁
+          - 反射的所有查找、修改，都是程序跑起来之后才做的
+        - 普通变量 = 编译时就知道要改谁
+      - 为什么反射查找元数据而不直接查找成员本身
+        - 比如字段age,age只知道自己存储的值18,但是不知自己的变量名age
+        - 变量名age需要在元数据中修改
+      - 为什么不直接用变量
+        - 因为会有不知道修改对象类型的情况,不过这个之后细讲罢
+  - Type
+    - 不是Student对象本身，它是描述 “这个类型长什么样” 的元数据对象
+    - 或者说就是取出要找的对象元数据,然后封装为一个对象
+  - 元数据
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_d9220820-76e2-4dff-d5fe-8e92a53690f1.png?x-tos-process=image/resize,w_400)
+  - 程序集
+    - bin里面的.dll类库文件,编译后就是程序集文件
+    - 本身不能被执行
+    - 项目中添加依赖->引用才能获取外部程序集
+      - 具体见程序集里的笔记
+- <mark style="background-color:#fce7f3;">语法例子总结</mark>
+  - 1.获取Type对象(钥匙)
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_a1925b56-4949-45b7-85c9-63b9777b3987.png?x-tos-process=image/resize,w_400)
+  - 2.程序集
+    - 基本使用
+      - 获取程序集
+        - Type对象所在程序集
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_0f08f82f-1fb3-4729-cb78-84f716ad5618.png?x-tos-process=image/resize,w_400)
+            - 注意int和Student自定类所在程序集不同
+        - 获取指定程序集
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_545ad7da-3254-4cf1-d9f2-18a1acbd754f.png?x-tos-process=image/resize,w_400)
+            - 这里\转义字符,所以需要加@或者\\
+            - `Assembly.Load()`
+              - <mark style="background-color:#fef3c7;">不限制程序集位置,但是必须对项目引用</mark>
+              - 解决方案中添加项目->类库(编译后就是程序集)
+              - 然后项目->依赖项->添加对类库文件的引用
+                - ![image-1](https://document-image.mubu.com/document_image/32569566_f7013848-8d31-4060-c6d9-4bf264687a16.png?x-tos-process=image/resize,w_179)
+            - `Assembly.LoadFile`
+              - 不需要引用,直接指定路径
+      - 用程序集获取Type对象
+        - 或者说获取程序集中指定元数据
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_11fc330f-bdac-4ff2-9b92-7060ec024e77.png?x-tos-process=image/resize,w_400)
+          - 根据程序集存储的元数据,生成对应Type对象
+            - 可以是任意类型的元数据(包含类,结构体,特性...)
+            - <mark style="background-color:#fef3c7;">注意必须是个独立类型,事件这种类的成员就没有对应Type对象</mark>
+          - 程序集里面只有类/类型,没有具体对象
+            - 所以没stu.GetType这种写法
+    - 补充
+      - <mark style="background-color:#fde8e8;">区分两种方法获取类元数据</mark>
+        - `Type tAsm2=asm1.GetType("Ref.Student");`
+          - 指定程序集里面找指定名称类(的元数据)
+        - `Type typ = Type.GetType("Ref.Student");`
+          - 【所有已加载的程序集 + 默认探测路径】里全局找这个类(的元数据)
+      - 枚举 + 反射 + 程序集
+        - 这里有个枚举`enum E_level{A,B,C}`
+        - 获取枚举对应Type对象
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_c551dcf4-38e5-40ca-8465-572548a76b0d.png?x-tos-process=image/resize,w_288)
+            - 1.不管直接获取Type对象,还是指定程序集获取Type对象
+              - 获取方式和类的方法都一样
+            - 2.仍然可以通过对象获取
+              - 枚举虽然是值类型没法new对象,但是枚举成员本身就是个值对象
+            - 3.注意通过对象类型获取枚举
+              - E_lev.A本身是枚举常量
+                - 所以`E_lev.A.GetType()`获取的是枚举类型的元数据
+              - stu.age是int成员变量
+                - 所以`stu.age.GetType()`获取的是int类型而非Student类型的元数据
+        - 获取(枚举对应Type对象)成员
+          - 一般还是用GetField而不是GetMember,毕竟枚举里都是字段
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_96f3190b-5db0-418a-bb6e-f43d04585a20.png?x-tos-process=image/resize,w_400)
+            - 1.还是和类没有区别
+            - 2.枚举中不能有重名成员,但是MemberInfo[]是通用方法不是专给枚举的
+              - 所以还是数组
+            - 3.枚举Type获取指定成员,不能用Type数组包装
+              - <mark style="background-color:#fff3bf;">枚举、字段、属性 Type对象获取成员→ 不能用 Type []</mark>
+              - <mark style="background-color:#fff3bf;">`Activator.CreateInstance(type, "jackie",18)`</mark><mark style="background-color:#fff3bf;">同样不用Type[]</mark>
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_0bcab3da-5ff8-4050-f7aa-8b22d83a4098.png?x-tos-process=image/resize,w_400)
+            - <mark style="background-color:#fef3c7;">获取数组,依据下标执行更不行了,非常不建议使用</mark>
+            - 这里会把从基类继承的方法取出来,结果里面不止ABC字段
+              - 自然没法使用GetValue
+  - 3.成员
+    - 通过Type对象
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_e289d278-822f-4fa7-b7f1-4d92ca9135ab.png?x-tos-process=image/resize,w_365)
+    - 指定名称成员
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_0c296b9a-5a0b-4ad9-d832-7df2040828bb.png?x-tos-process=image/resize,w_400)
+        - 获取指定成员仍然需要数组,因为可能有重名方法(重载)
+        - 注意如果是私有成员的属性,这里`GetMember("AgeElem")`才行
+    - 指定重载方法/构造
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_3d6def53-6bc7-4786-c82c-af7a71f15c8d.png?x-tos-process=image/resize,w_400)
+        - 父类容器装填子类对象
+          - 用GetMethod获取指定重载方法然后GetMemberInfo来封装
+        - <mark style="background-color:#fde8e8;">注意这里用MemberInfo而不是数组,指定重载方法没有重名,所以是单个</mark>
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_dd21edd3-10d6-4710-834c-5055b47095bc.png?x-tos-process=image/resize,w_400)
+        - 依旧父类容器
+  - 4.字段
+    - 通过Type对象获取所有公共字段
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_a698f271-24aa-4f07-9b23-d4d813c03467.png?x-tos-process=image/resize,w_400)
+        - <mark style="background-color:#fce7f3;">如果是私有字段就没法获取了(这里也不能填属性)</mark>
+        - 注意哈,不能填属性!!!!!!!!!
+    - 如果改为获取指定字段
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_bc4a96e2-2744-493f-8dd0-dab9dc8b80a2.png?x-tos-process=image/resize,w_400)
+        - 注意没有用Type数组封装
+          - <mark style="background-color:#fce7f3;">枚举、字段、属性 Type对象获取成员→ 不能用 Type []</mark>
+          - `Activator.CreateInstance(type, "jackie",18)`<mark style="background-color:#fce7f3;">同样不用Type[]</mark>
+        - 应该说只有找方法/构造函数,且指定参数的时候,才用Type数组
+  - 5.方法
+    - 获取所有方法
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_54186def-e4c2-422d-ecfc-6b724c185bdc.png?x-tos-process=image/resize,w_371)
+    - 获取指定方法
+      - <mark style="background-color:#fce7f3;">获取方法第一个参数填"方法名"</mark>
+        - 千万别和执行方法弄混
+      - <mark style="background-color:#dbeafe;">第二个参数传入Type类型数组</mark>
+        - 因为 GetMethod 是找方法，不是执行方法
+          - 找方法只需要知道参数类型，不需要真实数据
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_9559ccfc-f0d4-4058-81f4-20a2bb7c303a.png?x-tos-process=image/resize,w_400)
+        - GetMethod是根据参数获取独一份的方法,所以不用数组
+        - 静态方法和实例方法的获取没有任何区别
+    - 执行指定方法
+      - <mark style="background-color:#fce7f3;">执行方法第一个参数填"对象名"</mark>
+        - 这是为了确定执行哪个实例对象的Speak方法
+        - 获取方法不需要知道是哪个对象的,只要找到对应名字的方法即可
+      - <mark style="background-color:#dbeafe;">第二个参数传入Object类型数组</mark>
+        - <mark style="background-color:#fde8e8;">如果知道参数是多个int,可以直接传入new int[]</mark>
+        - <mark style="background-color:#fde8e8;">但是单个int参数不能传入new int[]只能是new object[]</mark>
+          - <mark style="background-color:#fde8e8;">很神秘罢</mark>
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_06f7f24b-4029-4ae1-a7eb-f6c844786b78.png?x-tos-process=image/resize,w_331)
+        - <mark style="background-color:#fde8e8;">但是这个取出并且执行,非常不建议使用!!!!!</mark>
+        - 我这里就报错了,因为有成员属性的get和set方法
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_2444cc4a-3abd-4cc9-82f1-352ba5b55205.png?x-tos-process=image/resize,w_164)
+            - 而且会把继承的方法一并取出来,全是垃圾
+          - 这里我就取出了get_NameElem方法而不是Speak方法,执行就报错
+        - <mark style="background-color:#fef3c7;">GetMethods ()一般只是用来看而不是执行的(毕竟只能盲猜执行的哪个)</mark>
+          - 如果实在要用也行,需要用foreach加个if判断语句
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_81b5df0b-5b9a-4d5a-8ef7-ffb038bb52a3.png?x-tos-process=image/resize,w_400)
+  - 6.构造函数
+    - 获取
+      - 所有构造函数
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_2c97a76b-dffa-41e8-a5d8-0273481161eb.png?x-tos-process=image/resize,w_400)
+      - 指定构造函数
+        - 无参构造
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_786c5b96-c5ce-4283-8504-76aee522b2c2.png?x-tos-process=image/resize,w_400)
+            - 重载指定Typeof(int)数组也是这样
+              - 不能传入空参数,因为根本没设计对应重载
+            - 一个类中不会有重名的无参构造,用不上重载
+        - 有参构造
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_d64eb8ea-5b82-4c31-ae07-82380a9d9383.png?x-tos-process=image/resize,w_400)
+        - 静态构造
+          - 无参数、无重载、不可手动调用
+          - <mark style="background-color:#fce7f3;">所以没法手动ConstructorInfo获取静态构造</mark>
+    - 执行
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_944cdff8-0df3-4238-b6ea-8752bb372ad6.png?x-tos-process=image/resize,w_400)
+        - 获取构造函数数组,同样需要取出其中一个再执行
+          - <mark style="background-color:#fde8e8;">好吧还是很不建议使用,构造函数数量少,但是依靠下标判断仍然不靠谱</mark>
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_8b0bee9c-4d27-4077-a051-c832ae9b5d3c.png?x-tos-process=image/resize,w_191)
+        - 执行有参构造同样传入object数组
+      - 静态构造函数
+        - 同样是没法手动执行,物体创建时自动执行一次
+- 反射关键类
+  - Activator
+    - 用于快速创建对象
+      - <mark style="background-color:#fef3c7;">需要先获取构造函数ConstructorInfo,然后执行Invoke(),有点麻烦</mark>
+      - <mark style="background-color:#fef3c7;">仅获取Type对象后就可以直接使用Activator,生成对象</mark>
+      - 获取结构体/枚举/int类型的Type对象也能创建实例对象
+        - 很神奇罢
+        - 只是不会调用构造函数(也不存在)
+    - 创建
+      - 无参构造对象
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_2935bf00-e4a5-4fbf-866d-030c7e72e057.png?x-tos-process=image/resize,w_400)
+          - <mark style="background-color:#fce7f3;">注意泛型写法不用Type对象参数,而且只能调用无参构造!!!!!</mark>
+          - 泛型默认隐含参数的
+      - 有参构造对象
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_068199b2-007a-4a6b-d76c-7ee37e0a0120.png?x-tos-process=image/resize,w_400)
+          - <mark style="background-color:#fce7f3;">语法糖,不需要将参数打包为Type[]或者Object[]数组</mark>
+      - 私有构造对象
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_483bbeef-48db-42d8-f438-5e04d6acc336.png?x-tos-process=image/resize,w_400)
+          - 普通方法可以访问私有构造,Activator原本不可以访问私有构造
+          - 这个是C#11以上的新写法,但是<mark style="background-color:#fef3c7;">限制很多不建议用</mark>
+            - 只能调用 无参 private 构造
+              - 有参private没法用
+            - 完全不支持 任何有参构造（不管是 public 还是 private）
+            - 代码可读性差

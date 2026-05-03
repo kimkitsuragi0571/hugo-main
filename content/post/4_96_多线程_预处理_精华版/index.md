@@ -1,0 +1,90 @@
+﻿+++
+title = "96 多线程 预处理 精华版"
+date = "2026-05-03T10:20:02+08:00"
+draft = false
+categories = ["C-Sharp"]
+tags = ["Notes"]
++++
+
+- 多线程
+  - 概念
+    - 需先引用 using System.Threading;
+    - 线程是程序调度的最小单位,一个进程可以并发调度多个线程
+    - 多线程:通过代码开启新的线程
+      - 各线程之间相互独立,互不干扰
+  - 使用
+    - 语法
+      - `Thread stu = new Thread(Test)`
+        - <mark style="background-color:#fce7f3;">Test 为无参静态方法</mark>
+        - <mark style="background-color:#fde8e8;">通过委托实现,所以这里传入方法名而没有()参数列表</mark>
+      - `static void Test(){ }`
+        - 新增的线程就在这个函数中执行,这个函数传入线程类对象
+      - `stu.start()`
+        - <mark style="background-color:#fde8e8;">只是把函数装进线程类并不会触发调用,还要启动</mark>
+    - 基础的Thread只能接受无参无返回值的委托
+      - 虽然有其他方法,但最常见的还是用lambda表达式
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_fe009591-2abc-4a4a-9c4f-918c07ef3a57.png?x-tos-process=image/resize,w_212)
+        - 利用了闭包变相传递参数
+  - 多线程操作
+    - 设置为后台线程
+      - 比如刚才新开线程Test里面无限循环
+        - 主线程只有个委托和启动线程,但执行完了也没法关闭程序
+        - 因为test设置为了前台线程,主线程关闭test也不会关闭
+      - `Test.IsBackground = true`
+        - <mark style="background-color:#fde8e8;">设置为后台进程,主线程关闭的时候就关闭</mark>
+    - 关闭/释放线程
+      - 非死循环的线程等他自己关闭回收即可
+      - 死循环的线程关闭
+        - <mark style="background-color:#fde8e8;">1.外部添加个bool标识</mark>
+          - 比如死循环是while(isRun),外部设置isRun=false让循环停止
+        - <mark style="background-color:#fde8e8;">2.线程提供方法</mark>
+          - 有的版本会报错
+          - `test.Abort();`
+            - 强制关闭,不建议使用
+    - 线程休眠
+      - `Thread.Sleep(1000)`
+        - 让当前线程休眠1000ms
+          - 1s=1000ms
+        - 注意是静态方法,不能实例.方法调用
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_190765dd-4248-4c02-a1a6-754daf90d2e9.png?x-tos-process=image/resize,w_260)
+        - 想指定让新开线程thr休眠,需要写在lambda表达式中
+        - 或者写在方法体中
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_79aba2a3-901c-4002-f3d7-352777cc7c32.png?x-tos-process=image/resize,w_261)
+        - 写在循环里,让轮回的慢一点
+        - 如果写在Main方法中,这里就是让主线程休眠了吧
+    - 线程之间数据共享
+      - 多线程共享使用同一片内存(因为属于同一块进程)
+        - 为了避免冲突,需要设置互斥访问
+      - `lock( ){ }`
+        - lock锁定当前变量,只有当前lock可以使用,执行完了再释放
+        - 进入当前语句前查看传入变量是否已经被其他进程锁定
+        - <mark style="background-color:#fce7f3;">传入变量obj记住一定是引用变量类型</mark>
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_a6f7eeb5-075a-46ae-a276-e0a84ac1ee36.png?x-tos-process=image/resize,w_289)
+        - 传入标记obj可以是string,object等引用类型变量,不可以是int等等
+          - 传入个999作为标记就是错误的
+        - <mark style="background-color:#fce7f3;">多个进程实现互斥就是用同一块标记</mark>
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_777ed407-71c5-4a97-cfe2-31aaf41a5810.png?x-tos-process=image/resize,w_321)
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_5054b503-61c1-4518-d59c-89eaef3ace52.png?x-tos-process=image/resize,w_282)
+- 预处理
+  - 概念
+    - 哦不就是C++里面的`#include``iostream`吗
+    - 讲课常用的`#region` `#enderegion` 也是
+    - 常见处理
+      - 定义(配合if预处理使用
+        - `#define`
+          - 定义一个符号
+        - `#undef`
+          - 取消define定义的符号
+      - 判断
+        - `#if`
+        - `#elif`
+          - 注意else if的缩写
+        - `#else`
+        - `#endif`
+      - 一般用来实现多版本的兼容
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_138406df-9087-4047-a388-7d39323a8e48.png?x-tos-process=image/resize,w_220)
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_2ad3a474-d691-4cb9-e4ec-2846216e877a.png?x-tos-process=image/resize,w_266)
+      - 也可以配合逻辑与或
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_7aa55b04-239e-411d-f96b-f165322fbefb.png?x-tos-process=image/resize,w_400)
+    - `#warning`和`#error`
+      - 用的很少,懒得介绍

@@ -1,0 +1,119 @@
+﻿+++
+title = "UR2 5 延迟和协同程序"
+date = "2026-05-03T10:20:04+08:00"
+draft = false
+categories = ["Unity"]
+tags = ["Notes"]
++++
+
+- 延迟函数
+  - `Invoke("DelayStudy", 5);`
+    - 必须传入字符串函数名
+      - 1.必须是本脚本中已经申明的函数,另一个脚本的函数也不行
+      - 2.不能包裹使用比如Invoke("Attack(10)", 2);错误的
+      - <mark style="background-color:#fef3c7;">3.必须是字符串</mark>
+        - 委托,多线程都是直接传递函数名
+        - 推荐使用nameof(函数名)的写法,和传入字符串是等价的
+      - <mark style="background-color:#fde8e8;">4.找不到局部函数</mark>
+        - 比如你把函数写在Start()里面,然后在Start()里面Invoke,显示找不到函数
+      - <mark style="background-color:#fef3c7;">5.必须是无参无返回值函数</mark>
+        - 和开启多线程一样的要求
+    - 延迟5秒执行
+  - 注意不是生命周期函数,执行条件不同
+    - <mark style="background-color:#fef3c7;">脚本依附对象失活,延迟函数仍然可以执行</mark>
+      - Awake只要物体失活就不执行
+    - <mark style="background-color:#fef3c7;">脚本依附对象销毁/脚本移除,无法执行</mark>
+  - 对比协程的缺点
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_3e59a0fb-e142-4967-bec3-7fe8196a6c66.png?x-tos-process=image/resize,w_295)
+- 取消延迟函数
+  - `CancelInvoke();`
+    - <mark style="background-color:#fde8e8;">不管之前开启多少个延迟执行函数,统一关闭</mark>
+  - 安全启停方案
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_6e59539f-02e3-4950-997d-c452f825b024.png?x-tos-process=image/resize,w_400)
+    - 避免物体失活后，延迟函数还在后台偷偷执行导致的 Bug
+- 协同程序
+  - 多线程
+    - C#,Unity里面开多线程
+      - `thr = new Thread(Test);`
+      - `thr.Start();`
+      - 1.均默认只接受无参无返回值函数
+      - 2.不释放就会一直执行,所以记得关闭线程
+    - Unity支持多线程,但是新开线程不能访问Unity相关对象内容
+      - 传入的Test方法要是移动物体this.ransform.translate直接就报错了
+      - 连访问并print场景中对象都会报错
+      - <mark style="background-color:#fef3c7;">调用Unity空间下的方法仍然报错</mark>
+        - 比如Random.Range(1,3)
+    - 线程很多时候作为一个独立管道,来处理某些计算逻辑
+      - 就是找外包,算完了再传回来提高效率
+      - 比如网络收发消息,A*算法
+    - 申明一个变量作为一个公共内存容器
+      - `Queue<Vector3> queue = new Queue<Vector3>();`
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_823a4960-c200-4ebf-aea8-405ee3fbc8b5.png?x-tos-process=image/resize,w_400)
+        - 这里没有用`Vector3(Random.Range(1,3), 2, 3)`
+        - 直接C#里随机数对象r.Next()
+        - 计算结果放入队列即可,之后主线程访问queue
+  - 协同程序(协程)
+    - 概念
+      - <mark style="background-color:#fef3c7;">继承MonoBehavior的类 都可以开启 协程函数</mark>
+      - <mark style="background-color:#fde8e8;">协程只是假的多线程</mark>,主要用于代码分时执行(中断操作)
+      - 区别
+        - 多线程是开启一个独立的管道和主线程并行
+        - 协同程序只是在原程序之上,实现逻辑分时分步执行
+      - 和延迟函数执行条件区分
+        - <mark style="background-color:#fef3c7;">组件失活执行,物体失活了就不执行</mark>
+        - 而延迟函数只要你不销毁脚本/物体,就无所谓了
+    - C#遍历器
+      - 协程本质就是遍历器,GetEnumerator,返回值是IEnumerator<int>
+      - 定义
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_29edea86-65a5-456e-f03f-cdba8c936ec2.png?x-tos-process=image/resize,w_315)
+          - yield return = 产出一个值，然后暂停当前方法
+            - 这里是手动返回数组元素,用foreach或for循环也是一样的
+          - 后面这种写法是错误的,你返回的只是个字符串而不是数组元素
+            - ![image-1](https://document-image.mubu.com/document_image/32569566_7b5d060a-28c7-41d8-a5e1-246de61cd5f4.png?x-tos-process=image/resize,w_277)
+          - 迭代器本身是GetEnumerator方法
+      - 使用
+        - `Student stu = new Student();`
+          - 实例化继承了接口的类
+          - 迭代器核心方法/被遍历数组 都是在这个类中
+        - `foreach(string name in stu){    Debug.Log(name);}`
+          - 调用的时候就没法写中断的逻辑了,这些都是在迭代器声明时确定的
+          - 1.为啥直接foreach遍历对象
+            - 和索引器一样,实现遍历对象中的数组
+          - 2.为什么调用的时候还要写foreach遍历
+            - 迭代器方法中声明的只是"遍历的步骤模版",实际遍历还得foreach
+          - <mark style="background-color:#fde8e8;">3.foreach是咋做到的遍历迭代器的</mark>
+            - foreach精准取出迭代器中yield return的元素,顺带把穿插的逻辑执行了
+    - 协程函数定义
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_ebd49387-7484-47de-a938-6bc0a6f6dad1.png?x-tos-process=image/resize,w_258)
+        - 协程本身不能写在生命周期函数中
+        - 返回值为IEnumerator类型及其子类
+          - 迭代器则是返回类中数组元素
+          - 好吧也不是真正的返回值,所以你想写多少个renturn都是可以的
+        - 返回IEnumerator子类
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_f1888cb1-d5c7-4eae-9949-cc1e76af78a9.png?x-tos-process=image/resize,w_400)
+        - 返回IEnumerator类本身
+          - `yield return MyCoroutine(1,"jackie");`
+          - 注意`yield return StartCoroutine(OtherCoroutine());`
+            - 返回的是 **Coroutine**  类型
+      - 配合循环
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_3f9cea24-24d0-4098-91ae-fc31b2449e14.png?x-tos-process=image/resize,w_269)
+    - 开启协程函数
+      - 分开写法
+        - `IEnumerator ie = MyCoroutine(1,"jackie");`
+          - 只是创建了一个 IEnumerator迭代器对象()
+          - 并没有执行协程(相当于制定计划但是没有执行计划)
+        - `StartCoroutine(ie);`
+          - 需要通过调度器开始执行
+      - 直接合并写法不就得了吗
+        - `StartCoroutine(MyCoroutine(1,"jackie");`
+          - StartCoroutine和迭代器的foreach调用差不多
+      - 也可以通过字符串方法开启协程(不建议)
+        - `StartCoroutine("MyCoroutine");`
+        - 使用字符串开启也必须用字符串关闭
+          - `StopCoroutine("MyCoroutine");`
+    - 关闭协程
+      - 关闭所有协程
+        - `StopAllCoroutines();`
+      - 关闭指定协程
+        - `Coroutine c1 = StartCoroutine(MyCoroutine(1, "123"));`
+        - `StopCoroutine(c1);`

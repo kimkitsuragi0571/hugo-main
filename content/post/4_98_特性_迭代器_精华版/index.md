@@ -1,0 +1,167 @@
+﻿+++
+title = "98 特性 迭代器 精华版"
+date = "2026-05-03T10:20:03+08:00"
+draft = false
+categories = ["C-Sharp"]
+tags = ["Notes"]
++++
+
+- 特性
+  - 概念
+    - 特性的作用就是「<mark style="background-color:#fef3c7;">配置信息 / 标签</mark>」
+      - 所以特性几乎都是<mark style="background-color:#fef3c7;">字段+构造函数</mark>
+      - 只负责存数据、传数据，不负责执行逻辑
+      - 用于对类/成员等的元数据添加额外信息,之后通过反射获取
+        - 所有元数据均在程序集中,所以特性就是让编译器把元数据嵌入程序集
+    - 常用特性
+      - [SerializeField]
+        - 是否可序列化(Unity老熟人了哈)
+      - [header("")]
+        - 编辑器面板上显示灰色标题文字
+  - 自定义特性
+    - 声明
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_8fe9a4b7-1e7e-4734-bd58-094cd87fe6b8.png?x-tos-process=image/resize,w_261)
+        - <mark style="background-color:#fef3c7;">特性就是类继承了Attribute,所以类成员都能写</mark>
+        - 但基本都是字段+构造函数
+        - 如果在特性中写了逻辑比如Console打印
+          - 执行代码并不会调用,反射访问的时候才会调用该逻辑
+          - 逻辑也不会被当成元数据存放进程序集
+    - 调用
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_6309c9b9-9576-4d3a-cabe-bdd093f9a0f0.png?x-tos-process=image/resize,w_261)
+        - 这里[]引用特性实质就是在<mark style="background-color:#fef3c7;">调用构造函数</mark>
+          - 1.编译期在程序集中存储元数据
+            - 就这三个,其余啥都没有
+            - ![image-1](https://document-image.mubu.com/document_image/32569566_877b02f4-70cd-40a0-8723-c469baa34004.png?x-tos-process=image/resize,w_267)
+          - 2.等到运行时你用反射调用的时候
+            - 此时现场new一个特性实例
+            - `new StuChara("学生特性")`
+          - 3.如果有多个构造函数
+            - 根据你传入的参数进行重载
+        - 对字段,成员方法,属性都可以用特性
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_9820d9d5-91aa-4e5e-dfce-e4ce3d8904b1.png?x-tos-process=image/resize,w_400)
+        - .NET内置的Required特性
+          - 标注成员,就会检查只有当<mark style="background-color:#fef3c7;">不是NULL,且不是空字符串</mark>时,才会返回True
+          - 元数据里面加了个附加声明,写"这个变量不能为null或者空",但是本身并没有任何其他功能(调用无参构造也不会报个错啥的)
+        - <mark style="background-color:#fef3c7;">主动调用「验证器」，特性才会生效</mark>
+          - 数据验证特性必须用「Validator 类」主动触发验证
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_93463968-363c-4b9e-ce0e-09d2762ecc3f.png?x-tos-process=image/resize,w_400)
+            - 这样才会报错
+          - [Required(ErrorMessage = "姓名不能为空")]
+            - 则是验证失败的时候弹出的信息
+    - 用反射判断/获取类自定义特性
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_c8fa9b32-a5d4-4cff-fac2-03c031f2b337.png?x-tos-process=image/resize,w_400)
+        - <mark style="background-color:#fde8e8;">判断类是否含有特性</mark>
+          - typeof(StuInfo)
+            - 检查的反射类型名称
+          - false
+            - 不检查其父类
+        - 判断成员是否含有特性
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_cc0c7e37-e041-4e88-f0d4-cdcd2bab0a7a.png?x-tos-process=image/resize,w_400)
+          - 这里就是检查父类中同名字段是否有特性
+        - 通过反射获取类特性
+          - `Attribute.GetCustomAttribute(typ, typeof(StuInfo))`
+          - 返回的Attribute基类对象,所以需要强制转化为StuInfo对象
+          - 获取后可以打印特性类中字段
+    - 限制自定义特性的使用范围
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_4797c065-eb5c-46ca-c268-a67fba62c59c.png?x-tos-process=image/resize,w_400)
+        - <mark style="background-color:#fef3c7;">注意这个是特性的特性,写在特性类的声明上</mark>
+    - 系统自带特性
+      - 过时标签
+        - `[Obsolete("此方法已过时，请使用NewSpeak()方法！")]`
+        - 提醒类已经过时,使用会报错
+      - 调用者信息特性
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_eda8cb75-476f-425e-d034-a5c1c4907208.png?x-tos-process=image/resize,w_332)
+      - 条件编译特性
+        - 根据编译条件，决定方法是否被调用,相当于给方法加了开关
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_a8c99792-62ee-45a2-b6f2-87c24a62102d.png?x-tos-process=image/resize,w_400)
+      - 外部dll函数特性
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_7908b446-a670-4741-d4a5-5b02a90ed836.png?x-tos-process=image/resize,w_400)
+          - <mark style="background-color:#fef3c7;">C# 本身无法直接调用 C++ 写的 DLL 函数，[DllImport]是桥梁</mark>
+          - <mark style="background-color:#fef3c7;">两个实现功能差不多,但是原理不同</mark>
+            - ### **[DllImport] = 用 C/C++ 写的 Windows 原生库**
+            - ### **添加引用 = 用 C# 写的 .NET 库**
+- 迭代器
+  - 概念
+    - 迭代器的作用
+      - 能一段一段执行代码，并且记住自己执行到哪了
+        - 跑一半遇到 yield暂停,下次调用 MoveNext()，从暂停的地方继续往下跑
+      - 普通函数只能一口气从头跑到尾，跑完就忘，下次再调用又从头来
+    - 需要`using System.Collection`
+    - 协程的本质就是一个被引擎 “逐帧调用” 的 C# 迭代器
+  - 成员
+    - `IEnumerable< T >`
+      - 表明这个类是集合本身
+      - 方法只有GetEnumerator(),负责提供遍历器
+    - `IEnumerator<T>`
+      - 表明这个类是遍历器(光标)本身
+      - 方法有Current、MoveNext()、Reset()
+    - `foreach`
+      - 自动帮你调用遍历器的语法糖
+      - 当调用`foreach (var item in 集合)`
+        - 1.调用集合的  **GetEnumerator()** ,得到一个  **遍历器（IEnumerator）**
+        - 2.循环调用  **MoveNext()**
+        - 3.如果返回 true，取出  **Current**
+        - 4.直到 MoveNext () 返回 false 结束
+  - <mark style="background-color:#fce7f3;">补充版,一次性讲透</mark>
+    - 定义
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_29edea86-65a5-456e-f03f-cdba8c936ec2.png?x-tos-process=image/resize,w_315)
+        - yield return = 产出一个值，然后暂停当前方法
+          - 这里是手动返回数组元素,用foreach或for循环也是一样的
+        - 后面这种写法是错误的,你返回的只是个字符串而不是数组元素
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_7b5d060a-28c7-41d8-a5e1-246de61cd5f4.png?x-tos-process=image/resize,w_277)
+        - 迭代器本身是GetEnumerator方法
+    - 使用
+      - `Student stu = new Student();`
+        - 实例化继承了接口的类
+        - 迭代器核心方法/被遍历数组 都是在这个类中
+      - `foreach(string name in stu){    Debug.Log(name);}`
+        - 调用的时候就没法写中断的逻辑了,这些都是在迭代器声明时确定的
+        - 1.为啥直接foreach遍历对象
+          - 和索引器一样,实现遍历对象中的数组
+        - 2.为什么调用的时候还要写foreach遍历
+          - 迭代器方法中声明的只是"遍历的步骤模版",实际遍历还得foreach
+        - <mark style="background-color:#fde8e8;">3.foreach是咋做到的遍历迭代器的</mark>
+          - foreach精准取出迭代器中yield return的元素,顺带把穿插的逻辑执行了
+  - 实现
+    - 直接写法
+      - 遍历器
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_af48ffde-e345-4eba-eb38-120f0a882d08.png?x-tos-process=image/resize,w_274)
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_14ba7265-d93c-4a16-ff1a-84adce838e77.png?x-tos-process=image/resize,w_282)
+          - 上面这个是返回传入数组当前下标的值
+          - 下面这个只是负责转发给Current
+            - 1.继承IEnumerator<int>  其实也隐含继承老版本IEnumerator
+            - 2.非泛型版本要求返回obj类型,这里就调用泛型Current,把结果int返回
+            - 3.不会手动调用这个,foreach也不会用它
+            - 4.IEnumerator.Current显式接口实现
+              - 说明是专门给「接口 IEnumerator」实现的属性
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_f15a0ce6-06cf-4888-91ed-e9570a79f9dd.png?x-tos-process=image/resize,w_224)
+      - 集合
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_9fad0a98-f5db-46d5-c7c0-9d8bd092b29d.png?x-tos-process=image/resize,w_225)
+          - 返回值类型是IEnumerator<int>,实际返回的是<mark style="background-color:#fef3c7;">继承该接口的任意类</mark>
+          - <mark style="background-color:#fef3c7;">GetEnumerator ()方法返回继承IEnumerator<int>的类,是为了把这个类交给foreach,让它来调用这个类实现遍历逻辑</mark>
+        - <mark style="background-color:#fce7f3;">总之不用yield就需要写:1.类继承IEnumerable<T>,2.成员数组,3.GetEnumerator()方法,4.兼容非泛型的老版本方法</mark>
+          - 还有个MyEnumerator系统补全就行了
+    - 利用yield return实现简化写法
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_2684059d-1df1-4f23-9f7e-2283497f1b31.png?x-tos-process=image/resize,w_233)
+        - <mark style="background-color:#fce7f3;">其余完全一样,只有GetEnumerator方法内部改了</mark>
+        - <mark style="background-color:#fce7f3;">从返回迭代器方法变成foreach</mark>
+          - 省掉了MyEnumerator代码
+          - 或者干脆不用foreach,直接手写依次return所有元素（实现遍历暂停）
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_8ddf91fc-cb73-4c6b-ed99-993d9e9d5ad1.png?x-tos-process=image/resize,w_333)
+      - 可以实现中途暂停
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_20060514-0f18-4383-9737-73e1a70cc0aa.png?x-tos-process=image/resize,w_216)
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_d9f2906f-aca5-4755-e1a3-eac61ccae707.png?x-tos-process=image/resize,w_213)
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_11832143-7d04-4c3d-b758-b008f3668d93.png?x-tos-process=image/resize,w_215)
+          - 走到 yield return 10 →  **方法暂停，退出去执行 foreach 里面的代码**
+      - 想同时遍历 int 数组 + string 数组
+        - 反正就那个意思
+          - <mark style="background-color:#fde8e8;">接口不能泛型重载</mark>
+            - 普通的方法Func<T>可以通过泛型实现重载
+          - <mark style="background-color:#fde8e8;">一个类不能同时实现 IEnumerable<int> 和 IEnumerable<string></mark>
+            - 一个类只能实现 1 个 IEnumerable<T>
+            - 所以不能写多个 GetEnumerator
+        - 所以不重载,而是额外写两个属性返回不同迭代器
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_8e38089c-d4bb-40f8-82e0-4afe8d1680b1.png?x-tos-process=image/resize,w_331)
+          - `public IEnumerable<int> IntNumbers { get { ... } }`
+          - 一个返回IEnumerable<int>的只读属性
+          - 两个属性名字不同,肯定不算重载

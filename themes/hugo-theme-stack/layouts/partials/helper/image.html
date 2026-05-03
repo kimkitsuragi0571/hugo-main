@@ -28,6 +28,35 @@
 
     {{ end }}
 
+{{ else if and (eq .Context.Kind "taxonomy") (eq .Context.Type "categories") }}
+    <!-- For categories taxonomy, check data/taxonomies -->
+    {{ $taxonomyData := dict }}
+    {{ $currentTitle := .Context.Title }}
+    {{ range $key, $value := .Context.Site.Data.taxonomies }}
+        {{ if strings.HasPrefix $key "categories." }}
+            {{ $categoryName := strings.TrimPrefix "categories." $key }}
+            {{ if eq $categoryName $currentTitle }}
+                {{ $taxonomyData = $value }}
+            {{ else if eq (lower $categoryName) (lower $currentTitle) }}
+                {{ $taxonomyData = $value }}
+            {{ end }}
+        {{ end }}
+    {{ end }}
+    {{ if $taxonomyData }}
+        {{ with $taxonomyData.image }}
+            {{ $result = merge $result (dict "exists" true) }}
+            {{ $url := urls.Parse . }}
+            
+            {{ if or (eq $url.Scheme "http") (eq $url.Scheme "https") }}
+                <!-- Is an external image -->
+                {{ $result = merge $result (dict "permalink" .) }}
+            {{ else }}
+                <!-- Is a local image -->
+                {{ $result = merge $result (dict "permalink" (relURL .)) }}
+            {{ end }}
+        {{ end }}
+    {{ end }}
+
 {{ else if and (ne .Type nil) (index .Context.Site.Params.defaultImage .Type) }}
     <!-- Type arg is set, check for defaultImage setting -->
     {{ $defaultImageSetting := index .Context.Site.Params.defaultImage .Type }}

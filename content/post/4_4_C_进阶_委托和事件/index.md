@@ -1,0 +1,168 @@
+﻿+++
+title = "4 C#进阶 委托和事件"
+date = "2026-05-03T10:20:02+08:00"
+draft = false
+categories = ["C-Sharp"]
+tags = ["Notes"]
++++
+
+- 委托
+  - 概念
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_d6eff52f-d8c0-475e-bbf9-acfb8de73011.png?x-tos-process=image/resize,w_400)
+  - (空)
+    - 申明
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_98e810fa-5f72-42f7-d558-b87dad47b39d.png?x-tos-process=image/resize,w_400)
+        - 写在类中也行,使用前就必须 类名.
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_829a91da-5eea-4ec4-ead3-95d8c43a31f6.png?x-tos-process=image/resize,w_400)
+        - 1.MyFun只是定义个规则,用来接收 没有参数没有返回值的函数 的容器
+        - 2.并不是函数,所以这里重名了但是没法实现重载,所以不能有重名委托
+      - 修饰符
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_d791af63-bca3-4075-85cb-737954813718.png?x-tos-process=image/resize,w_400)
+          - 额,似乎是讲的地方有错
+            - 委托默认internal,如果写在class里面则默认private
+    - 调用
+      - (空)
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_e2138a73-2d31-4326-ba36-822c8b2780f8.png)
+          - 声明委托的时候并不会调用函数
+            - 此时只是将函数装载进了Invoke容器
+          - 然后通过 f.Invoke()调用函数
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_d914cd27-1920-4b72-9951-69c201232d77.png?x-tos-process=image/resize,w_283)
+          - 委托函数中装载了Fun函数
+          - 但是注意这里Fun函数一定要和MyFun声明的规则一致
+      - (空)
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_0463aef3-61fd-4962-a363-6c272fbfd4eb.png?x-tos-process=image/resize,w_123)
+          - 简化调用方法
+          - 和普通函数写法完全一样
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_8b0fd134-ce1e-4dc3-d588-5a945756495e.png?x-tos-process=image/resize,w_288)
+          - 简化写法
+          - 注意右边只能是函数名,加上参数列表就是在调用函数了
+  - 使用定义好的委托
+    - ![image-1](https://document-image.mubu.com/document_image/1b31b175-937b-4ea2-aba3-d7202e920d2a-32569566.jpg?x-tos-process=image/resize,w_400)
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_6d361d3e-36fa-4cea-9979-e9afc01c2fd8.png?x-tos-process=image/resize,w_400)
+        - js中所谓回调函数
+        - 总之就是传入函数前可以执行些其他的操作
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_b7983bdb-7132-4d28-cfd5-d8abc48aaafb.png?x-tos-process=image/resize,w_400)
+        - 注意传入的必定是函数名,不要当做函数来传入
+  - 多播委托
+    - 说人话就是委托现在一次性存多个函数
+    - 增
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_5b00d304-9b48-4fc8-9c3e-87a3dd1020e2.png?x-tos-process=image/resize,w_252)
+        - 这里ff中存储了两次Fun
+        - 当调用ff的时候就会调用两次Fun
+          - 不同函数是先进先执行,类似队列
+        - 注册?
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_f971e308-b538-4968-b94c-2f2d695e8799.png?x-tos-process=image/resize,w_248)
+          - 一开始声明为空,后面再++也行
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_1ad87743-c7e2-4535-fa86-54a518253d2f.png?x-tos-process=image/resize,w_257)
+          - 传入函数之后通过this实例添加?
+          - 这函数名写的真让人懵
+          - ![image-1](https://document-image.mubu.com/document_image/32569566_310b2020-31f1-4315-cada-bbfbb0aa8390.png?x-tos-process=image/resize,w_250)
+    - 比如我想要调用某函数/类的时候执行XX功能,现在就可以把这个功能先存储起来
+    - 删
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_ab984de9-9db1-4026-f0cf-dc6c9f0a05d6.png?x-tos-process=image/resize,w_314)
+        - 从容器中移除
+          - 和队列一样先移除后进入的
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_00e43a56-42d3-4fcd-be70-7e565ca14dbd.png?x-tos-process=image/resize,w_241)
+          - 清空后调用容器就会报错
+          - 如果这里已经空了再-=Fun
+            - 其实不会报错,因为编译器找不到对应函数就不会操作
+  - 系统提供委托
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_fbd05031-1ce1-4346-e5db-e41067ac3f47.png?x-tos-process=image/resize,w_321)
+      - 记得导入Using System
+      - action就是默认的无返回值委托
+      - 反正容易让人知道这是委托
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_351ed922-db1b-4d09-b6ad-504a3170e4db.png?x-tos-process=image/resize,w_300)
+        - 系统提供了1到16个的委托
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_49af0aa9-a21d-4ab8-b072-6666cfb63169.png?x-tos-process=image/resize,w_400)
+      - ![image-1](https://document-image.mubu.com/document_image/434300f8-23c8-46e7-972b-cc69a02a08f1-32569566.jpg?x-tos-process=image/resize,w_262)
+      - Func就是默认的泛型委托
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_5b34bbe0-5e7b-4ad2-a01f-bffa3957211c.png?x-tos-process=image/resize,w_400)
+- 事件
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_45636281-fa85-4f08-9504-df0f08d7bfe8.png?x-tos-process=image/resize,w_400)
+    - 特殊的变量类型,让委托更有安全性
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_eb2ee43e-c751-4908-920a-bd3ef36143a6.png?x-tos-process=image/resize,w_400)
+    - public event StudentDel StudentEve
+  - 声明
+    ![声明-1](https://document-image.mubu.com/document_image/32569566_63e8f054-ff0f-4be8-99e2-9d67885d3e2f.png?x-tos-process=image/resize,w_400)
+    - 声明:就是相当于委托加了个event
+      - 将委托封装成事件
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_f5c03974-5f38-4e2e-a002-04b4e3cacb15.png?x-tos-process=image/resize,w_400)
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_0a04cf00-2c65-4de6-b5e0-9a08f9f12915.png?x-tos-process=image/resize,w_400)
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_3902e697-5e73-4369-bd78-6708427dd9c1.png?x-tos-process=image/resize,w_400)
+    - 委托.Invoke() 和 **直接调用委托** （如 委托()）在功能上 **完全等价**
+    - 事件和委托的使用一样
+      - 类的内部调用二者结果完全一样
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_9e868d3e-0ba6-48e9-b8af-3b4f29ca72fb.png?x-tos-process=image/resize,w_400)
+    - 区别
+    - 只能在外部加减没法直接调用没法直接赋值
+      - 外部无法覆盖/触发事件
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_b1bb3399-8549-4cac-e7de-d6dbc7e592d1.png?x-tos-process=image/resize,w_400)
+    - 只能作为类,接口,结构体中
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_eb13c1fd-2fc3-4b78-bb87-d75d965e2db5.png?x-tos-process=image/resize,w_400)
+    - 事件的=赋值限制是 “全局规则”（内外都禁止）
+    - “调用执行” 的限制仅针对外部，类内部完全可以触发事件
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_abb3b8b2-093f-4ac9-bcba-fd85dd5d19ed.png?x-tos-process=image/resize,w_400)
+    - 外部连+=/-=订阅的权限都没有(完全不可见)，而类内部的操作规则和其他访问修饰符的事件完全一致
+  - ![image-1](https://document-image.mubu.com/document_image/14b7f82b-a514-47c7-b3e4-1c99542bdf39-32569566.jpg?x-tos-process=image/resize,w_400)
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_6525e31a-7315-4a76-87dd-a8c4f9a7c4c9.png?x-tos-process=image/resize,w_400)
+- 匿名函数
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_9fa8339a-a838-4c67-c98e-6dd74a5d149b.png?x-tos-process=image/resize,w_400)
+    - 依托委托和事件存在
+  - ![image-1](https://document-image.mubu.com/document_image/32569566_4b3f8f12-e3ea-4fdc-bc26-247ddad4cb1f.png)
+    - 没错这个"函数"后面有分号;
+  - 接收
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_b60a06e2-3418-45c5-d90b-1563a9dd9dd2.png?x-tos-process=image/resize,w_400)
+      - 仅仅是声明个delegate(){}肯定报错
+        - 这里必须用委托来接收
+      - 此时并没有调用匿名容器
+        - 等委托调用的时候一起调用
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_68b58505-8787-4f2a-816b-a06a987e939e.png?x-tos-process=image/resize,w_400)
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_83bab614-02f7-4875-e09d-378231b823db.png?x-tos-process=image/resize,w_400)
+    - 暂时看不懂的作为参数
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_4e075b3a-36fa-40c0-8cfa-b5b9d3dec3c2.png?x-tos-process=image/resize,w_400)
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_144595e3-9ccf-4045-b46b-ccaa6e395230.png?x-tos-process=image/resize,w_400)
+      - 或者分开写
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_bd754c94-e5e1-4e7a-8ec0-ca5edfa428fa.png?x-tos-process=image/resize,w_400)
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_6dde088b-bc02-49d0-b72c-d80344a06591.png?x-tos-process=image/resize,w_400)
+    - 缺点
+      - ![image-1](https://document-image.mubu.com/document_image/2b81b9f2-4d45-4beb-909a-e8ed48f90e27-32569566.jpg?x-tos-process=image/resize,w_400)
+- lambda表达式
+  - 声明
+    - ![image-1](https://document-image.mubu.com/document_image/51ffee21-dc1b-499e-a93a-94f8a4d1ab31-32569566.jpg?x-tos-process=image/resize,w_164)
+  - 使用
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_e37cf5b2-c13c-4bc5-9ee3-8c4694e4a5f5.png?x-tos-process=image/resize,w_400)
+      - 一定配合前面的委托使用
+      - 后面的部分单独使用报错
+        - 和匿名函数一样
+      - 调用就是a();
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_ad4710e4-6c68-4413-c6e9-2379e59e2f96.png?x-tos-process=image/resize,w_400)
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_6e87269f-e9fc-4017-9b44-4afe3cb45623.png?x-tos-process=image/resize,w_400)
+        - 匿名函数不能这样省略
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_b17509ef-0bc1-4a52-d679-f373332ff23c.png?x-tos-process=image/resize,w_400)
+  - 闭包
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_e775c37a-ef0a-4a24-f806-4160f3c410e8.png?x-tos-process=image/resize,w_400)
+      - 经常出现在匿名函数或者lambda表达式中
+      - 说人话就是用到了外部函数(不属于自己的作用域)的变量
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_b7d53ab6-1f68-41bd-b591-bef40186d70a.png?x-tos-process=image/resize,w_400)
+      - 本来是这样的一个普通的lambda
+      - 普通函数 **只能访问「类成员变量 / 静态变量」** ，不能访问「方法内的局部变量」
+        - ![image-1](https://document-image.mubu.com/document_image/471862dd-34e1-48ac-93aa-a991630703ba-32569566.jpg?x-tos-process=image/resize,w_400)
+    - ![image-1](https://document-image.mubu.com/document_image/32569566_6dddca96-de53-4994-bed5-c1d7f5c369a0.png?x-tos-process=image/resize,w_381)
+      - 现在改成number在外部的方法中声明
+      - 理论上来说根据作用域
+        - 进入CallMyAction的时候,已经释放掉了number
+      - 实际上还是能正常执行
+        - 因为形成了闭包
+        - 此时用到了外部的number
+          - 延长了外部变量的声明周期
+          - 就是说外部的函数执行已经完毕,但是此时number仍然没有被回收
+    - 闭包不会复制变量创建时的值，而是 “绑定” 变量本身
+      - ![image-1](https://document-image.mubu.com/document_image/32569566_1f8eca60-1c88-450e-b632-8e5292924c93.png?x-tos-process=image/resize,w_400)
+        - 该变量提供的值并非变量创建时的值,而是复函数范围内的最终值
+        - 这里调用for参数列表中的i,打印出来的i值全部是10
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_56575e6d-5c14-4df8-b9dd-1364b9653383.png?x-tos-process=image/resize,w_400)
+        - ![image-1](https://document-image.mubu.com/document_image/32569566_df10cfed-d6cc-4ace-8dbd-848016890577.png?x-tos-process=image/resize,w_400)
+          - 类似的还有
+            - ![image-1](https://document-image.mubu.com/document_image/32569566_f38c2add-901c-44b1-b9a2-144226fa58ec.png?x-tos-process=image/resize,w_400)
+            - ![image-1](https://document-image.mubu.com/document_image/32569566_058e4c44-d31d-4965-f947-a0578bce1993.png?x-tos-process=image/resize,w_400)
+            - ![image-1](https://document-image.mubu.com/document_image/32569566_bc1897d7-ac04-4ab4-89d1-8178c29a996f.png?x-tos-process=image/resize,w_400)
