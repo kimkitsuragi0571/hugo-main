@@ -1,66 +1,77 @@
 +++
 title = "Unity事件中心模块"
-date = "2026-05-03T10:35:00+08:00"
+date = "2026-07-19T18:55:00+08:00"
 draft = false
 categories = ["Unity"]
 tags = ["笔记", "事件中心", "观察者模式"]
 +++
 
-Unity事件中心模块基于观察者模式实现，支持参数传递的事件机制。
+## 一、事件中心概念
+
+比如怪物死亡就有玩家奖励，播放动画，任务记录等多种事件，此时就得在怪物死亡 Dead() 方法中写这些逻辑。
+
+需要先获取 Player 物体然后获取上面的 Player.cs 脚本组件，调用其中的死亡方法，很麻烦，而且脚本间关联性太强，不符合七大设计原则。
+
+所以我们可以设置**事件中心**：怪物死亡就传递给事件中心，事件中心传递给各种事件让他们执行；事件自己也得告诉事件中心：XX 触发时，就告诉我执行 XX 逻辑。
+
+---
+
+## 二、基础版事件中心实现
+
+### 1. 事件中心 EventCenter
+
+使用 `Dictionary<string, UnityAction>` 存储事件名称与对应的委托回调。
 
 ```csharp
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.Events;
 
 public class EventCenter : BaseManager<EventCenter>
 {
-    //Key事件名称,value监听这个事件对应的委托函数们
-    //private Dictionary<string,UnityAction> eventDic = new Dictionary<string, UnityAction>();
-    private Dictionary<string,UnityAction<object>> eventDic = new Dictionary<string, UnityAction<object>>();
-
-    //添加事件监听
-    //public void AddEventListener(string name, UnityAction action)
-    public void AddEventListener(string name, UnityAction<object> action)
+    //string是事件名称,传入函数补充字典泛型,需要用委托
+    //这里是string事件加入UnityAction委托对应函数
+    //这里用字典主要是方便寻找是否有对应事件以及用参数来添加Key和Value
+    private Dictionary<string, UnityAction> eventDic = new Dictionary<string, UnityAction>();
+    
+    //传入的函数一开始没有被执行,只是被加入了事件订阅列表,所以是回调函数
+    //注意这里事件列表实际关联的物体实例+函数 两部分(所以后面销毁订阅呢),除非是静态函数
+    public void AddEvent(string name, UnityAction action)
     {
-        //如果有对应的事件监听
+        // 如果字典有对应的事件name，就添加到订阅列表
         if (eventDic.ContainsKey(name))
         {
             eventDic[name] += action;
         }
         else
         {
+            // 如果没有，就新增
             eventDic.Add(name, action);
         }
     }
 
-    //一定要记得销毁对应监听,否则物体销毁的时候还是有监听,导致内存泄露
-    //public void RemoveEventListener(string name, UnityAction action)
-    public void RemoveEventListener(string name, UnityAction<object> action)
+    //物体OnDestory()中必须调用RemoveEvent()移除监听
+    public void RemoveEvent(string name, UnityAction action)
     {
-        //移除时必定有事件监听,都可以不用写if的
+        // 理论上移除时必定有事件监听,不用写if也行
+        //实际上eventDic[name]可能报空引用异常,传入未注册key导致报错
         if (eventDic.ContainsKey(name))
         {
             eventDic[name] -= action;
         }
     }
-
-    //事件触发
-    //public void EventTrigger(string name)
-    public void EventTrigger(string name,object info)
+    
+    //事件触发,外部直接EventCenter.Instance.EventTrigger("OnPlayerShoot");触发指定时事件
+    public void EventTrigger(string name)
     {
         if (eventDic.ContainsKey(name))
         {
-            //eventDic[name]();
-            //这种会依据加入事件的前后依次触发函数
-            //eventDic[name].Invoke();
-            eventDic[name].Invoke(info);
+            // 这种会依据加入事件的前后依次触发函数
+            eventDic[name].Invoke();
         }
-        //没有对应事件监听时,不需要管触发
+        // 没有对应事件监听时，不需要管触发
     }
-
-    //清空事件中心(场景切换时)
+    
+    //场景切换和游戏结束时,记得清空防止内存泄露
     public void Clear()
     {
         eventDic.Clear();
@@ -68,79 +79,167 @@ public class EventCenter : BaseManager<EventCenter>
 }
 ```
 
-## 功能特点
-
-### 观察者模式
-- 使用 Dictionary 存储事件名称和对应的事件委托
-- 支持同一事件绑定多个监听函数
-- 事件触发时按绑定顺序依次执行
-
-### 参数传递
-- 使用 `UnityAction<object>` 支持任意类型的参数传递
-- 可以传递复杂数据类型作为事件信息
-
-### 内存管理
-- **重要**：在对象销毁时必须移除事件监听
-- 否则会导致内存泄漏和空引用异常
-- 场景切换时调用 `Clear()` 清空所有事件
-
-### 使用方法
+### 2. 事件订阅
 
 ```csharp
-// 1. 定义事件
-public class GameEventNames
-{
-    public const string PLAYER_DEAD = "PlayerDead";
-    public const string SCORE_UPDATE = "ScoreUpdate";
-    public const string LEVEL_COMPLETE = "LevelComplete";
-}
+using UnityEngine;
 
-// 2. 监听事件
-void Start()
+public class EnemyScript : MonoBehaviour
 {
-    EventCenter.Instance.AddEventListener(GameEventNames.PLAYER_DEAD, OnPlayerDead);
-    EventCenter.Instance.AddEventListener(GameEventNames.SCORE_UPDATE, OnScoreUpdate);
-}
+    public int HP = 100;
 
-private void OnPlayerDead(object info)
-{
-    Debug.Log("玩家死亡：" + info);
-}
+    //物体添加到订阅列表
+    void Awake()
+    {
+        //看似只是存储了一个函数名,实际委托间接创建了一个类实例引用和方法本身的引用
+        //总之事件的订阅列表实际上其实关联了实例方法和实例两部分
+        EventCenter.Instance.AddEvent("OnPlayerShoot", OnBeShot);
+    }
 
-private void OnScoreUpdate(object info)
-{
-    int score = (int)info;
-    Debug.Log("分数更新：" + score);
-}
+    void OnBeShot()
+    {
+        //这里定义类字段HP,并且访问HP时
+        //默认相当于this.HP -= 10,优先访问
+        HP -= 10;
+        if (HP <= 0)
+        {
+            Debug.Log("敌人死亡！");
+            // 死亡时销毁物体，触发 OnDestroy
+            Destroy(gameObject);
+        }
+    }
 
-// 3. 触发事件
-public void PlayerTakeDamage(int damage)
-{
-    EventCenter.Instance.EventTrigger(GameEventNames.PLAYER_DEAD, damage);
-}
-
-public void UpdateScore(int score)
-{
-    EventCenter.Instance.EventTrigger(GameEventNames.SCORE_UPDATE, score);
-}
-
-// 4. 移除监听（重要！）
-void OnDestroy()
-{
-    EventCenter.Instance.RemoveEventListener(GameEventNames.PLAYER_DEAD, OnPlayerDead);
-    EventCenter.Instance.RemoveEventListener(GameEventNames.SCORE_UPDATE, OnScoreUpdate);
-}
-
-// 5. 场景切换时清空
-void OnLevelWasLoaded(int level)
-{
-    EventCenter.Instance.Clear();
+    //物体销毁时移除订阅
+    void OnDestroy()
+    {
+        //即使方法内部只是Debug.Log仍然需要销毁订阅(因为委托还是关联了实例)
+        //如果是静态方法就不需要销毁订阅了
+        EventCenter.Instance.RemoveEvent("OnPlayerShoot", OnBeShot);
+    }
 }
 ```
 
-## 注意事项
+### 3. 事件触发
 
-1. **必须移除监听**：在 `OnDestroy` 或 `OnDisable` 中移除事件监听
-2. **及时清空**：场景切换时调用 `Clear()` 防止内存泄漏
-3. **类型安全**：使用 `object` 参数需要注意类型转换
-4. **线程安全**：Unity事件系统在主线程执行，无需担心线程问题
+```csharp
+using UnityEngine;
+
+public class PlayerController : MonoBehaviour
+{
+    void Update()
+    {
+       
+        if (Input.GetMouseButtonDown(0))
+        {
+            EventCenter.Instance.EventTrigger("OnPlayerShoot");
+        }
+    }
+}
+```
+
+也可以用 `EventCenter.Instance.EventTrigger("PlayerRun", this)`，从原来的只是广播"出事辣"变为广播"我出事辣"。
+
+`UnityAction` 改为 `UnityAction<object>`，并更新增删触发方法。触发和监听脚本都要修改，具体懒得搞了。
+
+---
+
+## 三、执行流程
+
+1. **实例化敌人**：`Instantiate(enemyObj)` → 触发 `EnemyScript.Awake()` → 从而将函数添加到事件列表
+2. **用户按下按键**：调用 `EventTrigger("OnPlayerShoot")` → EventCenter 根据 Key 执行列表
+   - 如果有多个敌人，一个 Key 对应多个 Value 全部执行
+3. **敌人销毁**：触发 `OnDestroy()` → 移除该实例相关订阅
+   - 多个物体多个 Value，只会移除那一个而不是全都移除
+
+---
+
+## 四、优化：泛型版本解决装箱拆箱
+
+### 泛型委托的意义
+
+比如 Monster 死了你咋知道是 BOSS 还是 Goblin 死了？
+
+这里把委托 `UnityAction` 都改成泛型委托 `UnityAction<object>`：
+- 传入的是万物之父 `object`，这样你传入什么类型都可以
+- 装箱拆箱肯定还是有性能开销
+- 装箱拆箱 + 泛型，还有这种用法的哦嚯嚯嚯
+
+### EventCenter 优化为泛型版本
+
+使用 `Dictionary<Type, Dictionary<string, Delegate>>` 双层字典结构，实现零装箱高性能版本。
+
+```csharp
+using System;
+using System.Collections.Generic;
+using UnityEngine.Events;
+
+/// <summary>
+/// 泛型事件中心 - 零装箱高性能版本
+/// 继承 BaseManager 实现单例模式
+/// </summary>
+public class EventCenter_T : BaseManager<EventCenter_T>
+{
+    private Dictionary<Type, Dictionary<string, Delegate>> eventDic = new Dictionary<Type, Dictionary<string, Delegate>>();
+
+    public void AddEventListener<T>(string name, UnityAction<T> action)
+    {
+        Type typeKey = typeof(T);
+        if (!eventDic.ContainsKey(typeKey))
+        {
+            eventDic[typeKey] = new Dictionary<string, Delegate>();
+        }
+
+        var typeDic = eventDic[typeKey];
+        
+        if (typeDic.ContainsKey(name))
+        {
+            typeDic[name] = (UnityAction<T>)typeDic[name] + action;
+        }
+        else
+        {
+            typeDic.Add(name, action);
+        }
+    }
+    
+    public void RemoveEventListener<T>(string name, UnityAction<T> action)
+    {
+        Type typeKey = typeof(T);
+
+        if (eventDic.TryGetValue(typeKey, out var typeDic))
+        {
+            if (typeDic.TryGetValue(name, out var del))
+            {
+                typeDic[name] = (UnityAction<T>)del - action;
+            }
+        }
+    }
+    
+    public void EventTrigger<T>(string name, T data)
+    {
+        Type typeKey = typeof(T);
+
+        if (eventDic.TryGetValue(typeKey, out var typeDic))
+        {
+            if (typeDic.TryGetValue(name, out var del))
+            {
+                ((UnityAction<T>)del)?.Invoke(data);
+            }
+        }
+    }
+    
+    public void Clear()
+    {
+        foreach (var typeDic in eventDic.Values)
+        {
+            typeDic.Clear();
+        }
+        eventDic.Clear();
+    }
+}
+```
+
+**优化原理：**
+- 第一层 Key 是参数类型 `Type`，不同类型的事件完全隔离
+- 第二层 Key 是事件名称 `string`，存储具体的 `UnityAction<T>` 委托
+- 存储时用 `Delegate` 基类，调用时强转回 `UnityAction<T>`
+- 全程没有 `object` 装箱，零性能损耗
