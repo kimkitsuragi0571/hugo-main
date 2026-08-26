@@ -243,7 +243,7 @@ public class TrickMgr : SingletonBase<TrickMgr>
         if (_cor != null)
         {
             //停止协程,然后移除句柄引用
-            MonoModuleMgr.Instance.StopCoroutine(_cor);
+            MonoModuleMgr.Instance.StopCor(_cor);
             _cor = null;
         }
     }
@@ -283,7 +283,7 @@ TrickMgr.Instance.StopUp();
 | 操作 | StartUp | StopUp |
 |------|---------|--------|
 | **Update 部分** | `AddUpdateEvent(Speak)` → Speak 加入每帧事件 | `RemoveUpdateEvent(Speak)` → 取消订阅 |
-| **协程部分** | `StartCor(Cor(1))` → 返回句柄保存到 `_cor` | `StopCoroutine(_cor)` → 用句柄停止协程，`_cor = null` 清空引用 |
+| **协程部分** | `StartCor(Cor(1))` → 返回句柄保存到 `_cor` | `StopCor(_cor)` → 用句柄停止协程，`_cor = null` 清空引用 |
 
 ---
 
@@ -322,5 +322,4 @@ TrickMgr.Instance.StopUp();
 
 1. **协程句柄必须保存**：`StartCor` 返回的 `Coroutine` 要存到 `_cor`，后续停止时才能用句柄精准停止，否则只能粗暴 `StopAllCoroutines` 影响其他模块
 2. **多次调用 StartUp 会重复订阅**：Speak 方法会被加多次，导致一帧执行多次 Speak。需要加 `if (_cor == null)` 等防重入判断
-3. **停止协程方法名**：脚本中写的是 `MonoModuleMgr.Instance.StopCoroutine(_cor)`，建议统一封装为 `StopCor(_cor)`，和 `StartCor` 对称，避免混用
-4. **销毁顺序**：MonoModuleMgr 被销毁时，TrickMgr 的 `_cor` 句柄会失效，重新调用 StartUp 时 MonoModuleMgr.Instance 会自动重建，但 `_cor` 还持有旧句柄需要清空
+3. **销毁顺序**：MonoModuleMgr 被销毁时，TrickMgr 的 `_cor` 句柄会失效，重新调用 StartUp 时 MonoModuleMgr.Instance 会自动重建，但 `_cor` 还持有旧句柄需要清空

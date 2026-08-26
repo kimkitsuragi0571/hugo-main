@@ -45,7 +45,7 @@ public class EventCenterMgr : MonoSingletonBase<EventCenterMgr>
         }
     }
 
-    public void Clear()
+    public void DictClear()
     {
         //字典对象自带的清空方法
         eventDict.Clear();

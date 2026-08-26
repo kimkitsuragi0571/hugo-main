@@ -83,6 +83,11 @@ public class LuaReloadMgr : MonoSingletonBase<LuaReloadMgr>
     {
         get
         {
+            if (luaEnv == null)
+            {
+                print("解析器未初始化!");
+                return null;
+            }
             return luaEnv.Global;
         }
     }

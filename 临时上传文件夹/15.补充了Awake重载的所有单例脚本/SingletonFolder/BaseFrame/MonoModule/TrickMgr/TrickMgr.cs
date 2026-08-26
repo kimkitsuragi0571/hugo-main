@@ -31,7 +31,7 @@ public class TrickMgr : SingletonBase<TrickMgr>
         if (_cor != null)
         {
             //停止协程,然后移除句柄引用
-            MonoModuleMgr.Instance.StopCoroutine(_cor);
+            MonoModuleMgr.Instance.StopCor(_cor);
             _cor = null;
         }
     }

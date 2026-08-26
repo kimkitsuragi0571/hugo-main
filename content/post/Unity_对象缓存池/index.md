@@ -189,9 +189,7 @@ public class BaseManager<T> :MonoBehaviour  where T :MonoBehaviour
 ### 2. 封装类 PoolData
 
 ```csharp
-using System.Collections;
 using System.Collections.Generic;
-using System.Net.Sockets;
 using UnityEngine;
 
 //PoolData封装,是把栈+每个栈的根对象封装为一块
@@ -332,9 +330,7 @@ public class PoolMgrLayout : BaseManager<PoolMgrLayout>
 ### 1. 封装类 PoolDataUpper
 
 ```csharp
-using System.Collections;
 using System.Collections.Generic;
-using System.Net.Sockets;
 using UnityEngine;
 
 public class PoolDataUpper 
