@@ -216,6 +216,11 @@ using XLua;
 
 public class LuaReloadMgr : MonoSingletonBase<LuaReloadMgr>
 {
+    protected override void Awake()
+    {
+        base.Awake();
+        print("哔哔哔...Lua重定向模块");
+    }
     private LuaEnv luaEnv;
 
     //总之就是避免_instance不为null,luaEnv为null,结果懒汉单例不初始化
