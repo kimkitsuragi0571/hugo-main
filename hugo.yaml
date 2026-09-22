@@ -19,7 +19,7 @@ languages:
         weight: 1
         params:
             sidebar:
-                subtitle: 相逢在宇宙
+                subtitle: 记录C#,Unity及.Net相关技术
             taxonomyImage: true
 
 services:

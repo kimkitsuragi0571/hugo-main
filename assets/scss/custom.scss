@@ -125,7 +125,7 @@ input:hover,
 /* 桌面端背景图 - 居中固定 不滚动 */
 @media (min-width: 769px) {
   body {
-    background: url("/background/bg.jpeg") no-repeat center center fixed !important;
+    background: url("/background/bg.jpg") no-repeat center center fixed !important;
     background-size: cover !important;
     background-attachment: fixed !important;
     background-color: transparent !important;
@@ -134,7 +134,7 @@ input:hover,
 /* 移动端背景图 - 顶部显示 随滚动 */
 @media (max-width: 768px) {
   body {
-    background: url("/background/bg.jpeg") no-repeat center top !important;
+    background: url("/background/bg.jpg") no-repeat center top !important;
     background-size: cover !important;
     background-attachment: scroll !important;
     background-color: transparent !important;
