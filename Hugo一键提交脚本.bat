@@ -1,6 +1,7 @@
 @echo off
 chcp 65001
 title Hugo博客一键提交脚本
+cd /d "%~dp0"
 cls
 echo =====================================
 echo      Hugo博客 一键提交/上传脚本

@@ -1,0 +1,16 @@
+﻿{
+  "playerName": "Batman",
+  "playerLevel": "13",
+  "Items": 
+  {
+    "Gun": "BatGun",
+    "Car": "BatCar"
+  },
+  "Skills":
+  [
+    "Kick",
+    "Punch"
+  ]
+  
+}
+
