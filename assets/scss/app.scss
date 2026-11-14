@@ -266,8 +266,8 @@ body{display:flex;flex-direction:column;min-height:100vh;}
 .app-main .article-content code{background:#eef0f4 !important;color:#b83b5e !important;border-radius:5px;padding:1px 6px;font-size:.88em;}
 [data-scheme="dark"] .app-main .article-content code{background:#1c2432 !important;color:#ffb4a1 !important;}
 
-/* 文章标签 */
-.app-main .article-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:20px;}
+/* 文章标签:已移除(隐藏底部胶囊区) */
+.app-main .article-tags{display:none;}
 .app-main .article-tags a{background:var(--a-side) !important;color:var(--a-text2) !important;border-radius:100px;padding:3px 10px;font-size:12px;text-decoration:none;}
 .app-main .article-tags a:hover{color:var(--a-accent) !important;}
 
