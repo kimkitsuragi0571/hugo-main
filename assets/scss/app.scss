@@ -24,9 +24,14 @@
   --a-hover:#111a2e;
 }
 
-/* 覆盖旧背景图,统一用纯色 */
+/* 覆盖旧背景图,统一用纯色 + 极淡点阵背景 */
 body{
-  background:var(--a-bg) !important;
+  background-color:var(--a-bg) !important;
+  background-image:radial-gradient(rgba(15,23,42,.045) 1px,transparent 1px);
+  background-size:24px 24px;
+}
+[data-scheme="dark"] body{
+  background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px);
 }
 
 /* 内容不足一屏时,让 .app 撑满、页脚贴底 */
@@ -393,3 +398,17 @@ body,.app,.app-left,.app-main,.app-right,.site-footer,.app-item,.app-tag,.app-se
 .highlight .lntable tr{display:flex !important;align-items:flex-start !important;width:100%;}
 .highlight .lntable .lntd{vertical-align:top !important;padding:0 !important;}
 .highlight .lntable .lntd pre{padding:14px 16px !important;margin:0 !important;line-height:1.7;}
+
+/* ===== 花哨效果:页面过渡 + 阅读进度 ===== */
+@view-transition{navigation:auto;}
+::view-transition-old(root){animation:vtOut .18s ease both;}
+::view-transition-new(root){animation:vtIn .22s ease both;}
+@keyframes vtOut{from{opacity:1;}to{opacity:0;}}
+@keyframes vtIn{from{opacity:0;}to{opacity:1;}}
+
+.read-progress{
+  position:fixed;top:0;left:0;width:100%;height:2px;
+  background:var(--a-accent);
+  transform:scaleX(0);transform-origin:0 50%;
+  z-index:9998;pointer-events:none;will-change:transform;
+}
