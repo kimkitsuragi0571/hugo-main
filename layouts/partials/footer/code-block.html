@@ -12,33 +12,45 @@
 
     .code-more-box {
         width: 100%;
-        padding-top: 78px;
-        background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 255, 0)), to(#fff));
+        padding-top: 40px;
+        background-image: linear-gradient(to bottom, rgba(244,245,247,0), #f4f5f7);
         position: absolute;
         left: 0;
         right: 0;
         bottom: 0;
         z-index: 1;
+        display: flex;
+        justify-content: center;
+    }
+
+    [data-scheme="dark"] .code-more-box {
+        background-image: linear-gradient(to bottom, rgba(22,27,38,0), #161b26);
     }
 
     .code-more-btn {
-        display: block;
-        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         width: 44px;
-        height: 22px;
-        background: #f0f0f5;
-        border-top-left-radius: 8px;
-        border-top-right-radius: 8px;
-        padding-top: 6px;
+        height: 20px;
+        margin: 0 auto;
+        background: var(--a-bg, #fff);
+        border: 1px solid var(--a-sep, #e9edf2);
+        border-radius: 100px;
         cursor: pointer;
+        transition: background .15s, border-color .15s;
+    }
+
+    .code-more-btn:hover {
+        background: var(--a-side, #f5f6f8);
     }
 
     .code-more-img {
         cursor: pointer !important;
         display: block;
-        margin: auto;
-        width: 22px;
-        height: 16px;
+        width: 14px;
+        height: auto;
+        opacity: .65;
     }
 </style>
 
