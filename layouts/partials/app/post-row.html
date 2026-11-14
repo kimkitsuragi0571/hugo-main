@@ -7,9 +7,4 @@
             {{- with .Params.categories -}}<span class="app-dot"></span><span>{{ index . 0 }}</span>{{- end -}}
         </div>
     </a>
-    {{- with .GetTerms "tags" -}}
-    <div class="app-item-tags">
-        {{- range . -}}<a class="app-tag" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{- end -}}
-    </div>
-    {{- end -}}
 </article>
