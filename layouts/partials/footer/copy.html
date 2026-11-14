@@ -62,8 +62,11 @@
     container.addEventListener('click', e => {
       if (!e.target.matches('.copyCodeButton')) return;
       const wrap = e.target.closest('pre, .highlight');
-      const codeTd = wrap?.querySelector('td:nth-child(2)') || wrap;
-      const txt = codeTd ? codeTd.textContent.trim() : '';
+      const codeEl = wrap?.querySelector('code[data-lang]') || wrap;
+      if (!codeEl) return;
+      const clone = codeEl.cloneNode(true);
+      clone.querySelectorAll('.ln, .lnt').forEach(el => el.remove());
+      const txt = clone.textContent.trim();
       navigator.clipboard.writeText(txt)
         .then(() => pushToast())
         .catch(err => alert('复制失败：' + err));
@@ -73,77 +76,62 @@
 </script>
 
 <style>
-/* ===== 复制按钮 ===== */
-.copyCodeButton {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  border-radius: 4px;
-  border: 1px solid #333;
-  background: #3d3c3c;
-  color: #fff;
-  padding: 4px 8px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: background .2s;
+/* ===== 代码块复制按钮:与淡灰代码块统一 ===== */
+.article-content .highlight .copyCodeButton{
+  position:absolute;
+  top:10px;
+  right:10px;
+  border:1px solid var(--a-sep);
+  border-radius:100px;
+  background:var(--a-bg);
+  color:var(--a-text2);
+  padding:3px 12px;
+  font-size:12px;
+  font-weight:500;
+  line-height:1.6;
+  box-shadow:none !important;
+  cursor:pointer;
+  opacity:0;
+  transition:opacity .2s, background .15s, color .15s, border-color .15s;
+  z-index:2;
 }
-.copyCodeButton:hover {
-  background: var(--hover-text-color);
-  color: #fff;
-}
+.article-content .highlight:hover .copyCodeButton{opacity:1;}
+.article-content .highlight .copyCodeButton:hover{background:var(--a-side);color:var(--a-text);}
 
-/* ===== 左侧顶部滑入 Toast ===== */
-.snack-left-top {
-  position: fixed;
-  left: 20px;
-  top: calc(20px + env(safe-area-inset-top, 0px));
-  transform: translateX(calc(-100% - 20px));
-  width: 300px;
-  height: 60px;
-  padding: 0;
-  margin: 0;
-  border: none;
-  border-radius: 15px;
-  background: var(--hover-text-color);
-  color: #fff;
-  box-shadow: 4px 4px 14px rgba(0, 0, 0, .35);
-  z-index: 9999;
-  font-size: 18px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: transform .35s cubic-bezier(.4, 0, .2, 1);
+/* ===== 复制提示:底部居中胶囊,与主界面统一 ===== */
+#toast-stack{
+  position:fixed;
+  left:50%;
+  bottom:24px;
+  transform:translateX(-50%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  z-index:9999;
+  pointer-events:none;
 }
-/* 显示态：滑入到可视位置 */
-.snack-left-top.show {
-  transform: translateX(0);
+.snack-left-top{
+  pointer-events:auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  max-width:80vw;
+  padding:9px 18px;
+  border-radius:100px;
+  background:#2b2f36;
+  color:#fff;
+  font-size:13px;
+  font-weight:500;
+  line-height:1.4;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+  opacity:0;
+  transform:translateY(12px);
+  transition:opacity .22s ease, transform .22s ease;
 }
-/* 挂载点本身不占空间 */
-#toast-stack {
-  position: fixed;
-  left: 0;
-  top: calc(20px + env(safe-area-inset-top, 0px));
-  z-index: 9999;
-  pointer-events: none;
-}
-
-/* 单条通知沿用你原来的 .snack-left-top，仅改两点 */
-#toast-stack .snack-left-top {
-  position: relative;   /* 改为相对，靠堆叠自然下垂 */
-  margin-bottom: 12px;  /* 条与条间距 */
-  pointer-events: auto;
-  transition: transform .35s cubic-bezier(.4, 0, .2, 1),
-              opacity   .35s cubic-bezier(.4, 0, .2, 1);
-  opacity: 0;
-  transform: translateX(calc(-100% - 20px));
-}
-
-#toast-stack .snack-left-top.show {
-  opacity: 1;
-  transform: translateX(0);
-}
+.snack-left-top.show{opacity:1;transform:translateY(0);}
+[data-scheme="dark"] .snack-left-top{background:#e6e9ef;color:#1f2937;}
 </style>

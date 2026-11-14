@@ -1,27 +1,9 @@
-// 【Stack主题鼠标样式写法】
-// default光标图片
-body,
-html,
-.article-content img {
-  cursor: url(../mouse/default.png), auto !important;
-}
-
-// pointer光标图片
-a:hover,
-button:hover,
-.copyCodeButton:hover,
+// 使用系统光标(移除自定义光标图片,避免在元素间切换时闪烁)
+a,
+button,
+.copyCodeButton,
 #dark-mode-toggle {
-  cursor: url(../mouse/pointer.png), auto;
-}
-
-// text光标图片
-input:hover,
-.site-description,
-.article-subtitle,
-.article-content span,
-.article-content li,
-.article-content p {
-  cursor: url(../mouse/text.png), auto;
+  cursor: pointer;
 }
 
 // 新增的highlight代码块 ✅ 已插入指定位置
@@ -120,26 +102,8 @@ input:hover,
 }
 
 // =====================================================
-// --------------- 背景图核心样式 (必加，恢复背景显示) ---------------
+// --------------- 背景:已改为纯色(见 app.scss) ---------------
 // =====================================================
-/* 桌面端背景图 - 居中固定 不滚动 */
-@media (min-width: 769px) {
-  body {
-    background: url("/background/bg.jpg") no-repeat center center fixed !important;
-    background-size: cover !important;
-    background-attachment: fixed !important;
-    background-color: transparent !important;
-  }
-}
-/* 移动端背景图 - 顶部显示 随滚动 */
-@media (max-width: 768px) {
-  body {
-    background: url("/background/bg.jpg") no-repeat center top !important;
-    background-size: cover !important;
-    background-attachment: scroll !important;
-    background-color: transparent !important;
-  }
-}
 /* 容器透明穿透 - 背景图能显示出来的关键 */
 #page-wrapper, .main-content, .container {
   background: none !important;
@@ -548,11 +512,6 @@ $image-scale:1.2;
 // =====================================================
 // --------------- MacOS 风格代码块 + 浅色模式最新配色 ---------------
 // =====================================================
-.article-content .highlight:before {
-  content:'' !important;display:block !important;background:url(/code-header.svg) !important;
-  height:32px !important;width:100% !important;background-size:57px !important;
-  background-repeat:no-repeat !important;margin-bottom:5px !important;background-position:-1px 2px !important;
-}
 [data-scheme="light"] .article-content .highlight { background-color:#fdf4eb !important; }
 [data-scheme="light"] .chroma { color:#ff6f00 !important;background-color:#fcf0e4cc !important; }
 
@@ -560,13 +519,7 @@ $image-scale:1.2;
 // --------------- 代码块按钮相关样式 ---------------
 // =====================================================
 .languageCodeButton { display:none !important; }
-.article-content .copyCodeButton {
-  position:absolute !important;top:10px !important;right:18px !important;border-radius:12px !important;
-  color:#ffffff !important;background:#3d3c3c !important;border:1px solid #333 !important;
-  padding:5px 10px !important;font-weight:500 !important;
-  text-shadow:0 0 1px rgba(255,255,255,0.5) !important;
-}
-.article-content .copyCodeButton:hover { background:#ffa500 !important;border-color:#000 !important; }
+/* 复制按钮样式已统一到 layouts/partials/footer/copy.html(胶囊 + 主题色) */
 
 // =====================================================
 // --------------- 修复引用块内容窄页面显示问题 ---------------
@@ -700,3 +653,6 @@ div.loaded div.spinner-box {
   75% { transform: rotate(-225deg); }
   100% { transform: rotate(-315deg); }
 }
+
+// ===== 新版三栏界面(2026 重做)=====
+@import "app.scss";

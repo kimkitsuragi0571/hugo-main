@@ -31,7 +31,7 @@ services:
         id:
 
 pagination:
-    pagerSize: 5
+    pagerSize: 7
 
 permalinks:
     post: /p/:slug/
@@ -191,7 +191,7 @@ params:
         toggle: true
 
         # Available values: auto, light, dark
-        default: auto
+        default: light
 
     imageProcessing:
         cover:
@@ -271,6 +271,6 @@ markup:
         guessSyntax: true
         lineNoStart: 1
         lineNos: true
-        lineNumbersInTable: true
+        lineNumbersInTable: false
         tabWidth: 4
         style: github-dark

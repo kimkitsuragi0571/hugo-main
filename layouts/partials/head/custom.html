@@ -1,11 +1,29 @@
-{{/* ============================================================================
-  站点自定义 <head> 片段
-  ----------------------------------------------------------------------------
-  此 partial 会被主题 layouts/partials/head/head.html 注入到 <head> 内,
-  只应放置 <meta> / <link> / <style> / <script> 等头部内容,
-  不要在此输出完整的 <html>/<head>/<body> 结构。
-
-  说明:原「3D 立方体加载动画」已移除,因为它与
-       layouts/partials/widget/preload.html 的「帷幕拉开」开屏动画重复。
-  如需新增 head 级内容,请在此文件内追加。
-  ============================================================================ */}}
+{{/* 站点自定义 <head> 片段
+   - 字体预加载:让浏览器尽早开始下载中文字体,减少「先默认字体后替换」的闪烁
+   - @font-face 移到 head 声明,尽早被浏览器发现
+*/}}
+{{- $fontName := "JianShouMengWaChaoCuYuanTi-2.ttf" -}}
+{{- $fontPath := printf "static/font/%s" $fontName -}}
+{{- if fileExists $fontPath -}}
+<link rel="preload" href="/font/{{ $fontName }}" as="font" type="font/ttf" crossorigin>
+<style>
+  @font-face {
+    font-family: 'MengWaXiYuan';
+    src: url('/font/{{ $fontName }}') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+  :root { --font-primary: 'MengWaXiYuan', sans-serif; }
+  html, body,
+  .article-content,
+  .single__contents,
+  .widget--toc,
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-primary) !important;
+  }
+  .article-content *:not(code):not(pre):not(.chroma):not(.highlight) {
+    font-family: inherit !important;
+  }
+</style>
+{{- end -}}

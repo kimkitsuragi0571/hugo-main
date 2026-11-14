@@ -1,0 +1,73 @@
+{{- $scope := default "homepage" .Scope -}}
+{{- $context := .Context -}}
+<aside class="app-right">
+  {{- if eq $scope "page" -}}
+    {{- with $context.TableOfContents -}}
+      <div class="app-block">
+        <div class="app-bh">本页目录</div>
+        <div class="app-toc">{{ . }}</div>
+      </div>
+      <script>
+      (function(){
+        var toc=document.querySelector('.app-toc');
+        if(!toc) return;
+        var pairs=[].slice.call(toc.querySelectorAll('a')).map(function(a){
+          var id=decodeURIComponent((a.getAttribute('href')||'').replace('#',''));
+          var el=id?document.getElementById(id):null;
+          return el?{a:a,el:el}:null;
+        }).filter(Boolean);
+        if(!pairs.length) return;
+        function upd(){
+          var y=window.scrollY+140, idx=-1;
+          pairs.forEach(function(p,i){ if(p.el.getBoundingClientRect().top+window.scrollY<=y) idx=i; });
+          pairs.forEach(function(p,i){ p.a.classList.toggle('active', i===idx); });
+        }
+        window.addEventListener('scroll',upd,{passive:true});
+        upd();
+      })();
+      </script>
+    {{- end -}}
+  {{- else -}}
+    {{- $search := $context.Site.GetPage "/search" -}}
+    {{- $searchURL := "/search/" | relLangURL -}}
+    {{- if $search -}}{{- $searchURL = $search.RelPermalink -}}{{- end -}}
+
+    {{- if not (and (eq $context.Kind "taxonomy") (eq $context.Data.Plural "categories")) -}}
+    <div class="app-block">
+      <div class="app-bh">搜索</div>
+      <form class="app-search" action="{{ $searchURL }}" method="get">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="text" name="keyword" placeholder="搜索文章…">
+      </form>
+    </div>
+    {{- end -}}
+
+    <div class="app-block">
+      <div class="app-bh">标签</div>
+      <div class="app-tags">
+        {{- range first 10 $context.Site.Taxonomies.tags.ByCount -}}
+          <a href="{{ .Page.RelPermalink }}">{{ .Page.Title }}</a>
+        {{- end -}}
+      </div>
+    </div>
+
+    {{- $archPages := where $context.Site.RegularPages "Type" "in" $context.Site.Params.mainSections -}}
+    <div class="app-block">
+      <div class="app-bh">归档</div>
+      <div class="app-rows">
+        {{- range first 6 ($archPages.GroupByDate "2006") -}}
+          <a href="{{ "/archives/" | relLangURL }}#{{ lower .Key }}"><span>{{ .Key }}</span><span class="c">{{ len .Pages }}</span></a>
+        {{- end -}}
+      </div>
+    </div>
+
+    <div class="app-block">
+      <div class="app-bh">分类</div>
+      <div class="app-rows">
+        {{- range first 6 $context.Site.Taxonomies.categories.ByCount -}}
+          <a href="{{ .Page.RelPermalink }}"><span>{{ .Page.Title }}</span><span class="c">{{ .Count }}</span></a>
+        {{- end -}}
+      </div>
+    </div>
+  {{- end -}}
+</aside>

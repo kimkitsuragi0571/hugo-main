@@ -1,16 +1,14 @@
 {{ define "main" }}
-    {{ $pages := where .Site.RegularPages "Type" "in" .Site.Params.mainSections }}
-    {{ $filtered := where $pages "Params.hidden" "!=" true }}
-    {{ $pag := .Paginate ($filtered) }}
+    {{- $pages := where .Site.RegularPages "Type" "in" .Site.Params.mainSections -}}
+    {{- $filtered := where $pages "Params.hidden" "!=" true -}}
+    {{- $pag := .Paginate $filtered -}}
 
-    <section class="article-list">
-        {{ range $index, $element := $pag.Pages }}
-            {{ partial "article-list/default" . }}
-        {{ end }}
-    </section>
-
-    {{- partial "pagination.html" . -}}
-    {{- partial "footer/footer" . -}}
+    <div class="app-list">
+        {{- range $pag.Pages -}}
+            {{ partial "app/post-row" . }}
+        {{- end -}}
+    </div>
+    {{- partial "app/pagination.html" . -}}
 {{ end }}
 
 {{ define "right-sidebar" }}

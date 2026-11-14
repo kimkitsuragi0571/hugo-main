@@ -1,0 +1,14 @@
+{{ $related := (where (.Site.RegularPages.Related .) "Params.hidden" "!=" true) | first 5 }}
+{{ with $related }}
+<aside class="app-related">
+  <div class="app-bh">相关文章</div>
+  <div class="app-related-list">
+    {{- range . }}
+    <a class="app-related-item" href="{{ .RelPermalink }}">
+      <span class="app-related-t">{{ .Title }}</span>
+      <span class="app-related-m">{{ .Date.Format "2006-01-02" }}</span>
+    </a>
+    {{- end }}
+  </div>
+</aside>
+{{ end }}

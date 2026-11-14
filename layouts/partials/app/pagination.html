@@ -1,0 +1,18 @@
+{{- $pag := $.Paginator -}}
+{{- if gt $pag.TotalPages 1 -}}
+<nav class="app-pagination" aria-label="pagination">
+  {{- $window := 2 -}}
+  {{- $last := 0 -}}
+  {{- range $pag.Pagers -}}
+    {{- $p := .PageNumber -}}
+    {{- $isFirst := eq $p 1 -}}
+    {{- $isLast := eq $p $pag.TotalPages -}}
+    {{- $inWindow := and (ge $p (sub $pag.PageNumber $window)) (le $p (add $pag.PageNumber $window)) -}}
+    {{- if or $isFirst $isLast $inWindow -}}
+      {{- if gt (sub $p $last) 1 -}}<span class="app-page-ellipsis">…</span>{{- end -}}
+      <a class="app-page-link{{ if eq $p $pag.PageNumber }} is-current{{ end }}" href="{{ .URL }}"{{ if eq $p $pag.PageNumber }} aria-current="page"{{ end }}>{{ $p }}</a>
+      {{- $last = $p -}}
+    {{- end -}}
+  {{- end -}}
+</nav>
+{{- end -}}

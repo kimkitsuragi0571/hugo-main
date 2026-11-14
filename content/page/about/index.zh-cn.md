@@ -1,5 +1,6 @@
 ---
-title: 相关
+title: 关于
+slug: about
 menu:
     main: 
         weight: -90
@@ -7,4 +8,4 @@ menu:
             icon: user
 ---
 
-This is a test page for i18n support.
+主要记录Unity及.Net开发相关技术文章

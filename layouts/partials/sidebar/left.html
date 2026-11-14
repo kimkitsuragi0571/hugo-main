@@ -1,0 +1,45 @@
+<aside class="app-left">
+  <div class="app-profile">
+    {{- $avatarURL := "" -}}
+    {{- with .Site.Params.sidebar.avatar -}}
+      {{- if .enabled -}}
+        {{- if .local -}}
+          {{- with resources.Get .src -}}{{- $avatarURL = (.Resize "64x").RelPermalink -}}{{- end -}}
+        {{- else -}}
+          {{- $avatarURL = .src -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+    <a class="app-avatar" href="{{ .Site.Home.RelPermalink }}">
+      {{- if $avatarURL -}}<img src="{{ $avatarURL }}" alt="{{ .Site.Title }}">{{- else -}}K{{- end -}}
+    </a>
+    <a class="app-name" href="{{ .Site.Home.RelPermalink }}">{{ .Site.Title }}</a>
+  </div>
+
+  {{- with .Site.Menus.social -}}
+  <div class="app-social">
+    {{- range . -}}
+      <a href="{{ .URL }}" title="{{ .Name }}" {{ if eq (default true .Params.newTab) true }}target="_blank" rel="me"{{ end }}>
+        {{- with .Params.icon -}}{{ partial "helper/icon" . }}{{- else -}}{{ .Name }}{{- end -}}
+      </a>
+    {{- end -}}
+  </div>
+  {{- end -}}
+
+  <div class="app-lbl">导航</div>
+  <nav class="app-menu">
+    <a href="{{ .Site.Home.RelPermalink }}" class="{{ if .IsHome }}active{{ end }}">
+      {{ partial "helper/icon" "home" }}<span>首页</span>
+    </a>
+    <a href="{{ "/about/" | relLangURL }}">{{ partial "helper/icon" "user" }}<span>关于</span></a>
+    <a href="{{ "/archives/" | relLangURL }}">{{ partial "helper/icon" "archives" }}<span>归档</span></a>
+    <a href="{{ "/categories/" | relLangURL }}">{{ partial "helper/icon" "categories" }}<span>分类</span></a>
+  </nav>
+
+  {{- if (default false .Site.Params.colorScheme.toggle) -}}
+  <div class="app-toggle" id="dark-mode-toggle">
+    <span>深色模式</span>
+    <span class="app-sw"></span>
+  </div>
+  {{- end -}}
+</aside>

@@ -1,0 +1,15 @@
+<article class="app-item">
+    <a class="app-item-main" href="{{ .RelPermalink }}">
+        <div class="app-item-t">{{ .Title }}</div>
+        {{- with .Summary -}}<div class="app-item-e">{{ . | plainify | truncate 90 }}</div>{{- end -}}
+        <div class="app-item-m">
+            <span>{{ .Date.Format "2006-01-02" }}</span>
+            {{- with .Params.categories -}}<span class="app-dot"></span><span>{{ index . 0 }}</span>{{- end -}}
+        </div>
+    </a>
+    {{- with .GetTerms "tags" -}}
+    <div class="app-item-tags">
+        {{- range . -}}<a class="app-tag" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{- end -}}
+    </div>
+    {{- end -}}
+</article>

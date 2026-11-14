@@ -3,7 +3,7 @@ title = "依赖注入代码示例（DI / ServiceCollection / 构造函数注入�
 date = "2026-09-17T10:30:00+08:00"
 draft = false
 slug = "dependency-injection-example"
-categories = ["Unity"]
+categories = [".NET开发"]
 tags = ["笔记", "Dotnet", "依赖注入", "DI", "ServiceCollection", "设计模式"]
 +++
 

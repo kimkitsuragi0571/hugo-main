@@ -1,31 +1,3 @@
-<!-- 字体引入 -->
-{{ $fontName := "JianShouMengWaChaoCuYuanTi-2.ttf" }}
-{{ $fontPath := printf "static/font/%s" $fontName }}
-{{ if fileExists $fontPath }}
-<style>
-  @font-face {
-    font-family: 'MengWaXiYuan';
-    src: url('/font/{{ $fontName }}') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-  }
-  :root {
-    --font-primary: 'MengWaXiYuan', sans-serif;
-  }
-  html, body,
-  .article-content,
-  .single__contents,
-  .widget--toc,
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-primary) !important;
-  }
-  .article-content *:not(code):not(pre):not(.chroma):not(.highlight) {
-    font-family: inherit !important;
-  }
-</style>
-{{ end }}
-
 <!-- TOC 折叠样式 -->
 <style>
   #TableOfContents > ul ul,
@@ -42,10 +14,9 @@
 <!-- 返回顶部按钮样式 -->
 <style>
   #backTopBtn {
-    display: none;
     position: fixed;
     bottom: 30px;
-    right: 20px; /* 建议添加 right 定位 */
+    right: 20px;
     z-index: 99;
     cursor: pointer;
     width: 30px;
@@ -56,7 +27,12 @@
     background-position: center;
     border: none;
     outline: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: opacity .25s ease, transform .25s ease, visibility .25s ease;
   }
+  #backTopBtn.show { opacity: 1; visibility: visible; transform: none; }
 </style>
 
 <script>
@@ -97,31 +73,49 @@
       });
     }
 
-    // ===== 2. 返回顶部按钮 =====
+    // ===== 2. 返回顶部按钮(淡入淡出) =====
     function initScrollTop() {
-      const rightSidebar = document.querySelector(".right-sidebar");
-      if (!rightSidebar) return;
-
       const btn = document.createElement("div");
       btn.id = "backTopBtn";
+      btn.setAttribute("aria-label", "回到顶部");
       btn.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
-      rightSidebar.appendChild(btn);
+      document.body.appendChild(btn);
 
-      window.addEventListener('scroll', () => {
-        btn.style.display = window.scrollY > 20 ? "block" : "none";
-      });
+      let ticking = false;
+      const upd = () => {
+        btn.classList.toggle("show", window.scrollY > 240);
+        ticking = false;
+      };
+      window.addEventListener("scroll", () => {
+        if (!ticking) { ticking = true; requestAnimationFrame(upd); }
+      }, { passive: true });
+      upd();
+    }
+
+    // ===== 3. 滚动显现 =====
+    function initReveal() {
+      const els = document.querySelectorAll(".app-right .app-block");
+      if (!els.length) return;
+      if (!("IntersectionObserver" in window)) {
+        els.forEach(el => el.classList.add("in"));
+        return;
+      }
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(en => {
+          if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+        });
+      }, { threshold: 0.08, rootMargin: "0px 0px -8% 0px" });
+      els.forEach(el => { el.classList.add("reveal"); io.observe(el); });
     }
 
     // 执行初始化
     initTocHide();
     initScrollTop();
+    initReveal();
   });
 </script>
 
 <!-- 其他自定义 partial -->
 {{ partial "footer/code-block.html" . }}
-{{ partial "footer/fish.html" . }}
 {{/* {{ partial "footer/return.html" . }} */}}
 {{ partial "footer/copy.html" . }}
-{{ partial "footer/anim.html" . }}
-{{ partial "footer/card.html" . }}

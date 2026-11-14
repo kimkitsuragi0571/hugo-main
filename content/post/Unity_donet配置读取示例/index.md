@@ -3,7 +3,7 @@ title = "Dotnet 配置读取示例（Json / Options / 命令行 / UserSecret）"
 date = "2026-09-17T10:00:00+08:00"
 draft = false
 slug = "dotnet-config-reading-example"
-categories = ["Unity"]
+categories = [".NET开发"]
 tags = ["笔记", "Dotnet", "配置", "IConfiguration", "Options", "UserSecrets"]
 +++
 
