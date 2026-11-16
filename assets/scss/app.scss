@@ -208,10 +208,14 @@ body{display:flex;flex-direction:column;min-height:100vh;}
 }
 @media (max-width:720px){
   .app{grid-template-columns:1fr;}
-  .app .app-left{padding:20px 16px;}
-  .app .app-main{padding:24px 20px 60px;}
-  .app-menu{flex-direction:row;flex-wrap:wrap;gap:0 14px;}
-  .app-menu a{border-left:none;padding:6px 0;}
+  .app .app-left{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:12px 16px;}
+  .app .app-profile{margin:0;flex:none;}
+  .app .app-lbl{display:none;}
+  .app .app-social{margin-top:0;flex:none;}
+  .app .app-menu{flex:1 1 auto;flex-direction:row;flex-wrap:wrap;gap:0 14px;min-width:0;}
+  .app .app-menu a{border-left:none;padding:4px 0;}
+  .app .app-toggle{margin-top:0;padding-top:0;border-top:none;flex:none;margin-left:auto;}
+  .app .app-main{padding:20px 16px 60px;}
   .app-pagehead h1{font-size:28px;}
 }
 
@@ -272,9 +276,12 @@ body{display:flex;flex-direction:column;min-height:100vh;}
 [data-scheme="dark"] .app-main .article-content code{background:#1c2432 !important;color:#ffb4a1 !important;}
 
 /* 文章标签:已移除(隐藏底部胶囊区) */
-.app-main .article-tags{display:none;}
-.app-main .article-tags a{background:var(--a-side) !important;color:var(--a-text2) !important;border-radius:100px;padding:3px 10px;font-size:12px;text-decoration:none;}
+.app-main .article-tags{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:18px;}
+.app-main .article-tags a{background:none !important;color:var(--a-text3) !important;border-radius:0;padding:0;font-size:12.5px;text-decoration:none;}
 .app-main .article-tags a:hover{color:var(--a-accent) !important;}
+
+/* 文章封面:各篇不统一,统一隐藏 */
+.app-main .article-header .article-image{display:none !important;}
 
 /* 版权/更新时间 */
 .app-main .article-copyright,
@@ -290,7 +297,8 @@ body{display:flex;flex-direction:column;min-height:100vh;}
 .app-related-m{font-size:12px;color:var(--a-text3);flex:none;}
 
 /* ===== 页脚:深灰底 ===== */
-.site-footer{background:#2b2f36 !important;padding:0;margin:0;border-top:1px solid #3a4048;color:#c9ced6;text-align:left;}
+footer.site-footer{background:#2b2f36 !important;padding:0 !important;margin:0;border-top:1px solid #3a4048;color:#c9ced6;text-align:left;font-size:12px;line-height:1.2;}
+footer.site-footer:before{display:none !important;}
 .app-footer{
   max-width:1480px;margin:0;padding:0 40px 0 36px;
   display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
@@ -300,7 +308,7 @@ body{display:flex;flex-direction:column;min-height:100vh;}
 .app-num{color:#ffffff;font-weight:600;font-variant-numeric:tabular-nums;}
 .app-sep{color:#8b929c;}
 .app-footer-copy{color:#9aa1ab;}
-[data-scheme="dark"] .site-footer{background:#151a22 !important;border-top-color:#232a36;}
+[data-scheme="dark"] footer.site-footer{background:#151a22 !important;border-top-color:#232a36;}
 
 /* ===== 分类页:搜索框 + 结果 ===== */
 .app-searchbar-wrap{margin-bottom:8px;}
@@ -400,8 +408,7 @@ body,.app,.app-left,.app-main,.app-right,.site-footer,.app-item,.app-tag,.app-se
 .highlight .lntable .lntd pre{padding:14px 16px !important;margin:0 !important;line-height:1.7;}
 
 /* ===== 花哨效果:页面过渡 + 阅读进度 ===== */
-@view-transition{navigation:auto;}
-::view-transition-old(root){animation:vtOut .18s ease both;}
+@view-transition{navigation:auto;}::view-transition-old(root){animation:vtOut .18s ease both;}
 ::view-transition-new(root){animation:vtIn .22s ease both;}
 @keyframes vtOut{from{opacity:1;}to{opacity:0;}}
 @keyframes vtIn{from{opacity:0;}to{opacity:1;}}
@@ -412,3 +419,22 @@ body,.app,.app-left,.app-main,.app-right,.site-footer,.app-item,.app-tag,.app-se
   transform:scaleX(0);transform-origin:0 50%;
   z-index:9998;pointer-events:none;will-change:transform;
 }
+
+/* PhotoSwipe 灯箱:未打开时隐藏(CDN 样式没加载时避免裸按钮暴露) */
+.pswp:not(.pswp--open){display:none !important;}
+
+/* 右栏「全部标签」入口 */
+.app-tags-more{display:inline-block;margin-top:8px;font-size:12px;color:var(--a-text3);text-decoration:none;}
+.app-tags-more:hover{color:var(--a-accent);}
+
+/* 深色模式:表格与归档渐变的对比度 */
+[data-scheme="dark"] .app-main .article-content table{border-color:var(--a-sep);}
+[data-scheme="dark"] .app-main .article-content table th{background:var(--a-side);color:var(--a-text);}
+[data-scheme="dark"] .app-main .article-content table td{border-color:var(--a-sep);}
+[data-scheme="dark"] .template-archives [class*="grad-"]{filter:brightness(.75);}
+
+/* 极简图片灯箱(替代 PhotoSwipe,零依赖) */
+.app-lightbox{position:fixed;inset:0;z-index:9999;background:rgba(8,12,20,.92);display:flex;align-items:center;justify-content:center;padding:24px;cursor:zoom-out;opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s;}
+.app-lightbox.show{opacity:1;visibility:visible;}
+.app-lightbox img{max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.article-content img{cursor:zoom-in;}

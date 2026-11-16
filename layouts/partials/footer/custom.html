@@ -1,16 +1,3 @@
-<!-- TOC 折叠样式 -->
-<style>
-  #TableOfContents > ul ul,
-  #TableOfContents > ul ol,
-  #TableOfContents > ol ul,
-  #TableOfContents > ol ol {
-    display: none;
-  }
-  #TableOfContents .open {
-    display: block !important;
-  }
-</style>
-
 <!-- 返回顶部按钮样式 -->
 <style>
   #backTopBtn {
@@ -127,11 +114,32 @@
       upd();
     }
 
+    // ===== 5. 极简图片灯箱(替代 PhotoSwipe) =====
+    function initLightbox() {
+      const imgs = document.querySelectorAll('.article-content img');
+      if (!imgs.length) return;
+      const box = document.createElement('div');
+      box.className = 'app-lightbox';
+      const big = document.createElement('img');
+      box.appendChild(big);
+      document.body.appendChild(box);
+      const close = () => box.classList.remove('show');
+      box.addEventListener('click', close);
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+      imgs.forEach(img => {
+        img.addEventListener('click', () => {
+          big.src = img.currentSrc || img.src;
+          box.classList.add('show');
+        });
+      });
+    }
+
     // 执行初始化
     initTocHide();
     initScrollTop();
     initReveal();
     initReadProgress();
+    initLightbox();
   });
 </script>
 

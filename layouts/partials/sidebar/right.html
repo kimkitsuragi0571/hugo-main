@@ -49,6 +49,7 @@
           <a href="{{ .Page.RelPermalink }}">{{ .Page.Title }}</a>
         {{- end -}}
       </div>
+      <a class="app-tags-more" href="{{ "/tags/" | relLangURL }}">全部标签 →</a>
     </div>
 
     {{- $archPages := where $context.Site.RegularPages "Type" "in" $context.Site.Params.mainSections -}}
